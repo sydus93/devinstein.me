@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Network</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <style>
+        body { margin: 0; padding: 0; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Extract React hooks from the global React object
+        const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+        // ── DATA ──
+        const PROJECTS = [
+          // Published
+          {
+            id: "fire1", label: "Know Thy Neighbor (AMJ)", status: "published", venue: "AMJ",
+            summary: "Community organizing and knowledge spillovers in wildfire governance — how Fire Safe Councils produce and diffuse actionable knowledge that improves community-level outcomes. Winner, Best Dissertation Award (ONE Division, AOM 2024).",
+            coauthors: "Stein & Minniti", year: 2025,
+            url: "https://doi.org/10.5465/amj.2023.0425",
+            themes: ["governance", "environment", "community", "knowledge"],
+            methods: ["panel", "iv", "gis"],
+            theories: ["Ostrom", "Polycentricity", "NIE"],
+          },
+          {
+            id: "navajo", label: "Navajo Nation", status: "published", venue: "JDE",
+            summary: "Disincentives to business development in the Navajo Nation — how institutional structures on tribal lands create barriers to entrepreneurial activity.",
+            coauthors: "Yonk, Hoffer & Stein", year: 2017,
+            url: "https://doi.org/10.1142/S1084946717500157",
+            themes: ["entrepreneurship", "governance"],
+            methods: ["archival"],
+            theories: ["NIE", "Property Rights"],
+          },
+          // R&R
+          {
+            id: "fire2", label: "Fire 2", status: "rr", venue: "SMJ",
+            summary: "Comparative governance of wildfire management — how polycentric organizational structures outperform centralized responses to environmental risk. Two-part model separating prevention from mitigation effects with instrumental variable identification.",
+            coauthors: "Stein & Minniti",
+            url: null,
+            themes: ["governance", "environment", "community"],
+            methods: ["panel", "iv", "gis"],
+            theories: ["NIE", "TCE", "Ostrom", "Polycentricity", "Property Rights"],
+          },
+          // Under Review
+          {
+            id: "hiv", label: "HIV / Brazil", status: "review", venue: "AMJ",
+            summary: "Stakeholder alignment in multilevel public-private collaborations — how Brazil's decentralized AIDS response created a polycentric governance model that outperformed centralized alternatives.",
+            coauthors: "Rodriguez, Stein & Minniti",
+            url: null,
+            themes: ["governance", "community", "health"],
+            methods: ["archival"],
+            theories: ["Ostrom", "Stakeholder Theory", "Polycentricity"],
+          },
+          // Working Papers
+          {
+            id: "steam", label: "Steam / Gaming", status: "wp", venue: null,
+            summary: "Are Players Early Birds or Work Mules? Comparative governance of crowdsourcing in video game communities.",
+            coauthors: "Wei, Stein & English",
+            url: null,
+            themes: ["governance", "platform"],
+            methods: ["archival"],
+            theories: ["NIE", "TCE"],
+          },
+          {
+            id: "water", label: "Water Rights", status: "wp", venue: null,
+            summary: "Scaling Without Hierarchy — how environmental entrepreneurs introduce novel property rights against incumbent resistance in western U.S. water basins. 908 basins, 11 states, 1850–2020.",
+            coauthors: "Stein",
+            url: null,
+            themes: ["governance", "environment", "entrepreneurship"],
+            methods: ["panel", "iv", "gis"],
+            theories: ["NIE", "Ostrom", "Property Rights", "Polycentricity"],
+          },
+          {
+            id: "know_wp", label: "Knowledge Spillovers", status: "wp", venue: null,
+            summary: "Extended analysis of knowledge spillover mechanisms in community organizing — how local organizations generate and transfer tacit knowledge across jurisdictional boundaries.",
+            coauthors: "Stein & Minniti",
+            url: null,
+            themes: ["community", "environment", "knowledge"],
+            methods: ["panel", "gis"],
+            theories: ["Ostrom", "Polycentricity"],
+          },
+          {
+            id: "hybrid", label: "Hybridity", status: "wp", venue: null,
+            summary: "Enabling systemic search through interorganizational hybridity — how hybrid governance forms enable exploration across organizational boundaries.",
+            coauthors: "Koppl, Minniti & Stein",
+            url: null,
+            themes: ["governance", "entrepreneurship"],
+            methods: ["archival"],
+            theories: ["Complexity", "Polycentricity"],
+          },
+          {
+            id: "nonmarket", label: "Nonmarket Strategy", status: "wp", venue: null,
+            summary: "Nonmarket strategies and firm performance — an industry lifecycle perspective on when and how nonmarket strategies create value.",
+            coauthors: "Palubinskas, Stein & Minniti",
+            url: null,
+            themes: ["strategy", "platform"],
+            methods: ["archival"],
+            theories: ["TCE", "Stakeholder Theory"],
+          },
+          {
+            id: "ski", label: "Ski Industry", status: "wp", venue: null,
+            summary: "Platform competition (Epic vs. Ikon), snowmaking investment, ownership consolidation, and ecological uncertainty. 110-year panel, 544 resorts, 36 states.",
+            coauthors: "Stein",
+            url: null,
+            themes: ["strategy", "platform", "environment"],
+            methods: ["panel", "archival"],
+            theories: ["Complexity"],
+          },
+          {
+            id: "vc", label: "VC & Disasters", status: "wp", venue: null,
+            summary: "How natural disasters affect venture capital funding flows — merging VentureXpert with SHELDUS disaster records to study geographic reallocation of capital.",
+            coauthors: "Han, Stein & English",
+            url: null,
+            themes: ["entrepreneurship", "environment"],
+            methods: ["panel", "gis"],
+            theories: [],
+          },
+        ];
+
+        // Compute links from shared themes/methods/theories
+        function computeLinks(projects) {
+          const links = [];
+          for (let i = 0; i < projects.length; i++) {
+            for (let j = i + 1; j < projects.length; j++) {
+              const a = projects[i], b = projects[j];
+              const sharedThemes = a.themes.filter(t => b.themes.includes(t));
+              const sharedMethods = a.methods.filter(m => b.methods.includes(m));
+              const sharedTheories = a.theories.filter(t => b.theories.includes(t));
+              const total = sharedThemes.length + sharedMethods.length + sharedTheories.length;
+              if (total >= 2) {
+                links.push({
+                  source: a.id, target: b.id,
+                  strength: total,
+                  shared: {
+                    themes: sharedThemes,
+                    methods: sharedMethods,
+                    theories: sharedTheories,
+                  },
+                });
+              }
+            }
+          }
+          return links;
+        }
+
+        const ALL_LINKS = computeLinks(PROJECTS);
+
+        const STATUS_META = {
+          rr: { label: "R&R", color: "#9a6b28", bg: "rgba(154,107,40,0.08)" },
+          review: { label: "Under Review", color: "#2a7350", bg: "rgba(42,115,80,0.08)" },
+          wp: { label: "Working Paper", color: "#999", bg: "rgba(150,150,150,0.06)" },
+          published: { label: "Published", color: "#1a6b5a", bg: "rgba(26,107,90,0.08)" },
+        };
+
+        const FILTERS = {
+          themes: {
+            label: "Themes",
+            options: [
+              { id: "governance", label: "Governance" },
+              { id: "environment", label: "Environment" },
+              { id: "community", label: "Community" },
+              { id: "entrepreneurship", label: "Entrepreneurship" },
+              { id: "platform", label: "Platforms" },
+              { id: "strategy", label: "Strategy" },
+              { id: "knowledge", label: "Knowledge" },
+              { id: "health", label: "Health" },
+            ],
+          },
+          methods: {
+            label: "Methods",
+            options: [
+              { id: "panel", label: "Panel Data" },
+              { id: "iv", label: "IV / GMM" },
+              { id: "gis", label: "GIS / Spatial" },
+              { id: "archival", label: "Archival" },
+            ],
+          },
+          theories: {
+            label: "Theory",
+            options: [
+              { id: "Ostrom", label: "Ostrom" },
+              { id: "NIE", label: "NIE" },
+              { id: "TCE", label: "TCE" },
+              { id: "Polycentricity", label: "Polycentricity" },
+              { id: "Property Rights", label: "Property Rights" },
+              { id: "Complexity", label: "Complexity" },
+              { id: "Stakeholder Theory", label: "Stakeholder" },
+            ],
+          },
+        };
+
+        const FILTER_COLORS = {
+          themes: "#1a6b5a",
+          methods: "#5a7a9a",
+          theories: "#b5704f",
+        };
+
+        function ResearchNetwork() {
+          const svgRef = useRef(null);
+          const containerRef = useRef(null);
+          const [selected, setSelected] = useState(null);
+          const [dims, setDims] = useState({ width: 900, height: 580 });
+          const [activeFilter, setActiveFilter] = useState(null); 
+          const [edgeTooltip, setEdgeTooltip] = useState(null);
+          const simRef = useRef(null);
+          const nodesRef = useRef(null);
+          const linksRef = useRef(null);
+
+          // Responsive
+          useEffect(() => {
+            const update = () => {
+              if (containerRef.current) {
+                const w = containerRef.current.clientWidth;
+                setDims({ width: w, height: Math.max(480, Math.min(640, w * 0.6)) });
+              }
+            };
+            update();
+            window.addEventListener("resize", update);
+            return () => window.removeEventListener("resize", update);
+          }, []);
+
+          // Compute which nodes match current filter
+          const matchingIds = useMemo(() => {
+            if (!activeFilter) return null;
+            const { type, id } = activeFilter;
+            return new Set(PROJECTS.filter(p => p[type]?.includes(id)).map(p => p.id));
+          }, [activeFilter]);
+
+          // D3
+          useEffect(() => {
+            if (!svgRef.current) return;
+            const { width, height } = dims;
+            const svg = d3.select(svgRef.current);
+            svg.selectAll("*").remove();
+
+            const nodes = PROJECTS.map(d => ({ ...d }));
+            const links = ALL_LINKS.map(d => ({ ...d }));
+            nodesRef.current = nodes;
+            linksRef.current = links;
+
+            const sim = d3.forceSimulation(nodes)
+              .force("link", d3.forceLink(links).id(d => d.id).distance(d => 140 - d.strength * 12).strength(d => 0.2 + d.strength * 0.06))
+              .force("charge", d3.forceManyBody().strength(-350))
+              .force("center", d3.forceCenter(width / 2, height / 2))
+              .force("collision", d3.forceCollide().radius(d => d.status === "published" ? 40 : 35))
+              .force("x", d3.forceX(width / 2).strength(0.05))
+              .force("y", d3.forceY(height / 2).strength(0.05));
+            simRef.current = sim;
+
+            const g = svg.append("g");
+            const zoom = d3.zoom().scaleExtent([0.4, 3]).on("zoom", e => g.attr("transform", e.transform));
+            svg.call(zoom);
+
+            // Links
+            const link = g.append("g").selectAll("line").data(links).join("line")
+              .attr("stroke", "#d4d4d4")
+              .attr("stroke-width", d => 0.5 + d.strength * 0.25)
+              .attr("stroke-opacity", 0.35);
+
+            // Link hover zones 
+            const linkHover = g.append("g").selectAll("line").data(links).join("line")
+              .attr("stroke", "transparent")
+              .attr("stroke-width", 12)
+              .style("cursor", "pointer")
+              .on("mouseover", (e, d) => {
+                const labels = [
+                  ...d.shared.themes.map(t => t),
+                  ...d.shared.methods.map(m => m),
+                  ...d.shared.theories.map(t => t),
+                ];
+                setEdgeTooltip({
+                  x: (d.source.x + d.target.x) / 2,
+                  y: (d.source.y + d.target.y) / 2,
+                  from: d.source.label,
+                  to: d.target.label,
+                  labels,
+                });
+              })
+              .on("mouseout", () => setEdgeTooltip(null));
+
+            // Node groups
+            const node = g.append("g").selectAll("g").data(nodes).join("g")
+              .style("cursor", "pointer")
+              .call(d3.drag()
+                .on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.2).restart(); d.fx = d.x; d.fy = d.y; })
+                .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
+                .on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
+              );
+
+            // Status ring
+            node.append("circle")
+              .attr("r", d => d.status === "published" ? 16 : 14)
+              .attr("fill", d => d.status === "published" ? STATUS_META[d.status]?.color : "none")
+              .attr("fill-opacity", d => d.status === "published" ? 0.12 : 0)
+              .attr("stroke", d => STATUS_META[d.status]?.color || "#999")
+              .attr("stroke-width", d => d.status === "published" ? 2 : 1.5)
+              .attr("stroke-opacity", d => d.status === "published" ? 0.7 : 0.4)
+              .attr("stroke-dasharray", d => d.status === "wp" ? "2,2" : "none");
+
+            // Inner dot
+            node.append("circle")
+              .attr("r", d => d.status === "published" ? 7 : 6)
+              .attr("fill", d => STATUS_META[d.status]?.color || "#999");
+
+            // Labels
+            node.append("text")
+              .text(d => d.label)
+              .attr("y", 28)
+              .attr("text-anchor", "middle")
+              .attr("font-family", "'DM Sans', -apple-system, sans-serif")
+              .attr("font-size", "10px")
+              .attr("font-weight", 500)
+              .attr("fill", "#555");
+
+            // Hover
+            node.on("mouseover", function(e, d) {
+              const connected = new Set([d.id]);
+              links.forEach(l => {
+                if (l.source.id === d.id) connected.add(l.target.id);
+                if (l.target.id === d.id) connected.add(l.source.id);
+              });
+              node.transition().duration(150)
+                .attr("opacity", n => connected.has(n.id) ? 1 : 0.12);
+              link.transition().duration(150)
+                .attr("stroke-opacity", l => (l.source.id === d.id || l.target.id === d.id) ? 0.7 : 0.04)
+                .attr("stroke", l => (l.source.id === d.id || l.target.id === d.id) ? STATUS_META[d.status]?.color || "#1a6b5a" : "#d4d4d4");
+            })
+            .on("mouseout", () => {
+              node.transition().duration(200).attr("opacity", 1);
+              link.transition().duration(200).attr("stroke-opacity", 0.35).attr("stroke", "#d4d4d4");
+            })
+            .on("click", (e, d) => {
+              e.stopPropagation();
+              setSelected(prev => prev?.id === d.id ? null : d);
+            });
+
+            svg.on("click", () => setSelected(null));
+
+            sim.on("tick", () => {
+              link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+              linkHover.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+              node.attr("transform", d => `translate(${d.x},${d.y})`);
+            });
+
+            return () => sim.stop();
+          }, [dims]);
+
+          // Apply filter highlighting via D3 transitions
+          useEffect(() => {
+            if (!svgRef.current || !nodesRef.current) return;
+            const svg = d3.select(svgRef.current);
+            const nodes = svg.selectAll("g g g"); 
+
+            if (!matchingIds) {
+              svg.selectAll("g g g").transition().duration(200).attr("opacity", 1);
+              svg.selectAll("g g line").transition().duration(200).attr("stroke-opacity", 0.35);
+              return;
+            }
+
+            svg.selectAll("g g g").each(function(d) {
+              d3.select(this).transition().duration(200)
+                .attr("opacity", matchingIds.has(d?.id) ? 1 : 0.1);
+            });
+          }, [matchingIds]);
+
+          const toggleFilter = (type, id) => {
+            setActiveFilter(prev => (prev?.type === type && prev?.id === id) ? null : { type, id });
+          };
+
+          return (
+            <div style={{
+              fontFamily: "'DM Sans', -apple-system, sans-serif",
+              background: "#f7f7f5", minHeight: "100vh",
+            }}>
+              {/* Header */}
+              <div style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1.5rem 0" }}>
+                <div style={{
+                  fontFamily: "'JetBrains Mono', monospace", fontSize: "0.62rem",
+                  color: "#b5704f", letterSpacing: "0.08em", textTransform: "uppercase",
+                  marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.6rem",
+                }}>
+                  <span style={{ display: "block", width: 24, height: 1, background: "#b5704f", opacity: 0.6 }} />
+                  Interactive
+                </div>
+                <h1 style={{
+                  fontFamily: "'Newsreader', Georgia, serif", fontSize: "1.8rem",
+                  fontWeight: 400, color: "#0a0a0a", margin: "0 0 0.3rem",
+                }}>Research Network</h1>
+                <p style={{ fontSize: "0.85rem", color: "#888", lineHeight: 1.6, maxWidth: 600, margin: "0 0 1.2rem" }}>
+                  An interactive map of my research program. Projects are connected by shared theory, methods, and themes. Use the filters to explore the intellectual architecture, or drag nodes to rearrange.
+                </p>
+
+                {/* Filter bar */}
+                <div style={{ display: "flex", gap: "1.8rem", flexWrap: "wrap", marginBottom: "1rem", alignItems: "flex-start" }}>
+                  {Object.entries(FILTERS).map(([type, { label, options }]) => (
+                    <div key={type}>
+                      <div style={{
+                        fontFamily: "'JetBrains Mono', monospace", fontSize: "0.58rem",
+                        color: FILTER_COLORS[type], letterSpacing: "0.1em", textTransform: "uppercase",
+                        marginBottom: "0.4rem", fontWeight: 500,
+                      }}>{label}</div>
+                      <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap" }}>
+                        {options.map(opt => {
+                          const isActive = activeFilter?.type === type && activeFilter?.id === opt.id;
+                          return (
+                            <button
+                              key={opt.id}
+                              onClick={() => toggleFilter(type, opt.id)}
+                              style={{
+                                fontFamily: "'JetBrains Mono', monospace", fontSize: "0.6rem",
+                                letterSpacing: "0.02em",
+                                color: isActive ? "#fff" : "#888",
+                                background: isActive ? FILTER_COLORS[type] : "transparent",
+                                border: `1px solid ${isActive ? FILTER_COLORS[type] : "#d4d4d4"}`,
+                                padding: "0.2rem 0.55rem", cursor: "pointer",
+                                borderRadius: 1, transition: "all 0.15s",
+                              }}
+                            >{opt.label}</button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Legend */}
+                <div style={{ display: "flex", gap: "1.2rem", marginBottom: "0.8rem", flexWrap: "wrap" }}>
+                  {Object.entries(STATUS_META).map(([key, meta]) => (
+                    <div key={key} style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                      <span style={{
+                        width: 10, height: 10, borderRadius: "50%",
+                        border: `1.5px ${key === "wp" ? "dashed" : "solid"} ${meta.color}`,
+                        background: key === "published" ? meta.color : "transparent", flexShrink: 0,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>
+                        {key !== "published" && <span style={{ width: 4, height: 4, borderRadius: "50%", background: meta.color }} />}
+                      </span>
+                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.6rem", color: "#888" }}>
+                        {meta.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Graph */}
+              <div ref={containerRef} style={{ maxWidth: 960, margin: "0 auto", padding: "0 1.5rem", position: "relative" }}>
+                <div style={{
+                  background: "#fff", border: "1px solid #d4d4d4",
+                  borderRadius: 2, overflow: "hidden", position: "relative",
+                }}>
+                  <svg ref={svgRef} width={dims.width} height={dims.height} style={{ display: "block" }} />
+
+                  {/* Edge tooltip */}
+                  {edgeTooltip && (
+                    <div style={{
+                      position: "absolute", left: "50%", top: 12,
+                      transform: "translateX(-50%)",
+                      background: "rgba(255,255,255,0.95)", backdropFilter: "blur(8px)",
+                      border: "1px solid #d4d4d4", padding: "0.6rem 0.9rem",
+                      pointerEvents: "none", textAlign: "center", maxWidth: 260,
+                    }}>
+                      <div style={{
+                        fontFamily: "'DM Sans', sans-serif", fontSize: "0.72rem", color: "#555", marginBottom: "0.25rem",
+                      }}>
+                        {edgeTooltip.from} ↔ {edgeTooltip.to}
+                      </div>
+                      <div style={{
+                        fontFamily: "'JetBrains Mono', monospace", fontSize: "0.58rem",
+                        color: "#1a6b5a", letterSpacing: "0.02em",
+                      }}>
+                        {edgeTooltip.labels.join(" · ")}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Selected detail */}
+                {selected && (
+                  <div style={{
+                    background: "#fff", border: "1px solid #d4d4d4",
+                    borderLeft: `3px solid ${STATUS_META[selected.status]?.color || "#1a6b5a"}`,
+                    padding: "1.4rem 1.6rem", marginTop: "0.6rem",
+                    animation: "fadeUp 0.25s ease",
+                  }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                      <div>
+                        <div style={{
+                          fontFamily: "'JetBrains Mono', monospace", fontSize: "0.6rem",
+                          color: STATUS_META[selected.status]?.color, letterSpacing: "0.04em",
+                          textTransform: "uppercase", fontWeight: 500, marginBottom: "0.25rem",
+                        }}>
+                          {STATUS_META[selected.status]?.label}{selected.venue ? ` · ${selected.venue}` : ""}{selected.year ? ` · ${selected.year}` : ""}
+                        </div>
+                        <div style={{
+                          fontFamily: "'Newsreader', Georgia, serif", fontSize: "1.15rem",
+                          color: "#0a0a0a", marginBottom: "0.15rem",
+                        }}>{selected.label}</div>
+                        <div style={{ fontSize: "0.78rem", color: "#888", marginBottom: "0.6rem" }}>
+                          {selected.coauthors}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setSelected(null)}
+                        style={{
+                          background: "none", border: "1px solid #d4d4d4",
+                          fontFamily: "'JetBrains Mono', monospace", fontSize: "0.58rem",
+                          color: "#888", padding: "0.2rem 0.5rem", cursor: "pointer", flexShrink: 0,
+                        }}>✕</button>
+                    </div>
+                    <p style={{
+                      fontSize: "0.9rem", color: "#2a2a2a", lineHeight: 1.75,
+                      fontFamily: "'Newsreader', Georgia, serif", margin: "0 0 0.8rem",
+                    }}>{selected.summary}</p>
+                    {selected.url && (
+                      <a
+                        href={selected.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "inline-flex", alignItems: "center", gap: "0.4rem",
+                          fontFamily: "'JetBrains Mono', monospace", fontSize: "0.64rem",
+                          color: "#1a6b5a", textDecoration: "none", fontWeight: 500,
+                          borderBottom: "1px solid transparent", transition: "border-color 0.2s",
+                          marginBottom: "0.8rem",
+                        }}
+                        onMouseOver={e => e.target.style.borderBottomColor = "#1a6b5a"}
+                        onMouseOut={e => e.target.style.borderBottomColor = "transparent"}
+                      >
+                        {selected.status === "published" ? "View paper ↗" : "View abstract ↗"}
+                      </a>
+                    )}
+                    <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: selected.url ? "0" : "0" }}>
+                      {[...selected.themes, ...selected.methods, ...selected.theories].map((tag, i) => (
+                        <span key={i} style={{
+                          fontFamily: "'JetBrains Mono', monospace", fontSize: "0.56rem",
+                          color: "#888", border: "1px solid #ebebeb", padding: "0.15rem 0.45rem",
+                          letterSpacing: "0.02em",
+                        }}>{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div style={{ maxWidth: 960, margin: "0 auto", padding: "1.2rem 1.5rem 3rem" }}>
+                <p style={{
+                  fontFamily: "'JetBrains Mono', monospace", fontSize: "0.58rem",
+                  color: "#b0b0b0", letterSpacing: "0.02em",
+                }}>
+                  Drag nodes to rearrange · Click for details · Hover edges to see shared connections · Scroll to zoom
+                </p>
+              </div>
+
+              <style>{`
+                @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+                button:hover { opacity: 0.85; }
+              `}</style>
+            </div>
+          );
+        }
+
+        // Render the React app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ResearchNetwork />);
+    </script>
+</body>
+</html>

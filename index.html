@@ -136,6 +136,13 @@ nav.scrolled{
 .nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--teal);transition:width .2s}
 .nav-links a:hover{color:var(--ink)}
 .nav-links a:hover::after{width:100%}
+.nav-dropdown{position:relative;display:inline-flex;align-items:baseline}
+.nav-dropdown-menu{position:absolute;top:100%;right:0;display:none;flex-direction:column;gap:0;background:rgba(255,255,255,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(212,212,212,.4);border-radius:4px;padding:.5rem 0;margin-top:.4rem;min-width:150px;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.nav-dropdown-menu::before{content:'';position:absolute;top:-.6rem;left:0;right:0;height:.6rem}
+.nav-dropdown:hover .nav-dropdown-menu{display:flex}
+.nav-dropdown-menu a{font-family:var(--sans);font-size:.68rem;font-weight:500;color:var(--dark);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;padding:.45rem 1rem;transition:background .15s,color .15s}
+.nav-dropdown-menu a:hover{background:var(--teal-faint);color:var(--teal)}
+.nav-dropdown-menu a::after{display:none}
 .hamburger{display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:4px}
 .hamburger span{display:block;width:18px;height:1.5px;background:var(--ink);transition:.3s}
 
@@ -158,11 +165,12 @@ nav.scrolled{
   opacity:0;animation:slideUp .5s ease .05s forwards;
 }
 .hero-photo{flex-shrink:0}
+.hero-photo{flex-shrink:0;overflow:hidden;width:140px;height:140px;border-radius:50%;border:2px solid var(--faint)}
 .hero-photo img{
-  width:120px;height:120px;border-radius:50%;
-  object-fit:cover;object-position:center 15%;
+  width:140px;height:140px;border-radius:50%;
+  object-fit:cover;object-position:center 20%;
   filter:grayscale(20%) contrast(1.04);
-  border:2px solid var(--faint);
+  transform:scale(1.15);
 }
 .hero-id-text{}
 .hero-eyebrow{
@@ -230,10 +238,10 @@ section{padding:2.5rem 0;position:relative;z-index:1}
 /* ── TEACHING ── */
 .teaching-row{display:grid;grid-template-columns:90px 1fr auto;gap:1.5rem;padding:.75rem 0;border-bottom:1px solid var(--faint);align-items:baseline}
 .teaching-row:first-child{border-top:1px solid var(--faint)}
-.teaching-code{font-family:var(--mono);font-size:.72rem;color:var(--mid)}
-.teaching-name{font-size:.95rem;color:var(--ink)}
-.teaching-school{font-family:var(--sans);font-size:.75rem;color:var(--muted)}
-.teaching-ratings{font-family:var(--mono);font-size:.68rem;color:var(--muted);text-align:right;white-space:nowrap}
+.teaching-code{font-family:var(--mono);font-size:.72rem;color:var(--white)}
+.teaching-name{font-size:.95rem;color:var(--white)}
+.teaching-school{font-family:var(--sans);font-size:.75rem;color:rgba(255,255,255,.85)}
+.teaching-ratings{font-family:var(--mono);font-size:.68rem;color:var(--teal);text-align:right;white-space:nowrap}
 .rating-high{color:var(--teal);font-weight:500}
 
 /* ── PRESENTATIONS ── */
@@ -253,8 +261,8 @@ section{padding:2.5rem 0;position:relative;z-index:1}
   box-shadow:0 2px 24px rgba(0,0,0,.03);
 }
 .intro-section::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,var(--teal),var(--sienna))}
-.intro-grid{display:grid;grid-template-columns:170px 1fr;gap:2.5rem}
-.intro-photo img{width:170px;height:212px;object-fit:cover;object-position:center top;filter:grayscale(25%) contrast(1.04);border:1px solid var(--faint)}
+.intro-grid{display:grid;grid-template-columns:200px 1fr;gap:2.5rem}
+.intro-photo img{width:200px;height:250px;object-fit:cover;object-position:center 15%;filter:grayscale(25%) contrast(1.04);border:1px solid var(--faint)}
 .intro-download{margin-top:.8rem}
 .intro-download a{font-family:var(--mono);font-size:.66rem;color:var(--teal);text-decoration:none;letter-spacing:.02em;display:inline-flex;align-items:center;gap:.3rem;border-bottom:1px solid transparent;transition:all .2s}
 .intro-download a:hover{border-bottom-color:var(--teal)}
@@ -336,17 +344,28 @@ section{padding:2.5rem 0;position:relative;z-index:1}
 #introductions .copy-btn{color:rgba(255,255,255,.5);background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15)}
 #introductions .copy-btn:hover{color:var(--teal-light);border-color:var(--teal-light);background:rgba(26,107,90,.15)}
 
+#teaching .section-num{color:rgba(255,255,255,.35)}
+#teaching .section-title{color:var(--teal-light)}
+#teaching .callout-margin{color:rgba(255,255,255,.8);border-left-color:var(--teal-light)}
+#teaching .callout-margin em{color:var(--teal-light)}
+#teaching .teaching-row{border-bottom-color:rgba(255,255,255,.1)}
+#teaching .teaching-row:first-child{border-top-color:rgba(255,255,255,.1)}
 #teaching .teaching-name{text-shadow:0 0 16px rgba(247,247,245,.12)}
+#teaching .teaching-ratings{color:var(--white)}
+#teaching .rating-high{color:var(--white)}
 
 /* ── RESPONSIVE ── */
 @media(max-width:760px){
   .container{padding:0 1.5rem}.nav-inner{padding:.85rem 1.5rem}
   .nav-links{display:none}
   .nav-links.open{display:flex;flex-direction:column;align-items:flex-end;position:absolute;top:100%;left:0;right:0;background:rgba(247,247,245,.4);backdrop-filter:blur(32px) saturate(1.5);-webkit-backdrop-filter:blur(32px) saturate(1.5);padding:1.2rem 2rem;gap:1rem;border-bottom:1px solid rgba(255,255,255,.25)}
+  .nav-dropdown-menu{position:static;display:flex !important;flex-direction:column;background:none;backdrop-filter:none;border:none;box-shadow:none;padding:0;margin:0;min-width:0;gap:.6rem;margin-top:.6rem}
+  .nav-dropdown-menu a{padding:0;font-size:.72rem;color:var(--dark)}
   .hamburger{display:flex}
   .hero{padding:7.5rem 0 3.5rem}
   .hero-identity{gap:1.2rem}
-  .hero-photo img{width:90px;height:90px}
+  .hero-photo{width:100px;height:100px}
+  .hero-photo img{width:100px;height:100px}
   .hero h1{font-size:2.4rem}.hero-subtitle{font-size:1.1rem}
   .hero-network{display:none}
   .research-item{grid-template-columns:1fr;gap:.2rem}
@@ -362,7 +381,8 @@ section{padding:2.5rem 0;position:relative;z-index:1}
 }
 @media(max-width:480px){
   .hero h1{font-size:2rem}.hero-subtitle{font-size:.95rem}
-  .hero-photo img{width:76px;height:76px}
+  .hero-photo{width:84px;height:84px}
+  .hero-photo img{width:84px;height:84px}
 }
 </style>
 </head>
@@ -380,12 +400,19 @@ section{padding:2.5rem 0;position:relative;z-index:1}
       <span></span><span></span><span></span>
     </button>
     <div class="nav-links">
-      <a href="#research">Research</a>
+      <div class="nav-dropdown">
+        <a href="#research">Research</a>
+        <div class="nav-dropdown-menu">
+          <a href="#research">Papers</a>
+          <a href="research.html">Research Map</a>
+        </div>
+      </div>
       <a href="#recognition">Recognition</a>
       <a href="#teaching">Teaching</a>
       <a href="#talks">Talks</a>
       <a href="#introductions">Bio &amp; Headshot</a>
       <a href="#contact">Contact</a>
+      <a href="https://docs.google.com/document/d/15JjioE7TF23AzHyGsPKE4yBeVMtSmnsa/export?format=pdf" target="_blank" rel="noopener">CV</a>
     </div>
   </div>
 </nav>
@@ -427,7 +454,7 @@ section{padding:2.5rem 0;position:relative;z-index:1}
 
   <div class="hero-identity">
     <div class="hero-photo">
-      <img src="img/headshot.jpg" alt="Devin Stein">
+      <img src="img/headshot-hires.jpg" alt="Devin Stein">
     </div>
     <div class="hero-id-text">
       <div class="hero-eyebrow">Strategy &middot; Governance &middot; Environment</div>
@@ -454,8 +481,8 @@ section{padding:2.5rem 0;position:relative;z-index:1}
       Stata &middot; Python &middot; QGIS &middot; R
     </div>
     <div class="hero-cv-links">
-      <a href="Stein_CV.pdf" download>&darr; CV (PDF)</a>
-      <a href="https://docs.google.com/document/d/YOUR_DOC_ID/edit" target="_blank" rel="noopener" class="cv-secondary">View latest &nearr;</a>
+      <a href="https://docs.google.com/document/d/15JjioE7TF23AzHyGsPKE4yBeVMtSmnsa/export?format=pdf" download>&darr; CV (PDF)</a>
+      <a href="https://docs.google.com/document/d/15JjioE7TF23AzHyGsPKE4yBeVMtSmnsa/edit" target="_blank" rel="noopener" class="cv-secondary">View latest &nearr;</a>
     </div>
   </div>
 </header>
@@ -503,6 +530,7 @@ section{padding:2.5rem 0;position:relative;z-index:1}
   <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Scaling Without Hierarchy: Governing Collective Action Across Organizational Boundaries</div><div class="research-authors">Stein, D.</div></div></div>
   <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Enabling Systemic Search Through Interorganizational Hybridity</div><div class="research-authors">Koppl, R., Minniti, M., &amp; Stein, D.</div></div></div>
   <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Nonmarket Strategies and Firm Performance: An Industry Lifecycle Perspective</div><div class="research-authors">Palubinskas, A., Stein, D., &amp; Minniti, M.</div></div></div>
+  <div style="margin-top:1.2rem;padding-top:.8rem"><a href="research.html" style="font-family:var(--mono);font-size:.72rem;color:var(--teal);text-decoration:none;letter-spacing:.02em;border-bottom:1px solid transparent;transition:border-color .2s" onmouseover="this.style.borderBottomColor='var(--teal)'" onmouseout="this.style.borderBottomColor='transparent'">Interactive Research Overview &rarr;</a></div>
 </section>
 
 <svg class="topo-divider topo-2" viewBox="0 0 2400 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -718,9 +746,11 @@ section{padding:2.5rem 0;position:relative;z-index:1}
   <div class="intro-section">
     <div class="intro-grid">
       <div>
-        <div class="intro-photo"><img src="img/headshot.jpg" alt="Devin Stein headshot"></div>
+        <div class="intro-photo"><img src="img/headshot-hires.jpg" alt="Devin Stein headshot"></div>
         <div class="intro-download">
           <a href="img/headshot-hires.jpg" download>&darr; Hi-res headshot</a>
+          <br>
+          <a href="https://docs.google.com/document/d/15JjioE7TF23AzHyGsPKE4yBeVMtSmnsa/export?format=pdf" download>&darr; CV (PDF)</a>
         </div>
       </div>
       <div class="intro-bios">

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Research Network</title>
-    
+    <title>Research Network — Devin Stein</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap" rel="stylesheet">
@@ -16,120 +16,155 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
     <style>
-        body { margin: 0; padding: 0; }
+        body { margin: 0; padding: 0; background: #0a0a0a; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        // Extract React hooks from the global React object
         const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+        // ── COLOR PALETTE (dark mode — mirrors index.html twilight section) ──
+        const C = {
+          ink: "#0a0a0a", dark: "#1a1a1a", body: "#2a2a2a", mid: "#555",
+          muted: "#888", light: "#b0b0b0", rule: "#d4d4d4", faint: "#ebebeb",
+          bg: "#0a0a0a", white: "#fff",
+          teal: "#1a6b5a", tealHover: "#0f5445", tealLight: "#e4efec",
+          sienna: "#b5704f",
+          // Dark-mode text
+          textPrimary: "rgba(247,247,245,0.92)",
+          textSecondary: "rgba(247,247,245,0.6)",
+          textMuted: "rgba(247,247,245,0.4)",
+          textFaint: "rgba(247,247,245,0.25)",
+          // Dark-mode borders
+          borderLight: "rgba(255,255,255,0.1)",
+          borderMid: "rgba(255,255,255,0.15)",
+        };
 
         // ── DATA ──
         const PROJECTS = [
           // Published
           {
-            id: "fire1", label: "Know Thy Neighbor (AMJ)", status: "published", venue: "AMJ",
-            summary: "Community organizing and knowledge spillovers in wildfire governance — how Fire Safe Councils produce and diffuse actionable knowledge that improves community-level outcomes. Winner, Best Dissertation Award (ONE Division, AOM 2024).",
+            id: "fire1", label: "Distributed Knowledge", status: "published", venue: "AMJ",
+            summary: "Community fire prevention plans activate distributed local knowledge across organizational hierarchies, reducing wildfire property losses. Cross-level collaboration roughly doubles the effect of planning alone.",
             coauthors: "Stein & Minniti", year: 2025,
             url: "https://doi.org/10.5465/amj.2023.0425",
-            themes: ["governance", "environment", "community", "knowledge"],
+            themes: ["governance", "environment", "community"],
             methods: ["panel", "iv", "gis"],
-            theories: ["Ostrom", "Polycentricity", "NIE"],
-          },
-          {
-            id: "navajo", label: "Navajo Nation", status: "published", venue: "JDE",
-            summary: "Disincentives to business development in the Navajo Nation — how institutional structures on tribal lands create barriers to entrepreneurial activity.",
-            coauthors: "Yonk, Hoffer & Stein", year: 2017,
-            url: "https://doi.org/10.1142/S1084946717500157",
-            themes: ["entrepreneurship", "governance"],
-            methods: ["archival"],
-            theories: ["NIE", "Property Rights"],
+            theories: ["Ostrom", "Polycentricity", "Stakeholder", "NIE"],
           },
           // R&R
           {
-            id: "fire2", label: "Fire 2", status: "rr", venue: "SMJ",
-            summary: "Comparative governance of wildfire management — how polycentric organizational structures outperform centralized responses to environmental risk. Two-part model separating prevention from mitigation effects with instrumental variable identification.",
-            coauthors: "Stein & Minniti",
+            id: "fire2", label: "Organizational Mixes", status: "rr", venue: "SMJ",
+            summary: "[Title Withheld for Blind Review] — Organizational diversity reduces wildfire property damage through task specialization. Instrumented via distance-to-MSA; government funding amplifies the diversity effect.",
+            coauthors: "Koppl, Minniti & Stein",
             url: null,
-            themes: ["governance", "environment", "community"],
+            themes: ["governance", "environment", "community", "strategy"],
             methods: ["panel", "iv", "gis"],
-            theories: ["NIE", "TCE", "Ostrom", "Polycentricity", "Property Rights"],
+            theories: ["Polycentricity", "NIE", "Stakeholder", "Ostrom"],
           },
           // Under Review
           {
-            id: "hiv", label: "HIV / Brazil", status: "review", venue: "AMJ",
-            summary: "Stakeholder alignment in multilevel public-private collaborations — how Brazil's decentralized AIDS response created a polycentric governance model that outperformed centralized alternatives.",
-            coauthors: "Rodriguez, Stein & Minniti",
+            id: "hiv", label: "HIV / Brazil", status: "review", venue: "MS",
+            summary: "Local religious stigma moderates Brazil's 2016 ARV deregulation. The mechanism is care entry, not treatment quality — stigma deters individuals from seeking treatment even when policy barriers fall.",
+            coauthors: "Minniti, Rodriguez & Stein",
             url: null,
-            themes: ["governance", "community", "health"],
-            methods: ["archival"],
-            theories: ["Ostrom", "Stakeholder Theory", "Polycentricity"],
+            themes: ["health", "governance", "community"],
+            methods: ["panel"],
+            theories: ["NIE", "Stakeholder"],
+          },
+          {
+            id: "jbv_si", label: "Entrepreneurial Ecosystems", status: "review", venue: "JBV SI",
+            summary: "[Title Withheld for Blind Review] — Successful entrepreneurial ecosystems transform distributed knowledge from public good into excludable club good through boundary mechanisms, reciprocity norms, coordination rituals, and failure tolerance.",
+            coauthors: "Stein & Minniti",
+            url: null,
+            themes: ["entrepreneurship", "community", "knowledge", "governance"],
+            methods: ["case_study", "archival"],
+            theories: ["Ostrom", "Property Rights", "NIE"],
           },
           // Working Papers
           {
-            id: "steam", label: "Steam / Gaming", status: "wp", venue: null,
-            summary: "Are Players Early Birds or Work Mules? Comparative governance of crowdsourcing in video game communities.",
-            coauthors: "Wei, Stein & English",
+            id: "hybrid", label: "Hybridity", status: "wp", venue: null,
+            summary: "Conceptual paper theorizing how interorganizational hybridity enables systemic search across heterogeneous knowledge domains, connecting organizational diversity to problem-solving under complexity.",
+            coauthors: "Koppl, Minniti & Stein",
             url: null,
-            themes: ["governance", "platform"],
-            methods: ["archival"],
-            theories: ["NIE", "TCE"],
+            themes: ["governance", "strategy", "knowledge"],
+            methods: [],
+            theories: ["Complexity", "NIE", "CAS", "Stakeholder"],
+          },
+          {
+            id: "fire3", label: "Know Thy Neighbor", status: "wp", venue: null,
+            summary: "Extends the AMJ findings by examining how community organizing generates knowledge spillovers across neighboring communities, with implications for the geography of collective action.",
+            coauthors: "Stein",
+            url: null,
+            themes: ["community", "entrepreneurship", "knowledge", "environment"],
+            methods: ["panel", "gis"],
+            theories: ["Ostrom", "Polycentricity", "Stakeholder"],
+          },
+          {
+            id: "trilateral", label: "Trilateral Governance", status: "wp", venue: null,
+            summary: "Tests whether jurisdictional fragmentation and ownership diversity degrade wildfire response at scale, and whether specialized bridging organizations restore coordination. Extends Williamson's trilateral governance from bilateral to multi-party settings under ecological uncertainty.",
+            coauthors: "Stein",
+            url: null,
+            themes: ["governance", "environment", "strategy"],
+            methods: ["panel", "iv", "survival"],
+            theories: ["TCE", "Polycentricity", "Ostrom", "NIE"],
           },
           {
             id: "water", label: "Water Rights", status: "wp", venue: null,
-            summary: "Scaling Without Hierarchy — how environmental entrepreneurs introduce novel property rights against incumbent resistance in western U.S. water basins. 908 basins, 11 states, 1850–2020.",
+            summary: "Novel property rights (environmental water) enter fragmented river basins through strategic positioning that minimizes interference with incumbents. But scaling requires the very concentration that blocks entry — creating a paradox.",
             coauthors: "Stein",
             url: null,
-            themes: ["governance", "environment", "entrepreneurship"],
-            methods: ["panel", "iv", "gis"],
-            theories: ["NIE", "Ostrom", "Property Rights", "Polycentricity"],
-          },
-          {
-            id: "know_wp", label: "Knowledge Spillovers", status: "wp", venue: null,
-            summary: "Extended analysis of knowledge spillover mechanisms in community organizing — how local organizations generate and transfer tacit knowledge across jurisdictional boundaries.",
-            coauthors: "Stein & Minniti",
-            url: null,
-            themes: ["community", "environment", "knowledge"],
+            themes: ["environment", "governance", "entrepreneurship"],
             methods: ["panel", "gis"],
-            theories: ["Ostrom", "Polycentricity"],
+            theories: ["Property Rights", "NIE", "Ostrom"],
           },
           {
-            id: "hybrid", label: "Hybridity", status: "wp", venue: null,
-            summary: "Enabling systemic search through interorganizational hybridity — how hybrid governance forms enable exploration across organizational boundaries.",
-            coauthors: "Koppl, Minniti & Stein",
-            url: null,
-            themes: ["governance", "entrepreneurship"],
-            methods: ["archival"],
-            theories: ["Complexity", "Polycentricity"],
-          },
-          {
-            id: "nonmarket", label: "Nonmarket Strategy", status: "wp", venue: null,
-            summary: "Nonmarket strategies and firm performance — an industry lifecycle perspective on when and how nonmarket strategies create value.",
-            coauthors: "Palubinskas, Stein & Minniti",
-            url: null,
-            themes: ["strategy", "platform"],
-            methods: ["archival"],
-            theories: ["TCE", "Stakeholder Theory"],
-          },
-          {
-            id: "ski", label: "Ski Industry", status: "wp", venue: null,
-            summary: "Platform competition (Epic vs. Ikon), snowmaking investment, ownership consolidation, and ecological uncertainty. 110-year panel, 544 resorts, 36 states.",
+            id: "space", label: "Orbital Commons", status: "wp", venue: null,
+            summary: "When sovereign authority cannot reach, national regulatory origin — not organizational diversity — governs actor behavior in global commons. U.S. operators comply more with voluntary deorbit guidelines; Chinese operators less.",
             coauthors: "Stein",
             url: null,
-            themes: ["strategy", "platform", "environment"],
-            methods: ["panel", "archival"],
-            theories: ["Complexity"],
+            themes: ["governance", "environment", "strategy"],
+            methods: ["panel", "iv"],
+            theories: ["NIE", "Ostrom", "Polycentricity"],
           },
           {
             id: "vc", label: "VC & Disasters", status: "wp", venue: null,
-            summary: "How natural disasters affect venture capital funding flows — merging VentureXpert with SHELDUS disaster records to study geographic reallocation of capital.",
-            coauthors: "Han, Stein & English",
+            summary: "Natural disasters deter new VC investors from entering (composition effect), but total capital is unaffected — disasters reshape who invests, not how much. Shared disaster exposure between investor and firm buffers the deterrence effect.",
+            coauthors: "Stein",
             url: null,
-            themes: ["entrepreneurship", "environment"],
-            methods: ["panel", "gis"],
-            theories: [],
+            themes: ["entrepreneurship", "environment", "strategy"],
+            methods: ["panel", "iv"],
+            theories: ["NIE", "Stakeholder"],
+          },
+          {
+            id: "ski", label: "Ski Industry", status: "wp", venue: null,
+            summary: "Epic and Ikon mega-passes restructure resort investment logic under seasonality and climate volatility. Platforms compete for the same high-value resort clusters rather than differentiating geographically.",
+            coauthors: "Stein",
+            url: null,
+            themes: ["platforms", "environment", "strategy", "entrepreneurship"],
+            methods: ["panel", "gis", "survival"],
+            theories: ["TCE", "Property Rights", "Complexity"],
+          },
+          // In Progress
+          {
+            id: "steam", label: "Steam / Gaming", status: "progress", venue: null,
+            summary: "Balanced governance and adaptive managerial attention enable emergent problem-solving in crowdsourced product development. Tests how bidirectional communication between firms and user communities shapes innovation outcomes under complex adaptive system dynamics.",
+            coauthors: "Wei, Stein & English",
+            url: null,
+            themes: ["platforms", "governance", "knowledge", "strategy"],
+            methods: ["panel"],
+            theories: ["TCE", "Complexity", "CAS", "Ostrom"],
+          },
+          {
+            id: "prres", label: "Privatized Resilience", status: "progress", venue: null,
+            summary: "Firm on-site power generation degrades community grid resilience by reducing utility revenue and eroding the political constituency for infrastructure investment. Effects concentrate in counties with weak regulatory oversight.",
+            coauthors: "Stein",
+            url: null,
+            themes: ["environment", "governance", "strategy", "community"],
+            methods: ["panel", "iv"],
+            theories: ["NIE", "Property Rights", "Stakeholder"],
           },
         ];
 
@@ -161,11 +196,22 @@
 
         const ALL_LINKS = computeLinks(PROJECTS);
 
+        // Status visual config — constellation style
         const STATUS_META = {
+          published: { label: "Published", color: C.teal, bg: "rgba(26,107,90,0.08)" },
           rr: { label: "R&R", color: "#9a6b28", bg: "rgba(154,107,40,0.08)" },
           review: { label: "Under Review", color: "#2a7350", bg: "rgba(42,115,80,0.08)" },
-          wp: { label: "Working Paper", color: "#999", bg: "rgba(150,150,150,0.06)" },
-          published: { label: "Published", color: "#1a6b5a", bg: "rgba(26,107,90,0.08)" },
+          wp: { label: "Working Paper", color: C.sienna, bg: "rgba(181,112,79,0.06)" },
+          progress: { label: "In Progress", color: "#666", bg: "rgba(150,150,150,0.06)" },
+        };
+
+        // Distinctive node styles
+        const NODE_STYLE = {
+          published: { r: 20, ringWidth: 3,   fillOpacity: 1,    strokeOpacity: 1,   dash: "none", glow: true,  innerDot: false },
+          rr:        { r: 16, ringWidth: 2.5,  fillOpacity: 0,    strokeOpacity: 0.85, dash: "none", glow: true,  innerDot: true },
+          review:    { r: 15, ringWidth: 2,    fillOpacity: 0,    strokeOpacity: 0.75, dash: "none", glow: false, innerDot: true },
+          wp:        { r: 13, ringWidth: 1.8,  fillOpacity: 0,    strokeOpacity: 0.5,  dash: "4,3", glow: false, innerDot: true },
+          progress:  { r: 12, ringWidth: 1.5,  fillOpacity: 0,    strokeOpacity: 0.4,  dash: "2,3", glow: false, innerDot: true },
         };
 
         const FILTERS = {
@@ -176,7 +222,7 @@
               { id: "environment", label: "Environment" },
               { id: "community", label: "Community" },
               { id: "entrepreneurship", label: "Entrepreneurship" },
-              { id: "platform", label: "Platforms" },
+              { id: "platforms", label: "Platforms" },
               { id: "strategy", label: "Strategy" },
               { id: "knowledge", label: "Knowledge" },
               { id: "health", label: "Health" },
@@ -189,6 +235,8 @@
               { id: "iv", label: "IV / GMM" },
               { id: "gis", label: "GIS / Spatial" },
               { id: "archival", label: "Archival" },
+              { id: "survival", label: "Survival Analysis" },
+              { id: "case_study", label: "Case Study" },
             ],
           },
           theories: {
@@ -200,23 +248,131 @@
               { id: "Polycentricity", label: "Polycentricity" },
               { id: "Property Rights", label: "Property Rights" },
               { id: "Complexity", label: "Complexity" },
-              { id: "Stakeholder Theory", label: "Stakeholder" },
+              { id: "Stakeholder", label: "Stakeholder" },
+              { id: "CAS", label: "CAS" },
             ],
           },
         };
 
         const FILTER_COLORS = {
-          themes: "#1a6b5a",
+          themes: C.teal,
           methods: "#5a7a9a",
-          theories: "#b5704f",
+          theories: C.sienna,
         };
+
+        // ── STAR FIELD COMPONENT ──
+        function StarField() {
+          const canvasRef = useRef(null);
+          const starsRef = useRef([]);
+          const frameRef = useRef(null);
+
+          useEffect(() => {
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+
+            const resize = () => {
+              canvas.width = canvas.parentElement.clientWidth;
+              canvas.height = canvas.parentElement.clientHeight;
+            };
+            resize();
+            window.addEventListener("resize", resize);
+
+            // Generate stars
+            const stars = [];
+            for (let i = 0; i < 100; i++) {
+              const isLarge = Math.random() < 0.15;
+              stars.push({
+                x: Math.random(),
+                y: Math.random(),
+                size: isLarge ? 1.5 + Math.random() * 2 : 0.5 + Math.random() * 1.2,
+                baseOpacity: 0.2 + Math.random() * 0.6,
+                twinkle: Math.random() > 0.35,
+                phase: Math.random() * Math.PI * 2,
+                speed: 0.3 + Math.random() * 0.8,
+                driftX: (Math.random() - 0.5) * 0.00003,
+                driftY: (Math.random() - 0.5) * 0.00003,
+              });
+            }
+            starsRef.current = stars;
+
+            let t = 0;
+            const draw = () => {
+              t += 0.016;
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+              stars.forEach(s => {
+                s.x += s.driftX;
+                s.y += s.driftY;
+                if (s.x < -0.02) s.x = 1.02;
+                if (s.x > 1.02) s.x = -0.02;
+                if (s.y < -0.02) s.y = 1.02;
+                if (s.y > 1.02) s.y = -0.02;
+
+                const px = s.x * canvas.width;
+                const py = s.y * canvas.height;
+                let opacity = s.baseOpacity;
+
+                if (s.twinkle) {
+                  opacity *= 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
+                }
+
+                ctx.beginPath();
+                ctx.arc(px, py, s.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(180, 195, 220, ${opacity})`;
+                ctx.fill();
+
+                // glow on larger stars
+                if (s.size > 1.5) {
+                  ctx.beginPath();
+                  ctx.arc(px, py, s.size * 3, 0, Math.PI * 2);
+                  ctx.fillStyle = `rgba(180, 195, 220, ${opacity * 0.12})`;
+                  ctx.fill();
+                }
+              });
+
+              frameRef.current = requestAnimationFrame(draw);
+            };
+            draw();
+
+            return () => {
+              window.removeEventListener("resize", resize);
+              cancelAnimationFrame(frameRef.current);
+            };
+          }, []);
+
+          return (
+            <canvas
+              ref={canvasRef}
+              style={{
+                position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
+                pointerEvents: "none",
+              }}
+            />
+          );
+        }
+
+        // ── FILM GRAIN OVERLAY ──
+        function FilmGrain() {
+          return (
+            <svg style={{
+              position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
+              pointerEvents: "none", zIndex: 1000, opacity: 0.02,
+            }}>
+              <filter id="grain">
+                <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+              </filter>
+              <rect width="100%" height="100%" filter="url(#grain)" />
+            </svg>
+          );
+        }
 
         function ResearchNetwork() {
           const svgRef = useRef(null);
           const containerRef = useRef(null);
           const [selected, setSelected] = useState(null);
-          const [dims, setDims] = useState({ width: 900, height: 580 });
-          const [activeFilter, setActiveFilter] = useState(null); 
+          const [dims, setDims] = useState({ width: 900, height: 620 });
+          const [activeFilter, setActiveFilter] = useState(null);
           const [edgeTooltip, setEdgeTooltip] = useState(null);
           const simRef = useRef(null);
           const nodesRef = useRef(null);
@@ -227,7 +383,7 @@
             const update = () => {
               if (containerRef.current) {
                 const w = containerRef.current.clientWidth;
-                setDims({ width: w, height: Math.max(480, Math.min(640, w * 0.6)) });
+                setDims({ width: w, height: Math.max(520, Math.min(700, w * 0.65)) });
               }
             };
             update();
@@ -249,6 +405,24 @@
             const svg = d3.select(svgRef.current);
             svg.selectAll("*").remove();
 
+            // SVG defs for glows
+            const defs = svg.append("defs");
+
+            // Glow filters for published and R&R nodes
+            ["published", "rr"].forEach(status => {
+              const color = STATUS_META[status].color;
+              const filter = defs.append("filter")
+                .attr("id", `glow-${status}`)
+                .attr("x", "-50%").attr("y", "-50%")
+                .attr("width", "200%").attr("height", "200%");
+              filter.append("feGaussianBlur").attr("in", "SourceGraphic").attr("stdDeviation", status === "published" ? 6 : 4).attr("result", "blur");
+              filter.append("feColorMatrix").attr("in", "blur").attr("type", "matrix")
+                .attr("values", `0 0 0 0 ${parseInt(color.slice(1,3),16)/255} 0 0 0 0 ${parseInt(color.slice(3,5),16)/255} 0 0 0 0 ${parseInt(color.slice(5,7),16)/255} 0 0 0 0.6 0`);
+              const merge = filter.append("feMerge");
+              merge.append("feMergeNode");
+              merge.append("feMergeNode").attr("in", "SourceGraphic");
+            });
+
             const nodes = PROJECTS.map(d => ({ ...d }));
             const links = ALL_LINKS.map(d => ({ ...d }));
             nodesRef.current = nodes;
@@ -256,9 +430,12 @@
 
             const sim = d3.forceSimulation(nodes)
               .force("link", d3.forceLink(links).id(d => d.id).distance(d => 140 - d.strength * 12).strength(d => 0.2 + d.strength * 0.06))
-              .force("charge", d3.forceManyBody().strength(-350))
+              .force("charge", d3.forceManyBody().strength(-400))
               .force("center", d3.forceCenter(width / 2, height / 2))
-              .force("collision", d3.forceCollide().radius(d => d.status === "published" ? 40 : 35))
+              .force("collision", d3.forceCollide().radius(d => {
+                const ns = NODE_STYLE[d.status] || NODE_STYLE.wp;
+                return ns.r + 22;
+              }))
               .force("x", d3.forceX(width / 2).strength(0.05))
               .force("y", d3.forceY(height / 2).strength(0.05));
             simRef.current = sim;
@@ -267,13 +444,13 @@
             const zoom = d3.zoom().scaleExtent([0.4, 3]).on("zoom", e => g.attr("transform", e.transform));
             svg.call(zoom);
 
-            // Links
+            // Links — constellation lines
             const link = g.append("g").selectAll("line").data(links).join("line")
-              .attr("stroke", "#d4d4d4")
-              .attr("stroke-width", d => 0.5 + d.strength * 0.25)
-              .attr("stroke-opacity", 0.35);
+              .attr("stroke", "rgba(26,107,90,0.15)")
+              .attr("stroke-width", d => 0.4 + d.strength * 0.2)
+              .attr("stroke-opacity", 0.5);
 
-            // Link hover zones 
+            // Link hover zones
             const linkHover = g.append("g").selectAll("line").data(links).join("line")
               .attr("stroke", "transparent")
               .attr("stroke-width", 12)
@@ -303,30 +480,52 @@
                 .on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
               );
 
-            // Status ring
-            node.append("circle")
-              .attr("r", d => d.status === "published" ? 16 : 14)
-              .attr("fill", d => d.status === "published" ? STATUS_META[d.status]?.color : "none")
-              .attr("fill-opacity", d => d.status === "published" ? 0.12 : 0)
-              .attr("stroke", d => STATUS_META[d.status]?.color || "#999")
-              .attr("stroke-width", d => d.status === "published" ? 2 : 1.5)
-              .attr("stroke-opacity", d => d.status === "published" ? 0.7 : 0.4)
-              .attr("stroke-dasharray", d => d.status === "wp" ? "2,2" : "none");
+            // Glow circle (behind main, for published/rr)
+            node.each(function(d) {
+              const ns = NODE_STYLE[d.status] || NODE_STYLE.wp;
+              if (ns.glow) {
+                d3.select(this).append("circle")
+                  .attr("r", ns.r)
+                  .attr("fill", STATUS_META[d.status]?.color || "#666")
+                  .attr("fill-opacity", d.status === "published" ? 0.2 : 0.15)
+                  .attr("filter", `url(#glow-${d.status})`);
+              }
+            });
 
-            // Inner dot
+            // Main ring/fill circle
             node.append("circle")
-              .attr("r", d => d.status === "published" ? 7 : 6)
-              .attr("fill", d => STATUS_META[d.status]?.color || "#999");
+              .attr("r", d => (NODE_STYLE[d.status] || NODE_STYLE.wp).r)
+              .attr("fill", d => {
+                const ns = NODE_STYLE[d.status] || NODE_STYLE.wp;
+                if (ns.fillOpacity === 1) return STATUS_META[d.status]?.color || "#666";
+                return "none";
+              })
+              .attr("fill-opacity", d => (NODE_STYLE[d.status] || NODE_STYLE.wp).fillOpacity)
+              .attr("stroke", d => STATUS_META[d.status]?.color || "#666")
+              .attr("stroke-width", d => (NODE_STYLE[d.status] || NODE_STYLE.wp).ringWidth)
+              .attr("stroke-opacity", d => (NODE_STYLE[d.status] || NODE_STYLE.wp).strokeOpacity)
+              .attr("stroke-dasharray", d => (NODE_STYLE[d.status] || NODE_STYLE.wp).dash);
 
-            // Labels
+            // Inner dot (for non-published)
+            node.each(function(d) {
+              const ns = NODE_STYLE[d.status] || NODE_STYLE.wp;
+              if (ns.innerDot) {
+                d3.select(this).append("circle")
+                  .attr("r", d.status === "rr" ? 6 : d.status === "review" ? 5.5 : d.status === "progress" ? 4 : 5)
+                  .attr("fill", STATUS_META[d.status]?.color || "#666")
+                  .attr("fill-opacity", d.status === "progress" ? 0.5 : 0.75);
+              }
+            });
+
+            // Labels — light text on dark background
             node.append("text")
               .text(d => d.label)
-              .attr("y", 28)
+              .attr("y", d => (NODE_STYLE[d.status] || NODE_STYLE.wp).r + 14)
               .attr("text-anchor", "middle")
               .attr("font-family", "'DM Sans', -apple-system, sans-serif")
               .attr("font-size", "10px")
               .attr("font-weight", 500)
-              .attr("fill", "#555");
+              .attr("fill", C.textSecondary);
 
             // Hover
             node.on("mouseover", function(e, d) {
@@ -338,12 +537,12 @@
               node.transition().duration(150)
                 .attr("opacity", n => connected.has(n.id) ? 1 : 0.12);
               link.transition().duration(150)
-                .attr("stroke-opacity", l => (l.source.id === d.id || l.target.id === d.id) ? 0.7 : 0.04)
-                .attr("stroke", l => (l.source.id === d.id || l.target.id === d.id) ? STATUS_META[d.status]?.color || "#1a6b5a" : "#d4d4d4");
+                .attr("stroke-opacity", l => (l.source.id === d.id || l.target.id === d.id) ? 0.8 : 0.04)
+                .attr("stroke", l => (l.source.id === d.id || l.target.id === d.id) ? STATUS_META[d.status]?.color || C.teal : "rgba(26,107,90,0.15)");
             })
             .on("mouseout", () => {
               node.transition().duration(200).attr("opacity", 1);
-              link.transition().duration(200).attr("stroke-opacity", 0.35).attr("stroke", "#d4d4d4");
+              link.transition().duration(200).attr("stroke-opacity", 0.5).attr("stroke", "rgba(26,107,90,0.15)");
             })
             .on("click", (e, d) => {
               e.stopPropagation();
@@ -367,11 +566,10 @@
           useEffect(() => {
             if (!svgRef.current || !nodesRef.current) return;
             const svg = d3.select(svgRef.current);
-            const nodes = svg.selectAll("g g g"); 
 
             if (!matchingIds) {
               svg.selectAll("g g g").transition().duration(200).attr("opacity", 1);
-              svg.selectAll("g g line").transition().duration(200).attr("stroke-opacity", 0.35);
+              svg.selectAll("g g line").transition().duration(200).attr("stroke-opacity", 0.5);
               return;
             }
 
@@ -385,26 +583,82 @@
             setActiveFilter(prev => (prev?.type === type && prev?.id === id) ? null : { type, id });
           };
 
+          // Legend item renderer — SVG icons matching node rendering
+          const legendIcon = (key, meta) => {
+            const ns = NODE_STYLE[key] || NODE_STYLE.wp;
+            const size = 14;
+            const r = 5;
+            return (
+              <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0, verticalAlign: "middle" }}>
+                <circle
+                  cx={size/2} cy={size/2} r={r}
+                  fill={ns.fillOpacity === 1 ? meta.color : "none"}
+                  fillOpacity={ns.fillOpacity}
+                  stroke={meta.color}
+                  strokeWidth={ns.ringWidth * 0.7}
+                  strokeOpacity={ns.strokeOpacity}
+                  strokeDasharray={ns.dash === "none" ? undefined : ns.dash}
+                />
+                {ns.innerDot && (
+                  <circle
+                    cx={size/2} cy={size/2} r={key === "progress" ? 2 : 2.5}
+                    fill={meta.color}
+                    fillOpacity={key === "progress" ? 0.5 : 0.75}
+                  />
+                )}
+              </svg>
+            );
+          };
+
           return (
             <div style={{
               fontFamily: "'DM Sans', -apple-system, sans-serif",
-              background: "#f7f7f5", minHeight: "100vh",
+              background: C.bg, minHeight: "100vh", position: "relative", overflow: "hidden",
             }}>
+              {/* Film grain overlay */}
+              <FilmGrain />
+
+              {/* Nav bar — dark frosted glass */}
+              <nav style={{
+                position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+                background: "rgba(10,10,10,0.7)",
+                backdropFilter: "blur(20px) saturate(1.5)",
+                WebkitBackdropFilter: "blur(20px) saturate(1.5)",
+                borderBottom: `1px solid ${C.borderLight}`,
+              }}>
+                <div style={{
+                  maxWidth: 960, margin: "0 auto", padding: "0.85rem 1.5rem",
+                  display: "flex", justifyContent: "space-between", alignItems: "baseline",
+                }}>
+                  <a href="index.html" style={{
+                    fontFamily: "'DM Sans', sans-serif", fontSize: "0.85rem", fontWeight: 700,
+                    color: C.textPrimary, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase",
+                  }}>Devin Stein</a>
+                  <a href="index.html" style={{
+                    fontFamily: "'DM Sans', sans-serif", fontSize: "0.72rem", fontWeight: 600,
+                    color: C.textSecondary, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase",
+                  }}>&larr; Home</a>
+                </div>
+              </nav>
+
               {/* Header */}
-              <div style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1.5rem 0" }}>
+              <div style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1.5rem 0", paddingTop: "4rem", position: "relative", zIndex: 2 }}>
                 <div style={{
                   fontFamily: "'JetBrains Mono', monospace", fontSize: "0.62rem",
-                  color: "#b5704f", letterSpacing: "0.08em", textTransform: "uppercase",
+                  color: C.sienna, letterSpacing: "0.08em", textTransform: "uppercase",
                   marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.6rem",
                 }}>
-                  <span style={{ display: "block", width: 24, height: 1, background: "#b5704f", opacity: 0.6 }} />
+                  <span style={{ display: "block", width: 24, height: 1, background: C.sienna, opacity: 0.6 }} />
                   Interactive
                 </div>
                 <h1 style={{
                   fontFamily: "'Newsreader', Georgia, serif", fontSize: "1.8rem",
-                  fontWeight: 400, color: "#0a0a0a", margin: "0 0 0.3rem",
+                  fontWeight: 400, color: C.textPrimary, margin: "0 0 0.3rem",
                 }}>Research Network</h1>
-                <p style={{ fontSize: "0.85rem", color: "#888", lineHeight: 1.6, maxWidth: 600, margin: "0 0 1.2rem" }}>
+                <p style={{
+                  fontFamily: "'Newsreader', Georgia, serif",
+                  fontSize: "0.85rem", color: C.textMuted, lineHeight: 1.6, maxWidth: 600, margin: "0 0 1.2rem",
+                }}>
                   An interactive map of my research program. Projects are connected by shared theory, methods, and themes. Use the filters to explore the intellectual architecture, or drag nodes to rearrange.
                 </p>
 
@@ -427,9 +681,9 @@
                               style={{
                                 fontFamily: "'JetBrains Mono', monospace", fontSize: "0.6rem",
                                 letterSpacing: "0.02em",
-                                color: isActive ? "#fff" : "#888",
+                                color: isActive ? C.white : C.textMuted,
                                 background: isActive ? FILTER_COLORS[type] : "transparent",
-                                border: `1px solid ${isActive ? FILTER_COLORS[type] : "#d4d4d4"}`,
+                                border: `1px solid ${isActive ? FILTER_COLORS[type] : C.borderMid}`,
                                 padding: "0.2rem 0.55rem", cursor: "pointer",
                                 borderRadius: 1, transition: "all 0.15s",
                               }}
@@ -445,15 +699,8 @@
                 <div style={{ display: "flex", gap: "1.2rem", marginBottom: "0.8rem", flexWrap: "wrap" }}>
                   {Object.entries(STATUS_META).map(([key, meta]) => (
                     <div key={key} style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                      <span style={{
-                        width: 10, height: 10, borderRadius: "50%",
-                        border: `1.5px ${key === "wp" ? "dashed" : "solid"} ${meta.color}`,
-                        background: key === "published" ? meta.color : "transparent", flexShrink: 0,
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                      }}>
-                        {key !== "published" && <span style={{ width: 4, height: 4, borderRadius: "50%", background: meta.color }} />}
-                      </span>
-                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.6rem", color: "#888" }}>
+                      {legendIcon(key, meta)}
+                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.6rem", color: C.textMuted }}>
                         {meta.label}
                       </span>
                     </div>
@@ -461,31 +708,34 @@
                 </div>
               </div>
 
-              {/* Graph */}
+              {/* Graph area with star field */}
               <div ref={containerRef} style={{ maxWidth: 960, margin: "0 auto", padding: "0 1.5rem", position: "relative" }}>
                 <div style={{
-                  background: "#fff", border: "1px solid #d4d4d4",
+                  background: "transparent",
                   borderRadius: 2, overflow: "hidden", position: "relative",
                 }}>
-                  <svg ref={svgRef} width={dims.width} height={dims.height} style={{ display: "block" }} />
+                  {/* Star field canvas behind the SVG */}
+                  <StarField />
 
-                  {/* Edge tooltip */}
+                  <svg ref={svgRef} width={dims.width} height={dims.height} style={{ display: "block", position: "relative", zIndex: 1 }} />
+
+                  {/* Edge tooltip — dark glass */}
                   {edgeTooltip && (
                     <div style={{
                       position: "absolute", left: "50%", top: 12,
-                      transform: "translateX(-50%)",
-                      background: "rgba(255,255,255,0.95)", backdropFilter: "blur(8px)",
-                      border: "1px solid #d4d4d4", padding: "0.6rem 0.9rem",
+                      transform: "translateX(-50%)", zIndex: 10,
+                      background: "rgba(20,20,20,0.85)", backdropFilter: "blur(8px)",
+                      border: `1px solid ${C.borderMid}`, padding: "0.6rem 0.9rem",
                       pointerEvents: "none", textAlign: "center", maxWidth: 260,
                     }}>
                       <div style={{
-                        fontFamily: "'DM Sans', sans-serif", fontSize: "0.72rem", color: "#555", marginBottom: "0.25rem",
+                        fontFamily: "'DM Sans', sans-serif", fontSize: "0.72rem", color: C.textSecondary, marginBottom: "0.25rem",
                       }}>
                         {edgeTooltip.from} ↔ {edgeTooltip.to}
                       </div>
                       <div style={{
                         fontFamily: "'JetBrains Mono', monospace", fontSize: "0.58rem",
-                        color: "#1a6b5a", letterSpacing: "0.02em",
+                        color: C.tealLight, letterSpacing: "0.02em",
                       }}>
                         {edgeTooltip.labels.join(" · ")}
                       </div>
@@ -493,11 +743,15 @@
                   )}
                 </div>
 
-                {/* Selected detail */}
+                {/* Selected detail — dark glass panel */}
                 {selected && (
                   <div style={{
-                    background: "#fff", border: "1px solid #d4d4d4",
-                    borderLeft: `3px solid ${STATUS_META[selected.status]?.color || "#1a6b5a"}`,
+                    background: "rgba(20,20,20,0.8)",
+                    backdropFilter: "blur(16px) saturate(1.3)",
+                    WebkitBackdropFilter: "blur(16px) saturate(1.3)",
+                    border: `1px solid ${C.borderMid}`,
+                    borderLeft: `3px solid ${STATUS_META[selected.status]?.color || C.teal}`,
+                    boxShadow: "0 2px 24px rgba(0,0,0,0.3)",
                     padding: "1.4rem 1.6rem", marginTop: "0.6rem",
                     animation: "fadeUp 0.25s ease",
                   }}>
@@ -512,22 +766,22 @@
                         </div>
                         <div style={{
                           fontFamily: "'Newsreader', Georgia, serif", fontSize: "1.15rem",
-                          color: "#0a0a0a", marginBottom: "0.15rem",
+                          color: C.textPrimary, marginBottom: "0.15rem",
                         }}>{selected.label}</div>
-                        <div style={{ fontSize: "0.78rem", color: "#888", marginBottom: "0.6rem" }}>
+                        <div style={{ fontSize: "0.78rem", color: C.textMuted, marginBottom: "0.6rem" }}>
                           {selected.coauthors}
                         </div>
                       </div>
                       <button
                         onClick={() => setSelected(null)}
                         style={{
-                          background: "none", border: "1px solid #d4d4d4",
+                          background: "none", border: `1px solid ${C.borderMid}`,
                           fontFamily: "'JetBrains Mono', monospace", fontSize: "0.58rem",
-                          color: "#888", padding: "0.2rem 0.5rem", cursor: "pointer", flexShrink: 0,
+                          color: C.textMuted, padding: "0.2rem 0.5rem", cursor: "pointer", flexShrink: 0,
                         }}>✕</button>
                     </div>
                     <p style={{
-                      fontSize: "0.9rem", color: "#2a2a2a", lineHeight: 1.75,
+                      fontSize: "0.9rem", color: C.textSecondary, lineHeight: 1.75,
                       fontFamily: "'Newsreader', Georgia, serif", margin: "0 0 0.8rem",
                     }}>{selected.summary}</p>
                     {selected.url && (
@@ -538,11 +792,11 @@
                         style={{
                           display: "inline-flex", alignItems: "center", gap: "0.4rem",
                           fontFamily: "'JetBrains Mono', monospace", fontSize: "0.64rem",
-                          color: "#1a6b5a", textDecoration: "none", fontWeight: 500,
+                          color: C.tealLight, textDecoration: "none", fontWeight: 500,
                           borderBottom: "1px solid transparent", transition: "border-color 0.2s",
                           marginBottom: "0.8rem",
                         }}
-                        onMouseOver={e => e.target.style.borderBottomColor = "#1a6b5a"}
+                        onMouseOver={e => e.target.style.borderBottomColor = C.tealLight}
                         onMouseOut={e => e.target.style.borderBottomColor = "transparent"}
                       >
                         {selected.status === "published" ? "View paper ↗" : "View abstract ↗"}
@@ -552,7 +806,7 @@
                       {[...selected.themes, ...selected.methods, ...selected.theories].map((tag, i) => (
                         <span key={i} style={{
                           fontFamily: "'JetBrains Mono', monospace", fontSize: "0.56rem",
-                          color: "#888", border: "1px solid #ebebeb", padding: "0.15rem 0.45rem",
+                          color: C.textMuted, border: `1px solid ${C.borderLight}`, padding: "0.15rem 0.45rem",
                           letterSpacing: "0.02em",
                         }}>{tag}</span>
                       ))}
@@ -561,13 +815,40 @@
                 )}
               </div>
 
-              <div style={{ maxWidth: 960, margin: "0 auto", padding: "1.2rem 1.5rem 3rem" }}>
+              {/* Footer */}
+              <div style={{
+                maxWidth: 960, margin: "0 auto", padding: "1.2rem 1.5rem 0",
+                position: "relative", zIndex: 2,
+              }}>
                 <p style={{
                   fontFamily: "'JetBrains Mono', monospace", fontSize: "0.58rem",
-                  color: "#b0b0b0", letterSpacing: "0.02em",
+                  color: C.textFaint, letterSpacing: "0.02em",
                 }}>
                   Drag nodes to rearrange · Click for details · Hover edges to see shared connections · Scroll to zoom
                 </p>
+              </div>
+
+              {/* Dusk/twilight horizon gradient at bottom */}
+              <div style={{
+                position: "relative", zIndex: 0,
+                height: 120, marginTop: "1rem",
+                background: `linear-gradient(180deg,
+                  transparent 0%,
+                  rgba(240,202,138,0.06) 20%,
+                  rgba(217,152,96,0.08) 40%,
+                  rgba(196,128,88,0.1) 55%,
+                  rgba(150,95,105,0.08) 70%,
+                  rgba(120,85,120,0.06) 85%,
+                  rgba(80,65,115,0.04) 100%
+                )`,
+              }}>
+                {/* Subtle sun glow */}
+                <div style={{
+                  position: "absolute", bottom: -40, left: "50%", transform: "translateX(-50%)",
+                  width: 400, height: 80,
+                  background: "radial-gradient(ellipse at center, rgba(240,202,138,0.1) 0%, rgba(217,152,96,0.05) 40%, transparent 70%)",
+                  pointerEvents: "none",
+                }} />
               </div>
 
               <style>{`

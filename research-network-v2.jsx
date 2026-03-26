@@ -192,17 +192,19 @@ export default function ResearchNetwork() {
   const [selected, setSelected] = useState(null);
   const [dims, setDims] = useState({ width: 900, height: 580 });
   const [activeFilter, setActiveFilter] = useState(null); // { type, id }
-  const [edgeTooltip, setEdgeTooltip] = useState(null);
   const simRef = useRef(null);
   const nodesRef = useRef(null);
   const linksRef = useRef(null);
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const floatPhaseRef = useRef(0);
 
   // Responsive
   useEffect(() => {
     const update = () => {
       if (containerRef.current) {
         const w = containerRef.current.clientWidth;
-        setDims({ width: w, height: Math.max(480, Math.min(640, w * 0.6)) });
+        const graphW = Math.max(400, w - 120);
+        setDims({ width: graphW, height: Math.max(480, Math.min(640, graphW * 0.6)) });
       }
     };
     update();
@@ -248,26 +250,11 @@ export default function ResearchNetwork() {
       .attr("stroke-width", d => 0.5 + d.strength * 0.25)
       .attr("stroke-opacity", 0.35);
 
-    // Link hover zones (wider invisible paths for easier hovering)
-    const linkHover = g.append("g").selectAll("line").data(links).join("line")
-      .attr("stroke", "transparent")
-      .attr("stroke-width", 12)
-      .style("cursor", "pointer")
-      .on("mouseover", (e, d) => {
-        const labels = [
-          ...d.shared.themes.map(t => t),
-          ...d.shared.methods.map(m => m),
-          ...d.shared.theories.map(t => t),
-        ];
-        setEdgeTooltip({
-          x: (d.source.x + d.target.x) / 2,
-          y: (d.source.y + d.target.y) / 2,
-          from: d.source.label,
-          to: d.target.label,
-          labels,
-        });
-      })
-      .on("mouseout", () => setEdgeTooltip(null));
+    // Track mouse position for subtle reactivity
+    svg.on("mousemove", (e) => {
+      const [mx, my] = d3.pointer(e);
+      mouseRef.current = { x: mx, y: my };
+    });
 
     // Node groups
     const node = g.append("g").selectAll("g").data(nodes).join("g")
@@ -327,15 +314,48 @@ export default function ResearchNetwork() {
 
     svg.on("click", () => setSelected(null));
 
-    sim.on("tick", () => {
+    // Continuous gentle floating animation
+    let floatFrame;
+    const floatTick = () => {
+      floatPhaseRef.current += 0.008;
+      const t = floatPhaseRef.current;
+      const mouse = mouseRef.current;
+
+      node.attr("transform", d => {
+        const seed = d.id.length * 7 + d.id.charCodeAt(0);
+        const floatX = Math.sin(t + seed * 0.5) * 2.5 + Math.cos(t * 0.7 + seed) * 1.5;
+        const floatY = Math.cos(t * 0.8 + seed * 0.3) * 2 + Math.sin(t * 0.6 + seed * 0.7) * 1.5;
+
+        const dx = d.x - mouse.x;
+        const dy = d.y - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        const pushRadius = 120;
+        let pushX = 0, pushY = 0;
+        if (dist < pushRadius && !d.fx) {
+          const force = (1 - dist / pushRadius) * 8;
+          pushX = (dx / dist) * force;
+          pushY = (dy / dist) * force;
+        }
+
+        return `translate(${d.x + floatX + pushX},${d.y + floatY + pushY})`;
+      });
+
       link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
         .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
-      linkHover.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+
+      floatFrame = requestAnimationFrame(floatTick);
+    };
+
+    sim.on("tick", () => {
+      link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
         .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
       node.attr("transform", d => `translate(${d.x},${d.y})`);
     });
 
-    return () => sim.stop();
+    sim.on("end", () => { floatFrame = requestAnimationFrame(floatTick); });
+    setTimeout(() => { if (!floatFrame) floatFrame = requestAnimationFrame(floatTick); }, 3000);
+
+    return () => { sim.stop(); cancelAnimationFrame(floatFrame); };
   }, [dims]);
 
   // Apply filter highlighting via D3 transitions
@@ -443,31 +463,9 @@ export default function ResearchNetwork() {
         <div style={{
           background: "#fff", border: "1px solid #d4d4d4",
           borderRadius: 2, overflow: "hidden", position: "relative",
+          display: "flex", justifyContent: "center",
         }}>
           <svg ref={svgRef} width={dims.width} height={dims.height} style={{ display: "block" }} />
-
-          {/* Edge tooltip */}
-          {edgeTooltip && (
-            <div style={{
-              position: "absolute", left: "50%", top: 12,
-              transform: "translateX(-50%)",
-              background: "rgba(255,255,255,0.95)", backdropFilter: "blur(8px)",
-              border: "1px solid #d4d4d4", padding: "0.6rem 0.9rem",
-              pointerEvents: "none", textAlign: "center", maxWidth: 260,
-            }}>
-              <div style={{
-                fontFamily: "'DM Sans', sans-serif", fontSize: "0.72rem", color: "#555", marginBottom: "0.25rem",
-              }}>
-                {edgeTooltip.from} ↔ {edgeTooltip.to}
-              </div>
-              <div style={{
-                fontFamily: "'JetBrains Mono', monospace", fontSize: "0.58rem",
-                color: "#1a6b5a", letterSpacing: "0.02em",
-              }}>
-                {edgeTooltip.labels.join(" · ")}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Selected detail */}
@@ -543,7 +541,7 @@ export default function ResearchNetwork() {
           fontFamily: "'JetBrains Mono', monospace", fontSize: "0.58rem",
           color: "#b0b0b0", letterSpacing: "0.02em",
         }}>
-          Drag nodes to rearrange · Click for details · Hover edges to see shared connections · Scroll to zoom
+          Drag nodes to rearrange · Click for details · Scroll to zoom
         </p>
       </div>
 

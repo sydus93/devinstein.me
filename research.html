@@ -42,7 +42,8 @@
           borderMid: "rgba(255,255,255,0.15)",
         };
 
-        // ── DATA ──
+        // ── DATA ── Keep in sync with index.html research section.
+        // Source of truth: brain vault overview files. See integration_roadmap.md §7.
         const PROJECTS = [
           // Published
           {
@@ -66,8 +67,8 @@
           },
           // Under Review
           {
-            id: "hiv", label: "HIV / Brazil", status: "review", venue: "MS",
-            summary: "Local religious stigma moderates Brazil's 2016 ARV deregulation. The mechanism is care entry, not treatment quality — stigma deters individuals from seeking treatment even when policy barriers fall.",
+            id: "hiv", label: "HIV / Brazil", status: "wp", venue: null,
+            summary: "Religious stigma suppresses HIV case detection; political alignment improves mandate implementation. Refocusing on detection mechanisms (H1–H2) after AMJ rejection; targeting Management Science.",
             coauthors: "Minniti, Rodriguez & Stein",
             url: null,
             themes: ["health", "governance", "community"],
@@ -95,16 +96,16 @@
           },
           {
             id: "fire3", label: "Know Thy Neighbor", status: "wp", venue: null,
-            summary: "Extends the AMJ findings by examining how community organizing generates knowledge spillovers across neighboring communities, with implications for the geography of collective action.",
-            coauthors: "Stein",
+            summary: "Final dissertation chapter. Extends Fire1 by examining how community organizing generates knowledge spillovers across neighboring communities. Published in BCERC conference proceedings (Top 40 Paper, 2024).",
+            coauthors: "Stein & Minniti",
             url: null,
             themes: ["community", "entrepreneurship", "knowledge", "environment"],
             methods: ["panel", "gis"],
             theories: ["Ostrom", "Polycentricity", "Stakeholder"],
           },
           {
-            id: "trilateral", label: "Trilateral Governance", status: "wp", venue: null,
-            summary: "Tests whether jurisdictional fragmentation and ownership diversity degrade wildfire response at scale, and whether specialized bridging organizations restore coordination. Extends Williamson's trilateral governance from bilateral to multi-party settings under ecological uncertainty.",
+            id: "resalloc", label: "Governance Capacity", status: "wp", venue: null,
+            summary: "When governance capacity is scarce, allocation follows observable salience (fire size) rather than institutional complexity (jurisdictional fragmentation) — producing systematic misallocation that concentrates performance penalties in the most governance-dependent environments.",
             coauthors: "Stein",
             url: null,
             themes: ["governance", "environment", "strategy"],
@@ -114,7 +115,7 @@
           {
             id: "water", label: "Water Rights", status: "wp", venue: null,
             summary: "Novel property rights (environmental water) enter fragmented river basins through strategic positioning that minimizes interference with incumbents. But scaling requires the very concentration that blocks entry — creating a paradox.",
-            coauthors: "Stein",
+            coauthors: "Stein, Dean & Minniti",
             url: null,
             themes: ["environment", "governance", "entrepreneurship"],
             methods: ["panel", "gis"],
@@ -132,7 +133,7 @@
           {
             id: "vc", label: "VC & Disasters", status: "wp", venue: null,
             summary: "Natural disasters deter new VC investors from entering (composition effect), but total capital is unaffected — disasters reshape who invests, not how much. Shared disaster exposure between investor and firm buffers the deterrence effect.",
-            coauthors: "Stein",
+            coauthors: "Han, Lee & Stein",
             url: null,
             themes: ["entrepreneurship", "environment", "strategy"],
             methods: ["panel", "iv"],
@@ -140,7 +141,7 @@
           },
           {
             id: "ski", label: "Ski Industry", status: "wp", venue: null,
-            summary: "Epic and Ikon mega-passes restructure resort investment logic under seasonality and climate volatility. Platforms compete for the same high-value resort clusters rather than differentiating geographically.",
+            summary: "Portfolio consolidation enables geographic hedging — building climate-diverse resort portfolios and spreading investment. Climate-diverse portfolios allocate capital more evenly across resorts, buffering individual exposure to snowfall volatility.",
             coauthors: "Stein",
             url: null,
             themes: ["platforms", "environment", "strategy", "entrepreneurship"],
@@ -149,7 +150,7 @@
           },
           // In Progress
           {
-            id: "steam", label: "Steam / Gaming", status: "progress", venue: null,
+            id: "steam", label: "Steam / Gaming", status: "wp", venue: null,
             summary: "Balanced governance and adaptive managerial attention enable emergent problem-solving in crowdsourced product development. Tests how bidirectional communication between firms and user communities shapes innovation outcomes under complex adaptive system dynamics.",
             coauthors: "Wei, Stein & English",
             url: null,
@@ -373,17 +374,19 @@
           const [selected, setSelected] = useState(null);
           const [dims, setDims] = useState({ width: 900, height: 620 });
           const [activeFilter, setActiveFilter] = useState(null);
-          const [edgeTooltip, setEdgeTooltip] = useState(null);
           const simRef = useRef(null);
           const nodesRef = useRef(null);
           const linksRef = useRef(null);
+          const mouseRef = useRef({ x: 0, y: 0 });
+          const floatPhaseRef = useRef(0);
 
           // Responsive
           useEffect(() => {
             const update = () => {
               if (containerRef.current) {
                 const w = containerRef.current.clientWidth;
-                setDims({ width: w, height: Math.max(520, Math.min(700, w * 0.65)) });
+                const graphW = Math.max(400, w - 120); // 60px padding each side
+                setDims({ width: graphW, height: Math.max(520, Math.min(700, graphW * 0.65)) });
               }
             };
             update();
@@ -450,26 +453,11 @@
               .attr("stroke-width", d => 0.4 + d.strength * 0.2)
               .attr("stroke-opacity", 0.5);
 
-            // Link hover zones
-            const linkHover = g.append("g").selectAll("line").data(links).join("line")
-              .attr("stroke", "transparent")
-              .attr("stroke-width", 12)
-              .style("cursor", "pointer")
-              .on("mouseover", (e, d) => {
-                const labels = [
-                  ...d.shared.themes.map(t => t),
-                  ...d.shared.methods.map(m => m),
-                  ...d.shared.theories.map(t => t),
-                ];
-                setEdgeTooltip({
-                  x: (d.source.x + d.target.x) / 2,
-                  y: (d.source.y + d.target.y) / 2,
-                  from: d.source.label,
-                  to: d.target.label,
-                  labels,
-                });
-              })
-              .on("mouseout", () => setEdgeTooltip(null));
+            // Track mouse position for hover glow
+            svg.on("mousemove", (e) => {
+              const [mx, my] = d3.pointer(e);
+              mouseRef.current = { x: mx, y: my };
+            });
 
             // Node groups
             const node = g.append("g").selectAll("g").data(nodes).join("g")
@@ -479,6 +467,12 @@
                 .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
                 .on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
               );
+
+            // Invisible hit area — makes small nodes easier to click/drag
+            node.append("circle")
+              .attr("r", d => Math.max((NODE_STYLE[d.status] || NODE_STYLE.wp).r + 10, 24))
+              .attr("fill", "transparent")
+              .attr("stroke", "none");
 
             // Glow circle (behind main, for published/rr)
             node.each(function(d) {
@@ -551,15 +545,40 @@
 
             svg.on("click", () => setSelected(null));
 
-            sim.on("tick", () => {
+            // Continuous gentle floating animation
+            let floatFrame;
+            const floatTick = () => {
+              floatPhaseRef.current += 0.008;
+              const t = floatPhaseRef.current;
+              const mouse = mouseRef.current;
+
+              node.attr("transform", d => {
+                // Gentle per-node float using unique phase offsets
+                const seed = d.id.length * 7 + d.id.charCodeAt(0);
+                const floatX = Math.sin(t + seed * 0.5) * 2.5 + Math.cos(t * 0.7 + seed) * 1.5;
+                const floatY = Math.cos(t * 0.8 + seed * 0.3) * 2 + Math.sin(t * 0.6 + seed * 0.7) * 1.5;
+
+                return `translate(${d.x + floatX},${d.y + floatY})`;
+              });
+
               link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
                 .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
-              linkHover.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+
+              floatFrame = requestAnimationFrame(floatTick);
+            };
+
+            sim.on("tick", () => {
+              link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
                 .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
               node.attr("transform", d => `translate(${d.x},${d.y})`);
             });
 
-            return () => sim.stop();
+            // Start floating after simulation settles
+            sim.on("end", () => { floatFrame = requestAnimationFrame(floatTick); });
+            // Also start it on a timer in case sim doesn't fully end
+            setTimeout(() => { if (!floatFrame) floatFrame = requestAnimationFrame(floatTick); }, 3000);
+
+            return () => { sim.stop(); cancelAnimationFrame(floatFrame); };
           }, [dims]);
 
           // Apply filter highlighting via D3 transitions
@@ -713,34 +732,12 @@
                 <div style={{
                   background: "transparent",
                   borderRadius: 2, overflow: "hidden", position: "relative",
+                  display: "flex", justifyContent: "center",
                 }}>
                   {/* Star field canvas behind the SVG */}
                   <StarField />
 
                   <svg ref={svgRef} width={dims.width} height={dims.height} style={{ display: "block", position: "relative", zIndex: 1 }} />
-
-                  {/* Edge tooltip — dark glass */}
-                  {edgeTooltip && (
-                    <div style={{
-                      position: "absolute", left: "50%", top: 12,
-                      transform: "translateX(-50%)", zIndex: 10,
-                      background: "rgba(20,20,20,0.85)", backdropFilter: "blur(8px)",
-                      border: `1px solid ${C.borderMid}`, padding: "0.6rem 0.9rem",
-                      pointerEvents: "none", textAlign: "center", maxWidth: 260,
-                    }}>
-                      <div style={{
-                        fontFamily: "'DM Sans', sans-serif", fontSize: "0.72rem", color: C.textSecondary, marginBottom: "0.25rem",
-                      }}>
-                        {edgeTooltip.from} ↔ {edgeTooltip.to}
-                      </div>
-                      <div style={{
-                        fontFamily: "'JetBrains Mono', monospace", fontSize: "0.58rem",
-                        color: C.tealLight, letterSpacing: "0.02em",
-                      }}>
-                        {edgeTooltip.labels.join(" · ")}
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Selected detail — dark glass panel */}
@@ -824,7 +821,7 @@
                   fontFamily: "'JetBrains Mono', monospace", fontSize: "0.58rem",
                   color: C.textFaint, letterSpacing: "0.02em",
                 }}>
-                  Drag nodes to rearrange · Click for details · Hover edges to see shared connections · Scroll to zoom
+                  Click a node for details · Drag to rearrange · Scroll to zoom
                 </p>
               </div>
 

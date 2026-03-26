@@ -221,7 +221,7 @@ section{padding:2.5rem 0;position:relative;z-index:1}
 .research-item:first-child{border-top:1px solid var(--faint)}
 .research-item:hover{background:rgba(228,239,236,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);margin:0 -1rem;padding-left:1rem;padding-right:1rem;border-radius:3px}
 .research-status{font-family:var(--mono);font-size:.64rem;font-weight:500;letter-spacing:.02em;line-height:1.7;padding-top:.18rem;white-space:nowrap}
-.status-rr{color:var(--amber)}.status-review{color:var(--green)}.status-wp{color:var(--light)}
+.status-published{color:var(--teal);font-weight:600}.status-rr{color:var(--amber)}.status-review{color:var(--green)}.status-wp{color:var(--light)}.status-progress{color:var(--muted);font-style:italic}
 .research-title{font-family:var(--serif);font-size:1.05rem;font-weight:400;color:var(--ink);line-height:1.5}
 .research-authors{font-family:var(--sans);font-size:.8rem;color:var(--muted);margin-top:.15rem}
 
@@ -322,6 +322,10 @@ section{padding:2.5rem 0;position:relative;z-index:1}
 .reveal.visible{opacity:1;transform:translateY(0)}
 
 /* ── DARK ZONE TEXT ADAPTATION ── */
+/* The sky-gradient is proportional to page height. Sections above #talks use dark text
+   (default body color). If the page grows significantly (e.g. more research items),
+   verify that #teaching still falls in the warm-but-readable zone of the gradient.
+   If teaching pushes into the dark zone, move its overrides from dark→light text. */
 #talks .section-num{color:rgba(255,255,255,.3)}
 #talks .section-title{color:var(--teal-light)}
 #talks .pres-year-label{color:rgba(255,255,255,.4)}
@@ -344,15 +348,17 @@ section{padding:2.5rem 0;position:relative;z-index:1}
 #introductions .copy-btn{color:rgba(255,255,255,.5);background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15)}
 #introductions .copy-btn:hover{color:var(--teal-light);border-color:var(--teal-light);background:rgba(26,107,90,.15)}
 
-#teaching .section-num{color:rgba(255,255,255,.35)}
-#teaching .section-title{color:var(--teal-light)}
-#teaching .callout-margin{color:rgba(255,255,255,.8);border-left-color:var(--teal-light)}
-#teaching .callout-margin em{color:var(--teal-light)}
-#teaching .teaching-row{border-bottom-color:rgba(255,255,255,.1)}
-#teaching .teaching-row:first-child{border-top-color:rgba(255,255,255,.1)}
-#teaching .teaching-name{text-shadow:0 0 16px rgba(247,247,245,.12)}
-#teaching .teaching-ratings{color:var(--white)}
-#teaching .rating-high{color:var(--white)}
+#teaching .section-num{color:var(--mid)}
+#teaching .section-title{color:var(--teal)}
+#teaching .callout-margin{color:var(--body);border-left-color:var(--teal)}
+#teaching .callout-margin em{color:var(--teal)}
+#teaching .teaching-row{border-bottom-color:rgba(0,0,0,.1)}
+#teaching .teaching-row:first-child{border-top-color:rgba(0,0,0,.1)}
+#teaching .teaching-code{color:var(--dark)}
+#teaching .teaching-name{color:var(--dark);text-shadow:none}
+#teaching .teaching-school{color:var(--mid)}
+#teaching .teaching-ratings{color:var(--dark)}
+#teaching .rating-high{color:var(--dark)}
 
 /* ── RESPONSIVE ── */
 @media(max-width:760px){
@@ -518,18 +524,23 @@ section{padding:2.5rem 0;position:relative;z-index:1}
   <polyline class="index-contour" points="1543,175 1605,188 1642,181 1657,180 1745,184 1768,184 1787,182 1831,175 1791,168 1768,165 1750,169 1653,172 1642,173 1634,173 1543,175"/>
 </svg>
 
-<!-- 01 RESEARCH -->
+<!-- 01 RESEARCH — Keep in sync with research.html PROJECTS array.
+     Source of truth: brain vault overview files. See integration_roadmap.md §7. -->
 <section id="research" class="reveal">
   <div class="section-head"><span class="section-num">01</span><span class="section-title">Research</span></div>
   <div class="callout-margin">My work contributes to strategy and management theory by studying <em>polycentric governance</em>&thinsp;&mdash;&thinsp;how decentralized, overlapping organizational structures create public value in contexts where centralized authority breaks down.</div>
 
-  <div class="research-item"><div class="research-status status-rr">R&amp;R &middot; SMJ</div><div><div class="research-title">[Title withheld for blind review] &mdash; Comparative governance of social issues</div><div class="research-authors">Stein, D. &amp; Minniti, M.</div></div></div>
-  <div class="research-item"><div class="research-status status-review">Under Review &middot; AMJ</div><div><div class="research-title">[Title withheld for blind review] &mdash; Stakeholder alignment in multilevel public-private collaborations</div><div class="research-authors">Rodriguez, Z., Stein, D., &amp; Minniti, M.</div></div></div>
-  <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Are Players Early Birds or Work Mules? The Comparative Governance of Crowdsourcing</div><div class="research-authors">Wei, S., Stein, D., &amp; English, T.</div></div></div>
-  <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Know Thy Neighbor: Community Organizing and Knowledge Spillovers</div><div class="research-authors">Stein, D. &amp; Minniti, M.</div></div></div>
-  <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Scaling Without Hierarchy: Governing Collective Action Across Organizational Boundaries</div><div class="research-authors">Stein, D.</div></div></div>
+  <div class="research-item"><div class="research-status status-published">Published &middot; AMJ</div><div><div class="research-title"><a href="https://doi.org/10.5465/amj.2023.0425" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid var(--rule);transition:border-color .2s" onmouseover="this.style.borderBottomColor='var(--teal)'" onmouseout="this.style.borderBottomColor='var(--rule)'">Distributed Knowledge and the Creation of Public Value</a></div><div class="research-authors">Stein, D. &amp; Minniti, M. (2025)</div></div></div>
+  <div class="research-item"><div class="research-status status-rr">R&amp;R &middot; SMJ</div><div><div class="research-title">[Title withheld for blind review] &mdash; Organizational diversity and wildfire management</div><div class="research-authors">Koppl, R., Minniti, M., &amp; Stein, D.</div></div></div>
+  <div class="research-item"><div class="research-status status-review">Under Review &middot; JBV</div><div><div class="research-title">[Title withheld for blind review] &mdash; Entrepreneurial ecosystems as knowledge commons</div><div class="research-authors">Stein, D. &amp; Minniti, M.</div></div></div>
+  <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Whisky is for Drinking, Water is for Fighting Over: Stakeholder Dynamics and Property Rights Innovations</div><div class="research-authors">Stein, D., Dean, T., &amp; Minniti, M.</div></div></div>
+  <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Governance Capacity and Coordination in Wildfire Response</div><div class="research-authors">Stein, D.</div></div></div>
+  <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Venture Capital Composition Under Natural Disaster Exposure</div><div class="research-authors">Han, S., Lee, S. Y., &amp; Stein, D.</div></div></div>
+  <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Adapting Together: Portfolio Consolidation and Climate Adaptation in the Ski Industry</div><div class="research-authors">Stein, D.</div></div></div>
   <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Enabling Systemic Search Through Interorganizational Hybridity</div><div class="research-authors">Koppl, R., Minniti, M., &amp; Stein, D.</div></div></div>
-  <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Nonmarket Strategies and Firm Performance: An Industry Lifecycle Perspective</div><div class="research-authors">Palubinskas, A., Stein, D., &amp; Minniti, M.</div></div></div>
+  <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Stigma, Alignment, and Public Health Policy in Brazil</div><div class="research-authors">Minniti, M., Rodriguez, Z., &amp; Stein, D.</div></div></div>
+  <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Know Thy Neighbor: Community Organizing and Knowledge Spillovers</div><div class="research-authors">Stein, D. &amp; Minniti, M.</div></div></div>
+  <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Crowdsourcing Governance in New Product Development</div><div class="research-authors">Wei, S., Stein, D., &amp; English, T.</div></div></div>
   <div style="margin-top:1.2rem;padding-top:.8rem"><a href="research.html" style="font-family:var(--mono);font-size:.72rem;color:var(--teal);text-decoration:none;letter-spacing:.02em;border-bottom:1px solid transparent;transition:border-color .2s" onmouseover="this.style.borderBottomColor='var(--teal)'" onmouseout="this.style.borderBottomColor='transparent'">Interactive Research Overview &rarr;</a></div>
 </section>
 

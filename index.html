@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Devin Stein</title>
-<meta name="description" content="Devin Stein — strategy, entrepreneurship, and environmental governance scholar. Assistant Professor at Colorado State University.">
+<meta name="description" content="Devin Stein — strategy, entrepreneurship, and environmental governance scholar. Assistant Professor at the University of Alabama.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400;1,6..72,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -356,7 +356,7 @@ section{padding:2.5rem 0;position:relative;z-index:1}
 #teaching .teaching-row:first-child{border-top-color:rgba(0,0,0,.1)}
 #teaching .teaching-code{color:var(--dark)}
 #teaching .teaching-name{color:var(--dark);text-shadow:none}
-#teaching .teaching-school{color:var(--mid)}
+#teaching .teaching-school{color:var(--dark)}
 #teaching .teaching-ratings{color:var(--dark)}
 #teaching .rating-high{color:var(--dark)}
 
@@ -365,8 +365,9 @@ section{padding:2.5rem 0;position:relative;z-index:1}
   .container{padding:0 1.5rem}.nav-inner{padding:.85rem 1.5rem}
   .nav-links{display:none}
   .nav-links.open{display:flex;flex-direction:column;align-items:flex-end;position:absolute;top:100%;left:0;right:0;background:rgba(247,247,245,.4);backdrop-filter:blur(32px) saturate(1.5);-webkit-backdrop-filter:blur(32px) saturate(1.5);padding:1.2rem 2rem;gap:1rem;border-bottom:1px solid rgba(255,255,255,.25)}
+  .nav-dropdown{gap:0}
   .nav-dropdown-menu{position:static;display:flex !important;flex-direction:column;background:none;backdrop-filter:none;border:none;box-shadow:none;padding:0;margin:0;min-width:0;gap:.6rem;margin-top:.6rem}
-  .nav-dropdown-menu a{padding:0;font-size:.72rem;color:var(--dark)}
+  .nav-dropdown-menu a{padding:0 0 0 1rem;font-size:.66rem;color:var(--muted);border-left:1.5px solid var(--rule)}
   .hamburger{display:flex}
   .hero{padding:7.5rem 0 3.5rem}
   .hero-identity{gap:1.2rem}
@@ -467,7 +468,7 @@ section{padding:2.5rem 0;position:relative;z-index:1}
       <h1>Devin Stein</h1>
       <div class="hero-subtitle">How order emerges without hierarchy</div>
       <div class="hero-affil">
-        Assistant Professor of Management, <a href="https://biz.colostate.edu/" target="_blank" rel="noopener">Colorado State University</a><br>
+        Assistant Professor of Entrepreneurship, <a href="https://culverhouse.ua.edu/" target="_blank" rel="noopener">Culverhouse College of Business, University of Alabama</a><br>
         Fellow, <a href="https://ies.syr.edu/" target="_blank" rel="noopener">Institute for an Entrepreneurial Society</a>
       </div>
     </div>
@@ -766,10 +767,10 @@ section{padding:2.5rem 0;position:relative;z-index:1}
       </div>
       <div class="intro-bios">
         <div class="bio-label">Short bio <button class="copy-btn" onclick="copyBio(this,'short')">Copy</button></div>
-        <div class="bio-text" id="bio-short">Devin Stein is an Assistant Professor of Management at Colorado State University. His research examines how communities and organizations self-organize to govern complex environmental challenges, with a focus on wildfire management and natural resource systems. His work has been recognized with the Academy of Management's Best Dissertation Award (ONE Division) and multiple teaching excellence awards. He holds a Ph.D. from Syracuse University.</div>
+        <div class="bio-text" id="bio-short">Devin Stein is an Assistant Professor of Entrepreneurship at the University of Alabama's Culverhouse College of Business. His research examines how communities and organizations self-organize to govern complex environmental challenges, with a focus on wildfire management and natural resource systems. His work has been recognized with the Academy of Management's Best Dissertation Award (ONE Division) and multiple teaching excellence awards. He holds a Ph.D. from Syracuse University.</div>
 
         <div class="bio-label">Extended bio <button class="copy-btn" onclick="copyBio(this,'long')">Copy</button></div>
-        <div class="bio-text" id="bio-long">Devin Stein is an Assistant Professor of Management at Colorado State University and a Fellow with the Institute for an Entrepreneurial Society at Syracuse University. His research sits at the intersection of strategic management, institutional economics, and environmental governance, asking how decentralized, polycentric organizational structures emerge to address problems&thinsp;&mdash;&thinsp;like wildfire risk and water governance&thinsp;&mdash;&thinsp;that no single actor can solve alone. Drawing on transaction cost economics, property rights theory, and Ostromian governance, his empirical work combines panel econometrics, geospatial analysis, and archival methods to study community organizing, public-private collaboration, and knowledge spillovers in environmental contexts. His dissertation on wildfire management received the Academy of Management's Best Dissertation Award (Organizations and the Natural Environment Division, 2024) and was a finalist for the SIM Division award. He has received multiple teaching excellence recognitions and previously served on the faculty at the University of Alabama's Culverhouse College of Business. He holds a Ph.D. from the Whitman School of Management at Syracuse University and an M.S. in Economics from Utah State University.</div>
+        <div class="bio-text" id="bio-long">Devin Stein is an Assistant Professor of Entrepreneurship at the University of Alabama's Culverhouse College of Business and a Fellow with the Institute for an Entrepreneurial Society at Syracuse University. His research sits at the intersection of strategic management, institutional economics, and environmental governance, asking how decentralized, polycentric organizational structures emerge to address problems&thinsp;&mdash;&thinsp;like wildfire risk and water governance&thinsp;&mdash;&thinsp;that no single actor can solve alone. Drawing on transaction cost economics, property rights theory, and Ostromian governance, his empirical work combines panel econometrics, geospatial analysis, and archival methods to study community organizing, public-private collaboration, and knowledge spillovers in environmental contexts. His dissertation on wildfire management received the Academy of Management's Best Dissertation Award (Organizations and the Natural Environment Division, 2024) and was a finalist for the SIM Division award. He has received multiple teaching excellence recognitions. He holds a Ph.D. from the Whitman School of Management at Syracuse University and an M.S. in Economics from Utah State University.</div>
       </div>
     </div>
   </div>
@@ -785,10 +786,11 @@ section{padding:2.5rem 0;position:relative;z-index:1}
       <div class="contact-links">
         <a href="https://scholar.google.com/citations?user=cMbzM1oAAAAJ&hl=en" target="_blank" rel="noopener">Google Scholar</a>
         <a href="https://www.linkedin.com/in/devinstein1/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://culverhouse.ua.edu/people/devin-stein/" target="_blank" rel="noopener">Faculty Profile</a>
       </div>
     </div>
     <div class="footer-row">
-      <span>&copy; 2025 Devin Stein</span>
+      <span>&copy; 2026 Devin Stein</span>
       <span>devinstein.me</span>
     </div>
   </div>

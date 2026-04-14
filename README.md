@@ -100,15 +100,3 @@ git commit -m "Update research section"
 git push
 ```
 
----
-
-## Checklist Before Going Live
-
-- [ ] Replace `img/headshot.jpg` with your actual headshot
-- [ ] Add `img/headshot-hires.jpg` for the download link
-- [ ] Update email from `dstein2@ua.edu` to CSU address when ready
-- [ ] Verify the Google Scholar and LinkedIn links work
-- [ ] Update the "University Profile" link once CSU page exists
-- [ ] Review both bio texts for accuracy
-- [ ] Test the Copy buttons on both bios
-- [ ] Check mobile layout on your phone

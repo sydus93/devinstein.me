@@ -364,10 +364,33 @@ section{padding:2.5rem 0;position:relative;z-index:1}
 @media(max-width:760px){
   .container{padding:0 1.5rem}.nav-inner{padding:.85rem 1.5rem}
   .nav-links{display:none}
-  .nav-links.open{display:flex;flex-direction:column;align-items:flex-end;position:absolute;top:100%;left:0;right:0;background:rgba(247,247,245,.4);backdrop-filter:blur(32px) saturate(1.5);-webkit-backdrop-filter:blur(32px) saturate(1.5);padding:1.2rem 2rem;gap:1rem;border-bottom:1px solid rgba(255,255,255,.25)}
+  /* Mobile menu panel: content-width, right-anchored, adaptive light/dark */
+  .nav-links.open{
+    display:flex;flex-direction:column;align-items:flex-start;
+    position:absolute;top:calc(100% + .35rem);right:1rem;
+    min-width:180px;max-width:80vw;width:max-content;
+    padding:1rem 1.25rem;gap:.9rem;
+    border-radius:10px;
+    background:rgba(247,247,245,.94);
+    border:1px solid rgba(0,0,0,.08);
+    box-shadow:0 12px 32px rgba(0,0,0,.14);
+    backdrop-filter:blur(24px) saturate(1.4);
+    -webkit-backdrop-filter:blur(24px) saturate(1.4);
+    transition:background .35s ease,border-color .35s ease,box-shadow .35s ease
+  }
+  .nav-links.open a{color:var(--ink);text-shadow:none}
   .nav-dropdown{gap:0}
   .nav-dropdown-menu{position:static;display:flex !important;flex-direction:column;background:none;backdrop-filter:none;border:none;box-shadow:none;padding:0;margin:0;min-width:0;gap:.6rem;margin-top:.6rem}
-  .nav-dropdown-menu a{padding:0 0 0 1rem;font-size:.66rem;color:var(--muted);border-left:1.5px solid var(--rule)}
+  .nav-dropdown-menu a{padding:0 0 0 1rem;font-size:.66rem;color:var(--dark);border-left:1.5px solid rgba(0,0,0,.22);transition:color .35s ease,border-color .35s ease}
+  /* Dark mode: nav.nav-dark set by JS when menu sits over dark sections */
+  nav.nav-dark .nav-links.open{
+    background:rgba(20,20,22,.88);
+    border-color:rgba(255,255,255,.14);
+    box-shadow:0 12px 32px rgba(0,0,0,.45)
+  }
+  nav.nav-dark .nav-links.open a{color:rgba(255,255,255,.92)}
+  nav.nav-dark .nav-dropdown-menu a{color:rgba(255,255,255,.72);border-left-color:rgba(255,255,255,.22)}
+  nav.nav-dark .hamburger span{background:rgba(255,255,255,.9)}
   .hamburger{display:flex}
   .hero{padding:7.5rem 0 3.5rem}
   .hero-identity{gap:1.2rem}
@@ -476,7 +499,7 @@ section{padding:2.5rem 0;position:relative;z-index:1}
 
   <div class="hero-body">
     <p class="hero-intro">
-      My research asks how communities and organizations self-organize to govern complex environmental problems&thinsp;&mdash;&thinsp;wildfire, water, and natural resource systems&thinsp;&mdash;&thinsp;when no single actor has the authority or knowledge to act alone. I draw on institutional economics, polycentric governance theory, and strategic management to study the structures that emerge when coordination happens without command.
+      My research asks how communities and organizations self-organize to govern complex collective problems&thinsp;&mdash;&thinsp;from wildfire and water rights to public health&thinsp;&mdash;&thinsp;when no single actor has the authority or knowledge to act alone. I draw on institutional economics, polycentric governance theory, and strategic management to study the structures that emerge when coordination happens without command.
     </p>
   </div>
 
@@ -535,13 +558,12 @@ section{padding:2.5rem 0;position:relative;z-index:1}
   <div class="research-item"><div class="research-status status-rr">R&amp;R &middot; SMJ</div><div><div class="research-title">[Title withheld for blind review] &mdash; Organizational diversity and wildfire management</div><div class="research-authors">Koppl, R., Minniti, M., &amp; Stein, D.</div></div></div>
   <div class="research-item"><div class="research-status status-review">Under Review &middot; JBV</div><div><div class="research-title">[Title withheld for blind review] &mdash; Entrepreneurial ecosystems as knowledge commons</div><div class="research-authors">Stein, D. &amp; Minniti, M.</div></div></div>
   <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Whisky is for Drinking, Water is for Fighting Over: Stakeholder Dynamics and Property Rights Innovations</div><div class="research-authors">Stein, D., Dean, T., &amp; Minniti, M.</div></div></div>
-  <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Governance Capacity and Coordination in Wildfire Response</div><div class="research-authors">Stein, D.</div></div></div>
+  <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Scaling Without Hierarchy: Governing Collective Action Across Organizational Boundaries</div><div class="research-authors">Stein, D.</div></div></div>
   <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Venture Capital Composition Under Natural Disaster Exposure</div><div class="research-authors">Han, S., Lee, S. Y., &amp; Stein, D.</div></div></div>
   <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Adapting Together: Portfolio Consolidation and Climate Adaptation in the Ski Industry</div><div class="research-authors">Stein, D.</div></div></div>
   <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Enabling Systemic Search Through Interorganizational Hybridity</div><div class="research-authors">Koppl, R., Minniti, M., &amp; Stein, D.</div></div></div>
   <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Stigma, Alignment, and Public Health Policy in Brazil</div><div class="research-authors">Minniti, M., Rodriguez, Z., &amp; Stein, D.</div></div></div>
   <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Know Thy Neighbor: Community Organizing and Knowledge Spillovers</div><div class="research-authors">Stein, D. &amp; Minniti, M.</div></div></div>
-  <div class="research-item"><div class="research-status status-wp">Working Paper</div><div><div class="research-title">Crowdsourcing Governance in New Product Development</div><div class="research-authors">Wei, S., Stein, D., &amp; English, T.</div></div></div>
   <div style="margin-top:1.2rem;padding-top:.8rem"><a href="research.html" style="font-family:var(--mono);font-size:.72rem;color:var(--teal);text-decoration:none;letter-spacing:.02em;border-bottom:1px solid transparent;transition:border-color .2s" onmouseover="this.style.borderBottomColor='var(--teal)'" onmouseout="this.style.borderBottomColor='transparent'">Interactive Research Overview &rarr;</a></div>
 </section>
 
@@ -583,6 +605,7 @@ section{padding:2.5rem 0;position:relative;z-index:1}
 <!-- 02 RECOGNITION -->
 <section id="recognition" class="reveal">
   <div class="section-head"><span class="section-num">02</span><span class="section-title">Recognition</span></div>
+  <div class="award-row award-highlight"><span class="award-year">2025</span><span class="award-text">Outstanding Dissertation Award<span class="award-org">Ed Snider Center for Enterprise &amp; Markets, University of Maryland</span></span></div>
   <div class="award-row award-highlight"><span class="award-year">2025</span><span class="award-text">Finalist, Best Dissertation Award<span class="award-org">Academy of Management &mdash; Social Impact &amp; Management (SIM)</span></span></div>
   <div class="award-row award-highlight"><span class="award-year">2025</span><span class="award-text">Excellence in Innovative Teaching Award<span class="award-org">Manderson Graduate School of Business</span></span></div>
   <div class="award-row award-highlight"><span class="award-year">2025</span><span class="award-text">Untenured Tenure-Track Instructional Excellence Award<span class="award-org">Culverhouse College of Business</span></span></div>
@@ -635,8 +658,8 @@ section{padding:2.5rem 0;position:relative;z-index:1}
 <!-- 03 TEACHING -->
 <section id="teaching" class="reveal">
   <div class="section-head"><span class="section-num">03</span><span class="section-title">Teaching</span></div>
-  <div class="callout-margin" style="border-left-color:var(--teal)">Overall instructor rating: <em>4.6 / 5.0</em> across 165 student evaluations. Three teaching excellence awards.</div>
-  <div class="teaching-row"><span class="teaching-code">GBA 525</span><div><div class="teaching-name">Business Policy</div><div class="teaching-school">Manderson Graduate School of Business, Alabama</div></div><div class="teaching-ratings"><span class="rating-high">5.00</span> &middot; 4.75</div></div>
+  <div class="callout-margin" style="border-left-color:var(--teal)">Overall instructor rating: <em>4.65 / 5.0</em> across 11 course sections. Three teaching excellence awards.</div>
+  <div class="teaching-row"><span class="teaching-code">GBA 525</span><div><div class="teaching-name">Business Policy</div><div class="teaching-school">Manderson Graduate School of Business, Alabama</div></div><div class="teaching-ratings"><span class="rating-high">5.00</span> &middot; 4.91 &middot; 4.80 &middot; 4.75</div></div>
   <div class="teaching-row"><span class="teaching-code">GBA 490</span><div><div class="teaching-name">Strategic Management</div><div class="teaching-school">Culverhouse College of Business, Alabama</div></div><div class="teaching-ratings">4.70 &middot; 4.61</div></div>
   <div class="teaching-row"><span class="teaching-code">MGT 387</span><div><div class="teaching-name">Building Blocks of Entrepreneurship I</div><div class="teaching-school">Culverhouse College of Business, Alabama</div></div><div class="teaching-ratings">4.64 &middot; 4.25</div></div>
   <div class="teaching-row"><span class="teaching-code">EEE 370</span><div><div class="teaching-name">Introduction to Entrepreneurship</div><div class="teaching-school">Whitman School of Management, Syracuse</div></div><div class="teaching-ratings">4.66 &middot; 4.44 &middot; 4.38</div></div>
@@ -767,10 +790,10 @@ section{padding:2.5rem 0;position:relative;z-index:1}
       </div>
       <div class="intro-bios">
         <div class="bio-label">Short bio <button class="copy-btn" onclick="copyBio(this,'short')">Copy</button></div>
-        <div class="bio-text" id="bio-short">Devin Stein is an Assistant Professor of Entrepreneurship at the University of Alabama's Culverhouse College of Business. His research examines how communities and organizations self-organize to govern complex environmental challenges, with a focus on wildfire management and natural resource systems. His work has been recognized with the Academy of Management's Best Dissertation Award (ONE Division) and multiple teaching excellence awards. He holds a Ph.D. from Syracuse University.</div>
+        <div class="bio-text" id="bio-short">Devin Stein is an Assistant Professor of Entrepreneurship at the University of Alabama's Culverhouse College of Business. His research examines how communities and organizations self-organize to address problems of collective action and social impact&thinsp;&mdash;&thinsp;from wildfire management to public health&thinsp;&mdash;&thinsp;with recent work published in the Academy of Management Journal. His award-winning dissertation on wildfire management in California has been recognized by the Academy of Management and the University of Maryland's Ed Snider Center. He holds a Ph.D. from the Whitman School of Management at Syracuse University.</div>
 
         <div class="bio-label">Extended bio <button class="copy-btn" onclick="copyBio(this,'long')">Copy</button></div>
-        <div class="bio-text" id="bio-long">Devin Stein is an Assistant Professor of Entrepreneurship at the University of Alabama's Culverhouse College of Business and a Fellow with the Institute for an Entrepreneurial Society at Syracuse University. His research sits at the intersection of strategic management, institutional economics, and environmental governance, asking how decentralized, polycentric organizational structures emerge to address problems&thinsp;&mdash;&thinsp;like wildfire risk and water governance&thinsp;&mdash;&thinsp;that no single actor can solve alone. Drawing on transaction cost economics, property rights theory, and Ostromian governance, his empirical work combines panel econometrics, geospatial analysis, and archival methods to study community organizing, public-private collaboration, and knowledge spillovers in environmental contexts. His dissertation on wildfire management received the Academy of Management's Best Dissertation Award (Organizations and the Natural Environment Division, 2024) and was a finalist for the SIM Division award. He has received multiple teaching excellence recognitions. He holds a Ph.D. from the Whitman School of Management at Syracuse University and an M.S. in Economics from Utah State University.</div>
+        <div class="bio-text" id="bio-long">Devin Stein is an Assistant Professor of Entrepreneurship at the University of Alabama's Culverhouse College of Business and a Fellow with the Institute for an Entrepreneurial Society at Syracuse University. His research sits at the intersection of strategic management, institutional economics, and social impact, asking how decentralized, polycentric organizational structures emerge to address problems&thinsp;&mdash;&thinsp;like wildfire risk, water governance, and public health&thinsp;&mdash;&thinsp;that no single actor can solve alone. Drawing on institutional economics and Ostrom's work on the commons, his empirical work combines panel econometrics, geospatial analysis, and archival methods to study community organizing, public-private collaboration, and knowledge spillovers. His research has appeared in the <em>Academy of Management Journal</em>. His dissertation on wildfire management in California has received multiple recognitions, including the Academy of Management's Best Dissertation Award (Organizations and the Natural Environment Division, 2024), the Ed Snider Center's Outstanding Dissertation Award at the University of Maryland (2025), and Finalist recognition from the Academy of Management's SIM Division (2025). He has also received multiple teaching awards. He holds a Ph.D. from the Whitman School of Management at Syracuse University and an M.S. in Economics from Utah State University.</div>
       </div>
     </div>
   </div>
@@ -798,7 +821,29 @@ section{padding:2.5rem 0;position:relative;z-index:1}
 
 <script>
 // ── NAV ──
-window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('scrolled',window.scrollY>20)});
+// Scrolled state + adaptive light/dark theme based on section behind the nav.
+(function(){
+  const navEl = document.getElementById('nav');
+  const darkFrom = ['teaching']; // sections where sky gradient + section bg read dark
+  const darkUntil = ['introductions']; // section where page returns to light
+  function update(){
+    navEl.classList.toggle('scrolled', window.scrollY > 20);
+    const navBottom = navEl.getBoundingClientRect().bottom;
+    let overDark = false;
+    const startEl = document.getElementById(darkFrom[0]);
+    const endEl = document.getElementById(darkUntil[0]);
+    if(startEl){
+      const startTop = startEl.getBoundingClientRect().top;
+      const endTop = endEl ? endEl.getBoundingClientRect().top : Infinity;
+      overDark = navBottom >= startTop && navBottom < endTop;
+    }
+    navEl.classList.toggle('nav-dark', overDark);
+  }
+  window.addEventListener('scroll', update, {passive:true});
+  window.addEventListener('resize', update);
+  window.addEventListener('load', update);
+  update();
+})();
 
 // ── REVEAL ──
 const obs=new IntersectionObserver(e=>{e.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.06});

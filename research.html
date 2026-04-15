@@ -51,9 +51,9 @@
             summary: "Community fire prevention plans activate distributed local knowledge across organizational hierarchies, reducing wildfire property losses. Cross-level collaboration roughly doubles the effect of planning alone.",
             coauthors: "Stein & Minniti", year: 2025,
             url: "https://doi.org/10.5465/amj.2023.0425",
-            themes: ["governance", "environment", "community"],
-            methods: ["panel", "iv", "gis"],
-            theories: ["Ostrom", "Polycentricity", "Stakeholder", "NIE"],
+            themes: ["governance", "environment", "community", "knowledge", "entrepreneurship", "strategy"],
+            methods: ["panel", "iv", "gis", "archival", "case_study"],
+            theories: ["Ostrom", "Polycentricity", "Stakeholder", "NIE", "Complexity"],
           },
           // R&R
           {
@@ -63,7 +63,7 @@
             url: null,
             themes: ["governance", "environment", "community", "strategy"],
             methods: ["panel", "iv", "gis"],
-            theories: ["Polycentricity", "NIE", "Stakeholder", "Ostrom"],
+            theories: ["Polycentricity", "NIE", "Stakeholder", "Ostrom", "Complexity"],
           },
           // Under Review
           {
@@ -73,7 +73,7 @@
             url: null,
             themes: ["health", "governance", "community"],
             methods: ["panel"],
-            theories: ["NIE", "Stakeholder"],
+            theories: ["NIE", "Stakeholder", "Ostrom", "Polycentricity"],
           },
           {
             id: "jbv_si", label: "Entrepreneurial Ecosystems", status: "review", venue: "JBV SI",
@@ -82,7 +82,7 @@
             url: null,
             themes: ["entrepreneurship", "community", "knowledge", "governance"],
             methods: ["case_study", "archival"],
-            theories: ["Ostrom", "Property Rights", "NIE"],
+            theories: ["Ostrom", "Property Rights", "NIE", "Stakeholder", "Complexity"],
           },
           // Working Papers
           {
@@ -92,7 +92,7 @@
             url: null,
             themes: ["governance", "strategy", "knowledge"],
             methods: [],
-            theories: ["Complexity", "NIE", "CAS", "Stakeholder"],
+            theories: ["Complexity", "NIE", "Stakeholder"],
           },
           {
             id: "fire3", label: "Know Thy Neighbor", status: "wp", venue: null,
@@ -100,7 +100,7 @@
             coauthors: "Stein & Minniti",
             url: null,
             themes: ["community", "entrepreneurship", "knowledge", "environment"],
-            methods: ["panel", "gis"],
+            methods: ["panel", "gis", "survival"],
             theories: ["Ostrom", "Polycentricity", "Stakeholder"],
           },
           {
@@ -109,8 +109,8 @@
             coauthors: "Stein",
             url: null,
             themes: ["governance", "environment", "strategy"],
-            methods: ["panel", "iv", "survival"],
-            theories: ["TCE", "Polycentricity", "Ostrom", "NIE"],
+            methods: ["panel", "iv", "survival", "gis"],
+            theories: ["TCE", "Polycentricity", "Ostrom", "NIE", "Stakeholder"],
           },
           {
             id: "water", label: "Water Rights", status: "wp", venue: null,
@@ -119,7 +119,7 @@
             url: null,
             themes: ["environment", "governance", "entrepreneurship"],
             methods: ["panel", "gis"],
-            theories: ["Property Rights", "NIE", "Ostrom"],
+            theories: ["Property Rights", "NIE", "Ostrom", "Stakeholder"],
           },
           {
             id: "vc", label: "VC & Disasters", status: "wp", venue: null,
@@ -127,7 +127,7 @@
             coauthors: "Han, Lee & Stein",
             url: null,
             themes: ["entrepreneurship", "environment", "strategy"],
-            methods: ["panel", "iv"],
+            methods: ["panel", "iv", "gis", "survival"],
             theories: ["NIE", "Stakeholder"],
           },
           {
@@ -135,13 +135,14 @@
             summary: "Portfolio consolidation enables geographic hedging — building climate-diverse resort portfolios and spreading investment. Climate-diverse portfolios allocate capital more evenly across resorts, buffering individual exposure to snowfall volatility.",
             coauthors: "Stein",
             url: null,
-            themes: ["platforms", "environment", "strategy", "entrepreneurship"],
+            themes: ["governance", "environment", "strategy", "entrepreneurship"],
             methods: ["panel", "gis", "survival"],
             theories: ["TCE", "Property Rights", "Complexity"],
           },
         ];
 
-        // Compute links from shared themes/methods/theories
+        // Compute links — require substantive alignment (themes + theories), not just shared methods.
+        // Strength is weighted: themes matter most, then theories, then methods.
         function computeLinks(projects) {
           const links = [];
           for (let i = 0; i < projects.length; i++) {
@@ -150,18 +151,19 @@
               const sharedThemes = a.themes.filter(t => b.themes.includes(t));
               const sharedMethods = a.methods.filter(m => b.methods.includes(m));
               const sharedTheories = a.theories.filter(t => b.theories.includes(t));
-              const total = sharedThemes.length + sharedMethods.length + sharedTheories.length;
-              if (total >= 2) {
-                links.push({
-                  source: a.id, target: b.id,
-                  strength: total,
-                  shared: {
-                    themes: sharedThemes,
-                    methods: sharedMethods,
-                    theories: sharedTheories,
-                  },
-                });
-              }
+              const t = sharedThemes.length, th = sharedTheories.length, m = sharedMethods.length;
+              const qualifies = (t >= 2 && th >= 1) || t >= 3;
+              if (!qualifies) continue;
+              const strength = 2 * t + 1.5 * th + m;
+              links.push({
+                source: a.id, target: b.id,
+                strength,
+                shared: {
+                  themes: sharedThemes,
+                  methods: sharedMethods,
+                  theories: sharedTheories,
+                },
+              });
             }
           }
           return links;
@@ -195,7 +197,6 @@
               { id: "environment", label: "Environment" },
               { id: "community", label: "Community" },
               { id: "entrepreneurship", label: "Entrepreneurship" },
-              { id: "platforms", label: "Platforms" },
               { id: "strategy", label: "Strategy" },
               { id: "knowledge", label: "Knowledge" },
               { id: "health", label: "Health" },
@@ -222,7 +223,6 @@
               { id: "Property Rights", label: "Property Rights" },
               { id: "Complexity", label: "Complexity" },
               { id: "Stakeholder", label: "Stakeholder" },
-              { id: "CAS", label: "CAS" },
             ],
           },
         };
@@ -403,13 +403,19 @@
             nodesRef.current = nodes;
             linksRef.current = links;
 
+            // Measure each label's half-width so collision force keeps labels from overlapping
+            const measureCtx = document.createElement("canvas").getContext("2d");
+            measureCtx.font = "500 10px 'DM Sans', -apple-system, sans-serif";
+            nodes.forEach(n => { n.labelHalfWidth = measureCtx.measureText(n.label).width / 2; });
+
             const sim = d3.forceSimulation(nodes)
-              .force("link", d3.forceLink(links).id(d => d.id).distance(d => 140 - d.strength * 12).strength(d => 0.2 + d.strength * 0.06))
+              .force("link", d3.forceLink(links).id(d => d.id).distance(d => 140 - d.strength * 4).strength(d => 0.2 + d.strength * 0.03))
               .force("charge", d3.forceManyBody().strength(-400))
               .force("center", d3.forceCenter(width / 2, height / 2))
               .force("collision", d3.forceCollide().radius(d => {
                 const ns = NODE_STYLE[d.status] || NODE_STYLE.wp;
-                return ns.r + 22;
+                // Use label half-width so horizontally adjacent labels don't overlap
+                return Math.max(ns.r + 22, d.labelHalfWidth + 12);
               }))
               .force("x", d3.forceX(width / 2).strength(0.05))
               .force("y", d3.forceY(height / 2).strength(0.05));
@@ -419,11 +425,14 @@
             const zoom = d3.zoom().scaleExtent([0.4, 3]).on("zoom", e => g.attr("transform", e.transform));
             svg.call(zoom);
 
-            // Links — constellation lines
+            // Links — weighted visual hierarchy so strong ties stand out and weak ones recede
+            const linkMaxStrength = d3.max(links, d => d.strength) || 1;
+            const linkOpacity = d3.scaleLinear().domain([3, linkMaxStrength]).range([0.15, 0.7]).clamp(true);
+            const linkWidth = d3.scaleLinear().domain([3, linkMaxStrength]).range([0.3, 1.8]).clamp(true);
             const link = g.append("g").selectAll("line").data(links).join("line")
-              .attr("stroke", "rgba(26,107,90,0.15)")
-              .attr("stroke-width", d => 0.4 + d.strength * 0.2)
-              .attr("stroke-opacity", 0.5);
+              .attr("stroke", "rgba(26,107,90,0.18)")
+              .attr("stroke-width", d => linkWidth(d.strength))
+              .attr("stroke-opacity", d => linkOpacity(d.strength));
 
             // Track mouse position for hover glow
             svg.on("mousemove", (e) => {
@@ -493,22 +502,27 @@
               .attr("font-weight", 500)
               .attr("fill", C.textSecondary);
 
-            // Hover
+            // Hover — show only the hovered node's top 4 strongest neighbors (fewer if it has fewer edges)
+            const HOVER_TOP_K = 4;
             node.on("mouseover", function(e, d) {
+              const topEdges = links
+                .filter(l => l.source.id === d.id || l.target.id === d.id)
+                .sort((a, b) => b.strength - a.strength)
+                .slice(0, HOVER_TOP_K);
+              const topEdgeSet = new Set(topEdges);
               const connected = new Set([d.id]);
-              links.forEach(l => {
-                if (l.source.id === d.id) connected.add(l.target.id);
-                if (l.target.id === d.id) connected.add(l.source.id);
-              });
+              topEdges.forEach(l => { connected.add(l.source.id); connected.add(l.target.id); });
               node.transition().duration(150)
                 .attr("opacity", n => connected.has(n.id) ? 1 : 0.12);
               link.transition().duration(150)
-                .attr("stroke-opacity", l => (l.source.id === d.id || l.target.id === d.id) ? 0.8 : 0.04)
-                .attr("stroke", l => (l.source.id === d.id || l.target.id === d.id) ? STATUS_META[d.status]?.color || C.teal : "rgba(26,107,90,0.15)");
+                .attr("stroke-opacity", l => topEdgeSet.has(l) ? 0.85 : 0.04)
+                .attr("stroke", l => topEdgeSet.has(l) ? STATUS_META[d.status]?.color || C.teal : "rgba(26,107,90,0.18)");
             })
             .on("mouseout", () => {
               node.transition().duration(200).attr("opacity", 1);
-              link.transition().duration(200).attr("stroke-opacity", 0.5).attr("stroke", "rgba(26,107,90,0.15)");
+              link.transition().duration(200)
+                .attr("stroke-opacity", l => linkOpacity(l.strength))
+                .attr("stroke", "rgba(26,107,90,0.18)");
             })
             .on("click", (e, d) => {
               e.stopPropagation();
@@ -539,16 +553,40 @@
               floatFrame = requestAnimationFrame(floatTick);
             };
 
+            // Auto-fit kicks in while sim is still settling so the orbit accelerates into the zoom
+            let didInitialFit = false;
+            const fitToViewport = () => {
+              const pad = 60; // leaves room for node radius + labels
+              const xs = nodes.map(n => n.x);
+              const ys = nodes.map(n => n.y);
+              const minX = Math.min(...xs), maxX = Math.max(...xs);
+              const minY = Math.min(...ys), maxY = Math.max(...ys);
+              const bboxW = maxX - minX, bboxH = maxY - minY;
+              if (bboxW <= 0 || bboxH <= 0) return;
+              const scale = Math.min(2, (width - pad * 2) / bboxW, (height - pad * 2) / bboxH);
+              const tx = width / 2 - ((minX + maxX) / 2) * scale;
+              const ty = height / 2 - ((minY + maxY) / 2) * scale;
+              svg.transition().duration(1500).ease(d3.easeCubicIn)
+                .call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+            };
+            const kickoff = () => {
+              if (didInitialFit) return;
+              didInitialFit = true;
+              fitToViewport();
+              floatFrame = requestAnimationFrame(floatTick);
+            };
+
             sim.on("tick", () => {
               link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
                 .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
               node.attr("transform", d => `translate(${d.x},${d.y})`);
+              // Begin the zoom-to-fit before sim fully settles so orbit and zoom blend
+              if (!didInitialFit && sim.alpha() < 0.1) kickoff();
             });
 
-            // Start floating after simulation settles
-            sim.on("end", () => { floatFrame = requestAnimationFrame(floatTick); });
-            // Also start it on a timer in case sim doesn't fully end
-            setTimeout(() => { if (!floatFrame) floatFrame = requestAnimationFrame(floatTick); }, 3000);
+            sim.on("end", kickoff);
+            // Fallback in case sim doesn't fully end
+            setTimeout(kickoff, 3000);
 
             return () => { sim.stop(); cancelAnimationFrame(floatFrame); };
           }, [dims]);
@@ -560,7 +598,9 @@
 
             if (!matchingIds) {
               svg.selectAll("g g g").transition().duration(200).attr("opacity", 1);
-              svg.selectAll("g g line").transition().duration(200).attr("stroke-opacity", 0.5);
+              const maxS = d3.max(ALL_LINKS, d => d.strength) || 1;
+              const opa = d3.scaleLinear().domain([3, maxS]).range([0.15, 0.7]).clamp(true);
+              svg.selectAll("g g line").transition().duration(200).attr("stroke-opacity", d => opa(d.strength));
               return;
             }
 

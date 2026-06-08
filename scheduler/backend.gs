@@ -31,6 +31,9 @@ const CONFIG = {
   BUFFER_MIN: 15,
   HORIZON_DAYS: 28,
   MIN_LEAD_HOURS: 4,
+  // Active Web App /exec URL — used to build self-service cancel links in emails.
+  // Stays constant across "New version" redeploys of the same deployment.
+  WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbwb3Sq3wgiCI_u5Of6lHH_zAtyJszipDh0iA3YU_-Cpi93uQLXEP-ospVvKBoKmzAVxBA/exec',
   MEETING_TITLE: name => `Office Hours: ${name} ↔ Devin Stein`,
 };
 
@@ -39,6 +42,7 @@ function doGet(e) {
   try {
     const action = (e && e.parameter && e.parameter.action) || '';
     if (action === 'availability') return jsonResponse(handleAvailability(e.parameter));
+    if (action === 'cancel') return handleCancel(e.parameter);  // returns an HTML page, not JSON
     return jsonResponse({ok: false, error: 'unknown_action'});
   } catch (err) {
     console.error('doGet error:', err);
@@ -112,14 +116,14 @@ function handleBook(params) {
 
   // 5. Send confirmation emails.
   try {
-    sendVisitorConfirmation({name, email, startDate, endDate, visitor_tz, meetUrl});
+    sendVisitorConfirmation({name, email, startDate, endDate, visitor_tz, meetUrl, eventId: event.id});
     sendDevinNotification({name, email, purpose, startDate, endDate, visitor_tz, meetUrl, eventId: event.id});
   } catch (err) {
     console.error('email send failed (event still created):', err);
     // Don't fail the booking — event exists, emails can be re-triggered manually.
   }
 
-  return {ok: true, event_id: event.id, meet_url: meetUrl || ''};
+  return {ok: true, event_id: event.id, meet_url: meetUrl || '', cancel_url: cancelUrl(event.id)};
 }
 
 // ─── SLOT LOGIC ─────────────────────────────────────────────────────
@@ -236,7 +240,7 @@ function extractMeetUrl(event) {
 }
 
 // ─── EMAIL ──────────────────────────────────────────────────────────
-function sendVisitorConfirmation({name, email, startDate, endDate, visitor_tz, meetUrl}) {
+function sendVisitorConfirmation({name, email, startDate, endDate, visitor_tz, meetUrl, eventId}) {
   const visitorTime = Utilities.formatDate(startDate, visitor_tz || 'UTC', "EEEE, MMMM d 'at' h:mm a z");
   const mtTime = Utilities.formatDate(startDate, CONFIG.WORK_TZ, "h:mm a z");
   const subject = `Office hours confirmed — ${Utilities.formatDate(startDate, visitor_tz || 'UTC', "MMM d, h:mm a")}`;
@@ -247,7 +251,10 @@ function sendVisitorConfirmation({name, email, startDate, endDate, visitor_tz, m
     '',
     meetUrl ? `Google Meet: ${meetUrl}` : 'Meeting details are in the calendar invite.',
     '',
-    'A calendar invite is in your inbox. If you need to cancel or reschedule, reply to this email — magic-link cancellation is coming in a future update.',
+    'A calendar invite is in your inbox.',
+    '',
+    `Need to cancel? ${cancelUrl(eventId)}`,
+    'To reschedule, cancel and book a new time — or just reply to this email.',
     '',
     '— devinstein.me/schedule',
   ].join('\n');
@@ -309,6 +316,114 @@ function verifyTurnstile(token, params) {
     console.error('Turnstile verify error:', err);
     return false;
   }
+}
+
+// ─── CANCELLATION (self-service magic link) ─────────────────────────
+function getCancelSecret() {
+  // Lazily provision a signing secret on first use — no manual setup needed.
+  const props = PropertiesService.getScriptProperties();
+  let secret = props.getProperty('CANCEL_SECRET');
+  if (!secret) {
+    secret = Utilities.getUuid() + Utilities.getUuid();
+    props.setProperty('CANCEL_SECRET', secret);
+  }
+  return secret;
+}
+
+function cancelToken(eventId) {
+  // HMAC-SHA256(eventId) → web-safe base64, unpadded. Stateless capability token.
+  const sig = Utilities.computeHmacSha256Signature(eventId, getCancelSecret());
+  return Utilities.base64EncodeWebSafe(sig).replace(/=+$/, '');
+}
+
+function cancelUrl(eventId) {
+  return CONFIG.WEB_APP_URL +
+    '?action=cancel&id=' + encodeURIComponent(eventId) +
+    '&t=' + encodeURIComponent(cancelToken(eventId));
+}
+
+function constantTimeEquals(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+function handleCancel(params) {
+  const eventId = params.id || '';
+  const token = params.t || '';
+  if (!eventId || !token) {
+    return cancelPage('Invalid link',
+      'This cancellation link is incomplete. To cancel, email ' + CONFIG.NOTIFICATION_EMAIL + '.', false);
+  }
+  // Verify the signed token before touching the calendar.
+  if (!constantTimeEquals(token, cancelToken(eventId))) {
+    return cancelPage('Invalid link',
+      "This cancellation link isn't valid. To cancel, email " + CONFIG.NOTIFICATION_EMAIL + '.', false);
+  }
+  // Look up the event; if it's gone or already cancelled, say so gracefully.
+  let event;
+  try {
+    event = Calendar.Events.get(CONFIG.CALENDAR_ID, eventId);
+  } catch (err) {
+    return cancelPage('Already cancelled',
+      'This meeting is no longer on the calendar — it looks like it was already cancelled.', true);
+  }
+  if (!event || event.status === 'cancelled') {
+    return cancelPage('Already cancelled', 'This meeting has already been cancelled.', true);
+  }
+  const whenMt = (event.start && event.start.dateTime)
+    ? Utilities.formatDate(new Date(event.start.dateTime), CONFIG.WORK_TZ, "EEEE, MMMM d 'at' h:mm a z")
+    : 'your scheduled time';
+  // Remove it; sendUpdates:'all' emails the attendee AND notifies the organizer.
+  try {
+    Calendar.Events.remove(CONFIG.CALENDAR_ID, eventId, {sendUpdates: 'all'});
+  } catch (err) {
+    console.error('cancel remove failed:', err);
+    return cancelPage('Something went wrong',
+      'We could not cancel automatically. Please email ' + CONFIG.NOTIFICATION_EMAIL + ' and we will take care of it.', false);
+  }
+  try { sendCancellationNotice(event, whenMt); } catch (err) { console.error('cancel notice failed:', err); }
+  return cancelPage('Meeting cancelled',
+    'Your office-hours meeting on ' + whenMt + ' has been cancelled, and the time is open again. ' +
+    'Need a different time? Book at devinstein.me/schedule.', true);
+}
+
+function sendCancellationNotice(event, whenMt) {
+  const attendee = (event.attendees && event.attendees[0]) ? event.attendees[0].email : '(unknown)';
+  const who = (event.summary || '').replace(/^Office Hours:\s*/, '').replace(/\s*↔.*$/, '') || attendee;
+  const subject = `Cancelled — ${who} on ${whenMt}`;
+  const body = [
+    `${who} <${attendee}> cancelled their office-hours meeting.`,
+    '',
+    `Was: ${whenMt}`,
+    '',
+    'The slot is open again. (Cancelled via the link in their confirmation email.)',
+  ].join('\n');
+  GmailApp.sendEmail(CONFIG.NOTIFICATION_EMAIL, subject, body);
+}
+
+function cancelPage(heading, message, ok) {
+  const accent = ok ? '#1a6b5a' : '#b5704f';
+  const html = '<!doctype html><html><head><meta charset="utf-8">' +
+    '<title>' + heading + ' — devinstein.me</title>' +
+    '<style>' +
+    'body{margin:0;background:#f4f2ec;color:#2c2a26;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;' +
+    'display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem;box-sizing:border-box}' +
+    '.card{background:#fff;max-width:440px;width:100%;padding:2.2rem 2rem;border-radius:14px;' +
+    'box-shadow:0 10px 40px rgba(0,0,0,.08);border-left:3px solid ' + accent + '}' +
+    'h1{font-family:Georgia,"Times New Roman",serif;font-size:1.5rem;font-weight:500;margin:0 0 .8rem;color:#1f1d1a}' +
+    'p{font-size:.97rem;line-height:1.6;margin:0 0 1rem;color:#4a4742}' +
+    'a{color:' + accent + ';text-decoration:none;border-bottom:1px solid rgba(26,107,90,.35)}' +
+    '.foot{font-size:.8rem;color:#8a857c;margin-top:1.4rem;margin-bottom:0}' +
+    '</style></head><body><div class="card">' +
+    '<h1>' + heading + '</h1>' +
+    '<p>' + message + '</p>' +
+    '<p class="foot"><a href="https://devinstein.me/schedule.html">&larr; Back to scheduling</a></p>' +
+    '</div></body></html>';
+  return HtmlService.createHtmlOutput(html)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+    .setTitle(heading + ' — devinstein.me');
 }
 
 // ─── CONFIG CHECK (run from editor to debug deployment state) ───────

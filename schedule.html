@@ -253,7 +253,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
   <header class="schedule-hero">
     <div class="eyebrow">Book a meeting</div>
     <h1>Schedule office hours</h1>
-    <p class="lede">Thirty minutes, on Google Meet (or in person if you're on campus at CSU). Best for students, prospective collaborators, and conversations about wildfire / public-value research.</p>
+    <p class="lede">Thirty minutes, on Google Meet (or in person if you're on campus at CSU).</p>
     <p class="meta">Mon–Fri, <strong>8am–5pm Mountain Time</strong>. Times below shown in your timezone (<span id="visitor-tz-label">…</span>).</p>
   </header>
 
@@ -319,7 +319,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
       <div class="eyebrow">Confirmed</div>
       <h2 id="successHeading">You're booked.</h2>
       <p id="successDetail">A confirmation email and calendar invite are on their way.</p>
-      <p>Need to cancel or reschedule? For now, <a href="mailto:devin.stein@colostate.edu?subject=Reschedule office hours">email me</a> — magic-link cancellation is coming soon.</p>
+      <p id="successCancel">Need to cancel? A cancel link is in your confirmation email, or <a href="mailto:devin.stein@colostate.edu?subject=Reschedule office hours">email me</a> to reschedule.</p>
       <div class="success-meta" id="successMeta"></div>
     </div>
   </section>
@@ -605,6 +605,11 @@ function showSuccess(json, who) {
   document.getElementById('successDetail').innerHTML = detail;
   if (json.event_id) {
     document.getElementById('successMeta').textContent = `Reference: ${json.event_id}`;
+  }
+  if (json.cancel_url) {
+    document.getElementById('successCancel').innerHTML =
+      `Need to cancel? <a href="${json.cancel_url}">Cancel this meeting</a>, or ` +
+      `<a href="mailto:devin.stein@colostate.edu?subject=Reschedule office hours">email me</a> to reschedule.`;
   }
   document.getElementById('step-success').scrollIntoView({behavior: 'smooth', block: 'start'});
 }

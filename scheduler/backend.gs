@@ -23,7 +23,7 @@
 // ─── CONFIG ─────────────────────────────────────────────────────────
 const CONFIG = {
   CALENDAR_ID: 'primary',
-  NOTIFICATION_EMAIL: 'dstein2@ua.edu',  // TODO: switch on CSU transition
+  NOTIFICATION_EMAIL: 'devin.stein@colostate.edu',  // CSU
   WORK_DAYS: [1, 2, 3, 4, 5],            // Mon..Fri (0=Sun, 6=Sat)
   WORK_HOURS_MT: [8, 17],                // [start, end_exclusive] in MT
   WORK_TZ: 'America/Denver',

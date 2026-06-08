@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schedule a meeting — Devin Stein</title>
+<meta name="description" content="Book office hours with Devin Stein. 30-minute slots, Mon–Fri 8am–5pm Mountain Time.">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#0a0a0a;--dark:#1a1a1a;--body:#2a2a2a;--mid:#555;--muted:#888;--light:#b0b0b0;
+  --rule:#d4d4d4;--faint:#ebebeb;--bg:#f7f7f5;--white:#fff;
+  --teal:#1a6b5a;--teal-hover:#0f5445;--teal-light:#e4efec;--teal-faint:#f0f7f5;
+  --sienna:#b5704f;--sienna-light:#f5ece6;--sienna-dim:#8a5438;
+  --amber:#9a6b28;--green:#2a7350;--red:#a8423a;
+  --serif:'Newsreader',Georgia,serif;
+  --sans:'DM Sans',-apple-system,Helvetica,sans-serif;
+  --mono:'JetBrains Mono','Consolas',monospace;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px;overflow-x:hidden}
+body{
+  font-family:var(--serif);color:var(--body);
+  background:linear-gradient(180deg,#fafaf7 0%,#f7f7f5 35%,#f5f1ea 100%);
+  line-height:1.7;-webkit-font-smoothing:antialiased;position:relative;min-height:100vh;
+}
+::selection{background:var(--teal-light);color:var(--teal-hover)}
+
+/* Grain — over everything */
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;opacity:0.022;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+.container{max-width:760px;margin:0 auto;padding:0 2.5rem;position:relative;z-index:1}
+
+/* ── NAV (matches main site, simplified) ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;
+  background:linear-gradient(180deg,rgba(255,255,255,.4) 0%,rgba(247,247,245,.45) 40%,rgba(240,240,238,.4) 100%);
+  backdrop-filter:blur(20px) saturate(1.8) brightness(1.08);
+  -webkit-backdrop-filter:blur(20px) saturate(1.8) brightness(1.08);
+  border-bottom:1px solid rgba(255,255,255,.3);
+  box-shadow:inset 0 -1px 0 rgba(255,255,255,.2),0 1px 8px rgba(0,0,0,.02);
+}
+.nav-inner{max-width:940px;margin:0 auto;padding:.85rem 2.5rem;display:flex;justify-content:space-between;align-items:baseline}
+.nav-name{font-family:var(--sans);font-size:.85rem;font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:.06em;text-transform:uppercase}
+.nav-links{display:flex;gap:1.8rem}
+.nav-links a{font-family:var(--sans);font-size:.72rem;font-weight:600;color:var(--dark);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;transition:color .2s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--teal);transition:width .2s}
+.nav-links a:hover{color:var(--teal)}
+.nav-links a:hover::after{width:100%}
+.nav-links a.active{color:var(--teal)}
+.nav-links a.active::after{width:100%}
+
+/* ── HERO ── */
+.schedule-hero{padding:8.5rem 0 2.5rem}
+.schedule-hero .eyebrow{
+  font-family:var(--mono);font-size:.62rem;font-weight:400;
+  color:var(--sienna);letter-spacing:.08em;text-transform:uppercase;
+  margin-bottom:.6rem;display:flex;align-items:center;gap:.6rem;
+}
+.schedule-hero .eyebrow::before{content:'';display:block;width:24px;height:1px;background:var(--sienna);opacity:.6}
+.schedule-hero h1{font-family:var(--serif);font-size:2.6rem;font-weight:500;line-height:1.1;color:var(--ink);letter-spacing:-.02em;margin-bottom:.4rem}
+.schedule-hero .lede{font-family:var(--serif);font-size:1.15rem;font-weight:300;font-style:italic;color:var(--mid);line-height:1.45;margin-bottom:.8rem;max-width:520px}
+.schedule-hero .meta{font-family:var(--sans);font-size:.78rem;color:var(--mid);line-height:1.6}
+.schedule-hero .meta strong{color:var(--teal);font-weight:500}
+
+/* ── STEPS / SECTIONS ── */
+.step{padding:1.8rem 0;border-top:1px solid var(--faint);position:relative}
+.step[hidden]{display:none}
+.step-head{display:flex;align-items:baseline;gap:1rem;margin-bottom:1.2rem}
+.step-num{font-family:var(--mono);font-size:.65rem;font-weight:400;color:var(--light);letter-spacing:.02em;min-width:20px}
+.step-title{font-family:var(--sans);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.15em;color:var(--teal)}
+.step-aside{font-family:var(--sans);font-size:.72rem;color:var(--muted);margin-left:auto}
+.step-aside strong{color:var(--teal);font-weight:500}
+
+/* ── DATE STRIP ── */
+.date-strip{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:.5rem;
+  margin-bottom:.5rem;
+}
+.date-strip-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem}
+.date-strip-month{font-family:var(--sans);font-size:.78rem;font-weight:500;color:var(--dark);letter-spacing:.02em}
+.date-strip-arrows{display:flex;gap:.4rem}
+.date-arrow{
+  font-family:var(--mono);font-size:.8rem;color:var(--muted);
+  background:var(--white);border:1px solid var(--rule);
+  width:28px;height:28px;border-radius:3px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.date-arrow:hover{color:var(--teal);border-color:var(--teal);background:var(--teal-faint)}
+.date-arrow:disabled{opacity:.3;cursor:not-allowed}
+.date-arrow:disabled:hover{color:var(--muted);border-color:var(--rule);background:var(--white)}
+
+.date-card{
+  background:var(--white);border:1px solid var(--rule);
+  padding:.7rem .3rem;text-align:center;cursor:pointer;
+  border-radius:3px;transition:all .15s;
+  display:flex;flex-direction:column;gap:.15rem;align-items:center;
+}
+.date-card:hover{border-color:var(--teal);background:var(--teal-faint)}
+.date-card.unavailable{opacity:.35;cursor:not-allowed;background:var(--bg)}
+.date-card.unavailable:hover{border-color:var(--rule);background:var(--bg)}
+.date-card.selected{border-color:var(--teal);background:var(--teal);color:var(--white)}
+.date-card.selected .date-day,.date-card.selected .date-num{color:var(--white)}
+.date-day{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.date-num{font-family:var(--serif);font-size:1.1rem;font-weight:500;color:var(--ink);line-height:1}
+
+/* ── SLOT GRID ── */
+.slot-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+  gap:.55rem;
+}
+.slot-btn{
+  background:var(--white);border:1px solid var(--rule);
+  padding:.7rem .9rem;cursor:pointer;border-radius:3px;
+  font-family:var(--mono);font-size:.78rem;font-weight:500;
+  color:var(--dark);transition:all .15s;
+  display:flex;flex-direction:column;gap:.15rem;align-items:flex-start;
+}
+.slot-btn:hover{border-color:var(--teal);background:var(--teal-faint);color:var(--teal-hover)}
+.slot-btn.selected{background:var(--teal);border-color:var(--teal);color:var(--white)}
+.slot-btn .slot-mt{
+  font-family:var(--sans);font-size:.6rem;font-weight:400;
+  color:var(--muted);letter-spacing:.02em;
+}
+.slot-btn:hover .slot-mt{color:var(--teal-hover)}
+.slot-btn.selected .slot-mt{color:rgba(255,255,255,.7)}
+.slot-empty{
+  font-family:var(--sans);font-size:.85rem;font-style:italic;color:var(--muted);
+  padding:1rem 0;grid-column:1/-1;text-align:center;
+}
+.slot-loading{
+  font-family:var(--mono);font-size:.7rem;color:var(--muted);
+  padding:1rem 0;grid-column:1/-1;text-align:center;letter-spacing:.05em;
+}
+.slot-loading::after{content:'...';animation:dots 1.4s infinite}
+@keyframes dots{0%,20%{content:'.'}40%{content:'..'}60%,100%{content:'...'}}
+
+/* ── FORM ── */
+.booking-form{display:flex;flex-direction:column;gap:1rem;max-width:480px}
+.form-row{display:flex;flex-direction:column;gap:.35rem}
+.form-row label{
+  font-family:var(--sans);font-size:.66rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.12em;color:var(--muted);
+}
+.form-row input,.form-row textarea{
+  font-family:var(--serif);font-size:1rem;color:var(--ink);
+  background:var(--white);border:1px solid var(--rule);
+  padding:.7rem .9rem;border-radius:3px;
+  transition:border-color .2s,box-shadow .2s;
+  width:100%;
+}
+.form-row input:focus,.form-row textarea:focus{
+  outline:none;border-color:var(--teal);
+  box-shadow:0 0 0 3px var(--teal-faint);
+}
+.form-row textarea{min-height:90px;resize:vertical;font-family:var(--serif)}
+
+.booking-summary{
+  background:rgba(228,239,236,.4);border-left:2px solid var(--teal);
+  padding:.7rem 1rem;font-family:var(--sans);font-size:.82rem;color:var(--body);
+  margin-bottom:.4rem;
+}
+.booking-summary strong{color:var(--teal-hover);font-weight:500}
+
+.cf-turnstile{margin-top:.4rem}
+
+.submit-btn{
+  font-family:var(--sans);font-size:.78rem;font-weight:600;
+  color:var(--white);background:var(--teal);
+  border:none;padding:.85rem 1.6rem;cursor:pointer;
+  letter-spacing:.06em;text-transform:uppercase;border-radius:3px;
+  transition:background .2s,transform .1s;
+  align-self:flex-start;margin-top:.4rem;
+}
+.submit-btn:hover:not(:disabled){background:var(--teal-hover)}
+.submit-btn:active:not(:disabled){transform:translateY(1px)}
+.submit-btn:disabled{background:var(--muted);cursor:not-allowed;opacity:.6}
+
+.error-msg{
+  font-family:var(--sans);font-size:.82rem;color:var(--red);
+  background:rgba(168,66,58,.06);border-left:2px solid var(--red);
+  padding:.6rem 1rem;margin-top:.4rem;
+}
+.error-msg[hidden]{display:none}
+
+/* ── SUCCESS CARD ── */
+.success-card{
+  background:rgba(255,255,255,.7);
+  backdrop-filter:blur(16px) saturate(1.3);
+  -webkit-backdrop-filter:blur(16px) saturate(1.3);
+  border:1px solid rgba(212,212,212,.4);
+  padding:2rem;position:relative;
+  box-shadow:0 2px 24px rgba(0,0,0,.04);
+  margin:2rem 0;
+}
+.success-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,var(--teal),var(--sienna))}
+.success-card .eyebrow{font-family:var(--mono);font-size:.62rem;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem}
+.success-card h2{font-family:var(--serif);font-size:1.5rem;font-weight:500;color:var(--ink);margin-bottom:.8rem;line-height:1.2}
+.success-card p{font-size:.95rem;color:var(--body);line-height:1.6;margin-bottom:.6rem}
+.success-card a{color:var(--teal);text-decoration:none;border-bottom:1px solid var(--teal-light);transition:border-color .2s}
+.success-card a:hover{border-bottom-color:var(--teal)}
+.success-meta{
+  font-family:var(--mono);font-size:.7rem;color:var(--muted);
+  margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--faint);
+  letter-spacing:.02em;
+}
+
+/* ── BACK LINK ── */
+.back-link{
+  margin:3rem 0 4rem;text-align:center;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.05em;
+}
+.back-link a{color:var(--muted);text-decoration:none;transition:color .2s}
+.back-link a:hover{color:var(--teal)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:760px){
+  .container{padding:0 1.5rem}
+  .nav-inner{padding:.85rem 1.5rem}
+  .nav-links{gap:1rem}
+  .schedule-hero{padding:7rem 0 2rem}
+  .schedule-hero h1{font-size:2rem}
+  .schedule-hero .lede{font-size:1rem}
+  .date-strip{grid-template-columns:repeat(5,1fr)}
+  .step-aside{display:none}
+}
+@media(max-width:480px){
+  .date-strip{grid-template-columns:repeat(4,1fr)}
+  .schedule-hero h1{font-size:1.7rem}
+  .slot-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-name">Devin Stein</a>
+    <div class="nav-links">
+      <a href="/#research">Research</a>
+      <a href="/#teaching">Teaching</a>
+      <a href="schedule.html" class="active">Schedule</a>
+      <a href="/#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <header class="schedule-hero">
+    <div class="eyebrow">Book a meeting</div>
+    <h1>Schedule office hours</h1>
+    <p class="lede">Thirty minutes, on Google Meet (or in person if you're at Culverhouse). Best for students, prospective collaborators, and conversations about wildfire / public-value research.</p>
+    <p class="meta">Mon–Fri, <strong>8am–5pm Mountain Time</strong>. Times below shown in your timezone (<span id="visitor-tz-label">…</span>).</p>
+  </header>
+
+  <!-- 01 — DATE -->
+  <section class="step" id="step-date">
+    <div class="step-head">
+      <span class="step-num">01</span>
+      <span class="step-title">Pick a date</span>
+      <span class="step-aside">Next 4 weeks · weekdays only</span>
+    </div>
+    <div class="date-strip-nav">
+      <span class="date-strip-month" id="dateStripMonth">…</span>
+      <div class="date-strip-arrows">
+        <button class="date-arrow" id="datePrev" aria-label="Previous week">‹</button>
+        <button class="date-arrow" id="dateNext" aria-label="Next week">›</button>
+      </div>
+    </div>
+    <div class="date-strip" id="dateStrip"></div>
+  </section>
+
+  <!-- 02 — TIME -->
+  <section class="step" id="step-time" hidden>
+    <div class="step-head">
+      <span class="step-num">02</span>
+      <span class="step-title">Pick a time</span>
+      <span class="step-aside" id="timeAside"></span>
+    </div>
+    <div class="slot-grid" id="slotGrid">
+      <div class="slot-loading">Loading availability</div>
+    </div>
+  </section>
+
+  <!-- 03 — DETAILS -->
+  <section class="step" id="step-form" hidden>
+    <div class="step-head">
+      <span class="step-num">03</span>
+      <span class="step-title">Your details</span>
+    </div>
+    <div class="booking-summary" id="bookingSummary"></div>
+    <form class="booking-form" id="bookingForm" novalidate>
+      <div class="form-row">
+        <label for="bk-name">Full name</label>
+        <input id="bk-name" name="name" type="text" required autocomplete="name">
+      </div>
+      <div class="form-row">
+        <label for="bk-email">Email</label>
+        <input id="bk-email" name="email" type="email" required autocomplete="email">
+      </div>
+      <div class="form-row">
+        <label for="bk-purpose">What would you like to discuss? <span style="color:var(--light);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea id="bk-purpose" name="purpose" placeholder="A sentence or two helps me prepare."></textarea>
+      </div>
+      <!-- Cloudflare Turnstile -->
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAADMs_XGt9bSo4hVS"></div>
+      <button type="submit" class="submit-btn" id="submitBtn">Confirm booking</button>
+      <div class="error-msg" id="errorMsg" hidden></div>
+    </form>
+  </section>
+
+  <!-- 04 — SUCCESS -->
+  <section class="step" id="step-success" hidden>
+    <div class="success-card">
+      <div class="eyebrow">Confirmed</div>
+      <h2 id="successHeading">You're booked.</h2>
+      <p id="successDetail">A confirmation email and calendar invite are on their way.</p>
+      <p>Need to cancel or reschedule? For now, <a href="mailto:dstein2@ua.edu?subject=Reschedule office hours">email me</a> — magic-link cancellation is coming soon.</p>
+      <div class="success-meta" id="successMeta"></div>
+    </div>
+  </section>
+
+  <p class="back-link"><a href="/">← Back to devinstein.me</a></p>
+
+</div>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+// ─────────────────────────────────────────────────────────────
+//  CONFIG — set after Apps Script web-app deployment.
+//  See brain/reference/schedule_spec.md §Architecture for deploy steps.
+// ─────────────────────────────────────────────────────────────
+const SCHEDULER_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwb3Sq3wgiCI_u5Of6lHH_zAtyJszipDh0iA3YU_-Cpi93uQLXEP-ospVvKBoKmzAVxBA/exec';
+const HORIZON_DAYS = 28;
+const WORK_DAYS = [1, 2, 3, 4, 5]; // Mon..Fri (0=Sun)
+const MT_TZ = 'America/Denver';
+
+// ─────────────────────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────────────────────
+const state = {
+  visitorTz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  weekOffset: 0,           // weeks from current visible week
+  selectedDate: null,      // YYYY-MM-DD in MT
+  selectedSlot: null,      // {start, end} ISO UTC
+  cachedAvailability: {},  // key: YYYY-MM-DD (MT) → array of slots
+};
+
+document.getElementById('visitor-tz-label').textContent = state.visitorTz;
+
+// ─────────────────────────────────────────────────────────────
+//  DATE STRIP
+// ─────────────────────────────────────────────────────────────
+function fmtMtDate(d) {
+  // Format a Date as YYYY-MM-DD in MT.
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: MT_TZ, year: 'numeric', month: '2-digit', day: '2-digit'
+  }).formatToParts(d);
+  const get = type => parts.find(p => p.type === type).value;
+  return `${get('year')}-${get('month')}-${get('day')}`;
+}
+function getMtWeekday(d) {
+  // 0=Sun..6=Sat in MT.
+  const dayName = new Intl.DateTimeFormat('en-US', {timeZone: MT_TZ, weekday: 'short'}).format(d);
+  return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(dayName);
+}
+
+function buildWeekdays(offsetWeeks) {
+  // Return the next 7 weekdays starting from (today + offsetWeeks weeks).
+  const out = [];
+  const start = new Date();
+  start.setDate(start.getDate() + offsetWeeks * 7);
+  let cursor = new Date(start);
+  // Move to next Monday (or stay if today is Mon during offset 0)
+  while (out.length < 7) {
+    const wd = getMtWeekday(cursor);
+    if (WORK_DAYS.includes(wd)) {
+      out.push(new Date(cursor));
+    }
+    cursor.setDate(cursor.getDate() + 1);
+    if (out.length >= 7) break;
+    if ((cursor - start) / (1000 * 60 * 60 * 24) > 14) break; // safety
+  }
+  return out;
+}
+
+function renderDateStrip() {
+  const strip = document.getElementById('dateStrip');
+  const monthLabel = document.getElementById('dateStripMonth');
+  const prev = document.getElementById('datePrev');
+  const next = document.getElementById('dateNext');
+  const days = buildWeekdays(state.weekOffset);
+  if (!days.length) { strip.innerHTML = ''; return; }
+
+  const firstMonth = new Intl.DateTimeFormat('en-US', {timeZone: MT_TZ, month: 'long', year: 'numeric'}).format(days[0]);
+  const lastMonth = new Intl.DateTimeFormat('en-US', {timeZone: MT_TZ, month: 'long', year: 'numeric'}).format(days[days.length-1]);
+  monthLabel.textContent = firstMonth === lastMonth ? firstMonth : `${firstMonth.split(' ')[0]} – ${lastMonth}`;
+
+  const horizonEnd = new Date();
+  horizonEnd.setDate(horizonEnd.getDate() + HORIZON_DAYS);
+  const minLead = new Date();
+  minLead.setHours(minLead.getHours() + 4); // keep in sync with backend MIN_LEAD_HOURS
+
+  prev.disabled = state.weekOffset <= 0;
+  next.disabled = days[0] > horizonEnd;
+
+  strip.innerHTML = days.map(d => {
+    const ymd = fmtMtDate(d);
+    const dayShort = new Intl.DateTimeFormat('en-US', {timeZone: MT_TZ, weekday: 'short'}).format(d);
+    const dayNum = new Intl.DateTimeFormat('en-US', {timeZone: MT_TZ, day: 'numeric'}).format(d);
+    const tooEarly = d < minLead;
+    const tooLate = d > horizonEnd;
+    const unavailable = tooEarly || tooLate;
+    const selected = state.selectedDate === ymd;
+    return `
+      <div class="date-card${unavailable ? ' unavailable' : ''}${selected ? ' selected' : ''}" data-date="${ymd}" ${unavailable ? '' : `tabindex="0" role="button"`}>
+        <span class="date-day">${dayShort}</span>
+        <span class="date-num">${dayNum}</span>
+      </div>
+    `;
+  }).join('');
+
+  strip.querySelectorAll('.date-card:not(.unavailable)').forEach(card => {
+    card.addEventListener('click', () => onDateSelect(card.dataset.date));
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onDateSelect(card.dataset.date); }
+    });
+  });
+}
+
+document.getElementById('datePrev').addEventListener('click', () => { if (state.weekOffset > 0) { state.weekOffset--; renderDateStrip(); } });
+document.getElementById('dateNext').addEventListener('click', () => { state.weekOffset++; renderDateStrip(); });
+
+// ─────────────────────────────────────────────────────────────
+//  AVAILABILITY (calls Apps Script)
+// ─────────────────────────────────────────────────────────────
+async function fetchAvailability(ymd) {
+  if (state.cachedAvailability[ymd]) return state.cachedAvailability[ymd];
+  const url = new URL(SCHEDULER_ENDPOINT);
+  url.searchParams.set('action', 'availability');
+  url.searchParams.set('date', ymd);
+  url.searchParams.set('days', '1');
+  url.searchParams.set('tz', state.visitorTz);
+  const res = await fetch(url.toString(), {method: 'GET'});
+  if (!res.ok) throw new Error('fetch failed');
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error || 'availability error');
+  state.cachedAvailability[ymd] = json.slots || [];
+  return state.cachedAvailability[ymd];
+}
+
+async function onDateSelect(ymd) {
+  state.selectedDate = ymd;
+  state.selectedSlot = null;
+  document.getElementById('step-form').hidden = true;
+  document.getElementById('step-success').hidden = true;
+  renderDateStrip();
+  const stepTime = document.getElementById('step-time');
+  stepTime.hidden = false;
+  const grid = document.getElementById('slotGrid');
+  grid.innerHTML = '<div class="slot-loading">Loading availability</div>';
+
+  // Update aside label
+  const dateObj = new Date(ymd + 'T12:00:00Z');
+  const dateLabel = new Intl.DateTimeFormat('en-US', {timeZone: MT_TZ, weekday: 'long', month: 'long', day: 'numeric'}).format(dateObj);
+  document.getElementById('timeAside').innerHTML = `<strong>${dateLabel}</strong>`;
+
+  try {
+    const slots = await fetchAvailability(ymd);
+    renderSlots(slots);
+  } catch (err) {
+    grid.innerHTML = `<div class="slot-empty" style="color:var(--red)">Could not load availability. Please try again.</div>`;
+  }
+
+  stepTime.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function renderSlots(slots) {
+  const grid = document.getElementById('slotGrid');
+  if (!slots.length) {
+    grid.innerHTML = '<div class="slot-empty">No availability on this date — try another.</div>';
+    return;
+  }
+  grid.innerHTML = slots.map(slot => {
+    const start = new Date(slot.start);
+    const visitorTime = new Intl.DateTimeFormat('en-US', {timeZone: state.visitorTz, hour: 'numeric', minute: '2-digit', hour12: true}).format(start);
+    const mtTime = new Intl.DateTimeFormat('en-US', {timeZone: MT_TZ, hour: 'numeric', minute: '2-digit', hour12: true}).format(start);
+    const same = visitorTime === mtTime;
+    return `
+      <button type="button" class="slot-btn" data-start="${slot.start}" data-end="${slot.end}">
+        <span>${visitorTime}</span>
+        ${same ? '' : `<span class="slot-mt">${mtTime} MT</span>`}
+      </button>
+    `;
+  }).join('');
+  grid.querySelectorAll('.slot-btn').forEach(btn => {
+    btn.addEventListener('click', () => onSlotSelect({start: btn.dataset.start, end: btn.dataset.end}, btn));
+  });
+}
+
+function onSlotSelect(slot, btn) {
+  state.selectedSlot = slot;
+  document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+  if (btn) btn.classList.add('selected');
+  showForm();
+}
+
+// ─────────────────────────────────────────────────────────────
+//  FORM / BOOKING
+// ─────────────────────────────────────────────────────────────
+function showForm() {
+  const stepForm = document.getElementById('step-form');
+  stepForm.hidden = false;
+  const start = new Date(state.selectedSlot.start);
+  const visitorFmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: state.visitorTz, weekday: 'long', month: 'long', day: 'numeric',
+    hour: 'numeric', minute: '2-digit', hour12: true
+  }).format(start);
+  const mtFmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: MT_TZ, hour: 'numeric', minute: '2-digit', hour12: true
+  }).format(start);
+  document.getElementById('bookingSummary').innerHTML = `
+    <strong>${visitorFmt}</strong> (${mtFmt} MT) · 30 minutes
+  `;
+  stepForm.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+document.getElementById('bookingForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const errorMsg = document.getElementById('errorMsg');
+  errorMsg.hidden = true;
+  const submitBtn = document.getElementById('submitBtn');
+  const form = e.target;
+  const name = form.name.value.trim();
+  const email = form.email.value.trim();
+  const purpose = form.purpose.value.trim();
+  const turnstileEl = form.querySelector('[name="cf-turnstile-response"]');
+  const turnstileToken = turnstileEl ? turnstileEl.value : '';
+
+  if (!name || !email) { showError('Please fill in your name and email.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('That email address looks off — please double-check.'); return; }
+  if (!turnstileToken) { showError('Please complete the spam check.'); return; }
+  if (!state.selectedSlot) { showError('Please pick a time slot.'); return; }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Booking…';
+
+  try {
+    const body = new URLSearchParams({
+      action: 'book',
+      name, email, purpose,
+      start: state.selectedSlot.start,
+      end: state.selectedSlot.end,
+      visitor_tz: state.visitorTz,
+      turnstile_token: turnstileToken,
+    });
+    const res = await fetch(SCHEDULER_ENDPOINT, {method: 'POST', body});
+    const json = await res.json();
+    if (!json.ok) {
+      showError(formatError(json.error));
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Confirm booking';
+      return;
+    }
+    showSuccess(json, {name, email});
+  } catch (err) {
+    showError('Something went wrong on our end. Please try again, or email me directly.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Confirm booking';
+  }
+});
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.hidden = false;
+}
+
+function formatError(code) {
+  switch (code) {
+    case 'slot_taken': return 'That slot was just booked by someone else. Please pick another.';
+    case 'spam_check_failed': return 'The spam check failed. Please try again.';
+    case 'validation_error': return 'Some of the information looks invalid. Please re-check.';
+    default: return 'Something went wrong on our end. Please try again, or email me directly.';
+  }
+}
+
+function showSuccess(json, who) {
+  document.getElementById('step-form').hidden = true;
+  document.getElementById('step-success').hidden = false;
+  const start = new Date(state.selectedSlot.start);
+  const visitorFmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: state.visitorTz, weekday: 'long', month: 'long', day: 'numeric',
+    hour: 'numeric', minute: '2-digit', hour12: true
+  }).format(start);
+  document.getElementById('successHeading').textContent = `You're booked for ${visitorFmt}.`;
+  let detail = `A confirmation email and calendar invite are on their way to <strong>${who.email}</strong>.`;
+  if (json.meet_url) {
+    detail += ` Your Google Meet link: <a href="${json.meet_url}" target="_blank" rel="noopener">${json.meet_url}</a>.`;
+  }
+  document.getElementById('successDetail').innerHTML = detail;
+  if (json.event_id) {
+    document.getElementById('successMeta').textContent = `Reference: ${json.event_id}`;
+  }
+  document.getElementById('step-success').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+// ─────────────────────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────────────────────
+renderDateStrip();
+</script>
+</body>
+</html>

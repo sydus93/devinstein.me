@@ -303,12 +303,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
         <input id="bk-email" name="email" type="email" required autocomplete="email">
       </div>
       <div class="form-row">
-        <label for="bk-purpose">What would you like to discuss? <span style="color:var(--light);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
-        <textarea id="bk-purpose" name="purpose" placeholder="A sentence or two helps me prepare."></textarea>
+        <label for="bk-purpose">What would you like to discuss?</label>
+        <textarea id="bk-purpose" name="purpose" required placeholder="A sentence or two — this helps me confirm the right meetings."></textarea>
       </div>
       <!-- Cloudflare Turnstile -->
       <div class="cf-turnstile" data-sitekey="0x4AAAAAADMs_XGt9bSo4hVS"></div>
-      <button type="submit" class="submit-btn" id="submitBtn">Confirm booking</button>
+      <p style="font-size:.85rem;color:var(--light);line-height:1.5;margin:.1rem 0 .2rem">I review each request and confirm by email, usually within a day.</p>
+      <button type="submit" class="submit-btn" id="submitBtn">Request this time</button>
       <div class="error-msg" id="errorMsg" hidden></div>
     </form>
   </section>
@@ -316,10 +317,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
   <!-- 04 — SUCCESS -->
   <section class="step" id="step-success" hidden>
     <div class="success-card">
-      <div class="eyebrow">Confirmed</div>
-      <h2 id="successHeading">You're booked.</h2>
-      <p id="successDetail">A confirmation email and calendar invite are on their way.</p>
-      <p id="successCancel">Need to cancel? A cancel link is in your confirmation email, or <a href="mailto:devin.stein@colostate.edu?subject=Reschedule office hours">email me</a> to reschedule.</p>
+      <div class="eyebrow">Request sent</div>
+      <h2 id="successHeading">Request sent.</h2>
+      <p id="successDetail">I'll review your request and email a confirmation with the Google Meet link, usually within a day.</p>
+      <p id="successCancel">Need to change something? Just reply to that email, or <a href="mailto:devin.stein@colostate.edu?subject=Office hours request">email me</a> directly.</p>
       <div class="success-meta" id="successMeta"></div>
     </div>
   </section>
@@ -543,11 +544,12 @@ document.getElementById('bookingForm').addEventListener('submit', async e => {
 
   if (!name || !email) { showError('Please fill in your name and email.'); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('That email address looks off — please double-check.'); return; }
+  if (!purpose) { showError("Please add a sentence about what you'd like to discuss."); return; }
   if (!turnstileToken) { showError('Please complete the spam check.'); return; }
   if (!state.selectedSlot) { showError('Please pick a time slot.'); return; }
 
   submitBtn.disabled = true;
-  submitBtn.textContent = 'Booking…';
+  submitBtn.textContent = 'Sending…';
 
   try {
     const body = new URLSearchParams({
@@ -563,14 +565,14 @@ document.getElementById('bookingForm').addEventListener('submit', async e => {
     if (!json.ok) {
       showError(formatError(json.error));
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Confirm booking';
+      submitBtn.textContent = 'Request this time';
       return;
     }
     showSuccess(json, {name, email});
   } catch (err) {
     showError('Something went wrong on our end. Please try again, or email me directly.');
     submitBtn.disabled = false;
-    submitBtn.textContent = 'Confirm booking';
+    submitBtn.textContent = 'Request this time';
   }
 });
 
@@ -582,8 +584,9 @@ function showError(msg) {
 
 function formatError(code) {
   switch (code) {
-    case 'slot_taken': return 'That slot was just booked by someone else. Please pick another.';
+    case 'slot_taken': return 'That slot was just requested by someone else. Please pick another.';
     case 'spam_check_failed': return 'The spam check failed. Please try again.';
+    case 'busy': return 'The scheduler is briefly busy — please try again in a moment.';
     case 'validation_error': return 'Some of the information looks invalid. Please re-check.';
     default: return 'Something went wrong on our end. Please try again, or email me directly.';
   }
@@ -597,19 +600,32 @@ function showSuccess(json, who) {
     timeZone: state.visitorTz, weekday: 'long', month: 'long', day: 'numeric',
     hour: 'numeric', minute: '2-digit', hour12: true
   }).format(start);
-  document.getElementById('successHeading').textContent = `You're booked for ${visitorFmt}.`;
-  let detail = `A confirmation email and calendar invite are on their way to <strong>${who.email}</strong>.`;
-  if (json.meet_url) {
-    detail += ` Your Google Meet link: <a href="${json.meet_url}" target="_blank" rel="noopener">${json.meet_url}</a>.`;
+  const firstName = (who.name || '').trim().split(/\s+/)[0];
+  if (json.status === 'pending') {
+    // Approval-gated flow: the booking is a request, not yet a confirmed meeting.
+    document.getElementById('successHeading').textContent = `Request sent for ${visitorFmt}.`;
+    document.getElementById('successDetail').innerHTML =
+      `Thanks${firstName ? ', ' + firstName : ''} — I'll review your request and email a confirmation with the ` +
+      `Google Meet link to <strong>${who.email}</strong>, usually within a day. That time is held for you in the meantime.`;
+    document.getElementById('successCancel').innerHTML =
+      `Need to change something before it's confirmed? Just reply to that email, or ` +
+      `<a href="mailto:devin.stein@colostate.edu?subject=Office hours request">email me</a> directly.`;
+  } else {
+    // Legacy instant-confirm response (kept for backward compatibility).
+    document.getElementById('successHeading').textContent = `You're booked for ${visitorFmt}.`;
+    let detail = `A confirmation email and calendar invite are on their way to <strong>${who.email}</strong>.`;
+    if (json.meet_url) {
+      detail += ` Your Google Meet link: <a href="${json.meet_url}" target="_blank" rel="noopener">${json.meet_url}</a>.`;
+    }
+    document.getElementById('successDetail').innerHTML = detail;
+    if (json.cancel_url) {
+      document.getElementById('successCancel').innerHTML =
+        `Need to cancel? <a href="${json.cancel_url}">Cancel this meeting</a>, or ` +
+        `<a href="mailto:devin.stein@colostate.edu?subject=Reschedule office hours">email me</a> to reschedule.`;
+    }
   }
-  document.getElementById('successDetail').innerHTML = detail;
   if (json.event_id) {
     document.getElementById('successMeta').textContent = `Reference: ${json.event_id}`;
-  }
-  if (json.cancel_url) {
-    document.getElementById('successCancel').innerHTML =
-      `Need to cancel? <a href="${json.cancel_url}">Cancel this meeting</a>, or ` +
-      `<a href="mailto:devin.stein@colostate.edu?subject=Reschedule office hours">email me</a> to reschedule.`;
   }
   document.getElementById('step-success').scrollIntoView({behavior: 'smooth', block: 'start'});
 }

@@ -362,6 +362,17 @@ section{padding:2.5rem 0;position:relative;z-index:1}
 #teaching .teaching-school{color:var(--dark)}
 #teaching .teaching-ratings{color:var(--dark)}
 #teaching .rating-high{color:var(--dark)}
+/* Drink Wars — teaching-tool callout (work in progress) */
+.dw-card{margin-top:2.25rem;padding:1.4rem 1.5rem;border:1px solid rgba(0,0,0,.1);border-left:2px solid var(--teal);background:rgba(255,255,255,.42)}
+.dw-card .dw-eyebrow{font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--teal)}
+.dw-card .dw-title{display:inline-flex;align-items:baseline;gap:.55rem;margin-top:.4rem;font-family:var(--serif);font-size:1.5rem;font-weight:500;color:var(--ink);text-decoration:none;border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.dw-card .dw-title:hover{color:var(--teal);border-bottom-color:var(--teal)}
+.dw-card .dw-title .arrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--sienna)}
+.dw-card .dw-desc{font-family:var(--sans);font-size:.9rem;line-height:1.55;color:var(--body);margin-top:.55rem;max-width:46em}
+.dw-card .dw-meta{display:flex;flex-wrap:wrap;gap:1.4rem;align-items:baseline;margin-top:.75rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.04em;color:var(--mid)}
+.dw-card .dw-meta a{color:var(--sienna);text-decoration:none;border-bottom:1px solid rgba(181,112,79,.35)}
+.dw-card .dw-meta a:hover{border-bottom-color:var(--sienna)}
+@media(max-width:760px){.dw-card{padding:1.15rem;margin-top:1.75rem}.dw-card .dw-title{font-size:1.3rem}}
 
 /* ── RESPONSIVE ── */
 @media(max-width:760px){
@@ -382,9 +393,10 @@ section{padding:2.5rem 0;position:relative;z-index:1}
     transition:background .35s ease,border-color .35s ease,box-shadow .35s ease
   }
   .nav-links.open a{color:var(--ink);text-shadow:none}
-  .nav-dropdown{gap:0}
-  .nav-dropdown-menu{position:static;display:flex !important;flex-direction:column;background:none;backdrop-filter:none;border:none;box-shadow:none;padding:0;margin:0;min-width:0;gap:.6rem;margin-top:.6rem}
-  .nav-dropdown-menu a{padding:0 0 0 1rem;font-size:.66rem;color:var(--dark);border-left:1.5px solid rgba(0,0,0,.22);transition:color .35s ease,border-color .35s ease}
+  .nav-dropdown{display:flex;flex-direction:column;align-items:flex-start;gap:.55rem}
+  .nav-dropdown-menu{position:static;display:flex !important;flex-direction:column;background:none;backdrop-filter:none;border:none;border-left:1px solid rgba(0,0,0,.14);box-shadow:none;padding:0 0 0 .9rem;margin:.05rem 0 0 .1rem;min-width:0;gap:.7rem}
+  .nav-dropdown-menu a{padding:0;font-size:.66rem;color:var(--mid);border-left:none;transition:color .2s ease}
+  .nav-dropdown-menu a:hover{color:var(--teal)}
   /* Dark mode: nav.nav-dark set by JS when menu sits over dark sections */
   nav.nav-dark .nav-links.open{
     background:rgba(20,20,22,.88);
@@ -392,7 +404,8 @@ section{padding:2.5rem 0;position:relative;z-index:1}
     box-shadow:0 12px 32px rgba(0,0,0,.45)
   }
   nav.nav-dark .nav-links.open a{color:rgba(255,255,255,.92)}
-  nav.nav-dark .nav-dropdown-menu a{color:rgba(255,255,255,.72);border-left-color:rgba(255,255,255,.22)}
+  nav.nav-dark .nav-dropdown-menu{border-left-color:rgba(255,255,255,.2)}
+  nav.nav-dark .nav-dropdown-menu a{color:rgba(255,255,255,.66)}
   nav.nav-dark .hamburger span{background:rgba(255,255,255,.9)}
   .hamburger{display:flex}
   .hero{padding:7.5rem 0 3.5rem}
@@ -441,7 +454,13 @@ section{padding:2.5rem 0;position:relative;z-index:1}
         </div>
       </div>
       <a href="#recognition">Recognition</a>
-      <a href="#teaching">Teaching</a>
+      <div class="nav-dropdown">
+        <a href="#teaching">Teaching</a>
+        <div class="nav-dropdown-menu">
+          <a href="#teaching">Courses</a>
+          <a href="https://devinstein.me/drinkwars/">Drink Wars</a>
+        </div>
+      </div>
       <a href="#talks">Talks</a>
       <a href="#introductions">Bio &amp; Headshot</a>
       <a href="schedule.html">Schedule</a>
@@ -667,6 +686,16 @@ section{padding:2.5rem 0;position:relative;z-index:1}
   <div class="teaching-row"><span class="teaching-code">GBA 490</span><div><div class="teaching-name">Strategic Management</div><div class="teaching-school">Culverhouse College of Business, Alabama</div></div><div class="teaching-ratings">4.70 &middot; 4.61</div></div>
   <div class="teaching-row"><span class="teaching-code">MGT 387</span><div><div class="teaching-name">Building Blocks of Entrepreneurship I</div><div class="teaching-school">Culverhouse College of Business, Alabama</div></div><div class="teaching-ratings">4.64 &middot; 4.25</div></div>
   <div class="teaching-row"><span class="teaching-code">EEE 370</span><div><div class="teaching-name">Introduction to Entrepreneurship</div><div class="teaching-school">Whitman School of Management, Syracuse</div></div><div class="teaching-ratings">4.66 &middot; 4.44 &middot; 4.38</div></div>
+
+  <div class="dw-card">
+    <div class="dw-eyebrow">Teaching tool &middot; In development</div>
+    <a class="dw-title" href="https://devinstein.me/drinkwars/">Drink Wars <span class="arrow">Play&nbsp;&rarr;</span></a>
+    <div class="dw-desc">A business-strategy simulation I am building for the capstone classroom. Students run a craft-beverage company across sixteen rounds of pricing, capacity, brand, and stakeholder decisions against adaptive AI rivals, then weather the occasional market shock. A single-player prototype runs entirely in the browser.</div>
+    <div class="dw-meta">
+      <span>Single-player &middot; 16 rounds &middot; no sign-in</span>
+      <a href="mailto:devin.stein@colostate.edu?subject=Drink%20Wars%20feedback">Still a work in progress &mdash; feedback welcome</a>
+    </div>
+  </div>
 </section>
 
 <svg class="topo-divider topo-4" viewBox="0 0 2400 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">

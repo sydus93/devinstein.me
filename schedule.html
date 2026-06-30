@@ -1,594 +1,479 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-mode="sectional">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Schedule a meeting — Devin Stein</title>
-<meta name="description" content="Book office hours with Devin Stein. 30-minute slots, Mon–Fri 8am–5pm Mountain Time.">
-<link rel="icon" href="/favicon.ico?v=2" sizes="any">
-<link rel="icon" type="image/svg+xml" href="/img/favicon.svg?v=2">
-<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png?v=2">
-<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png?v=2">
-<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png?v=2">
+<meta name="description" content="Book office hours with Devin Stein. 30-minute slots on Google Meet, Mon–Fri, Mountain Time.">
+<link rel="icon" href="/favicon.ico?v=3" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/img/favicon.svg?v=3">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png?v=3">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png?v=3">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png?v=3">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
-:root {
-  --ink:#0a0a0a;--dark:#1a1a1a;--body:#2a2a2a;--mid:#555;--muted:#888;--light:#b0b0b0;
-  --rule:#d4d4d4;--faint:#ebebeb;--bg:#f7f7f5;--white:#fff;
-  --teal:#1a6b5a;--teal-hover:#0f5445;--teal-light:#e4efec;--teal-faint:#f0f7f5;
-  --sienna:#b5704f;--sienna-light:#f5ece6;--sienna-dim:#8a5438;
-  --amber:#9a6b28;--green:#2a7350;--red:#a8423a;
-  --serif:'Newsreader',Georgia,serif;
-  --sans:'DM Sans',-apple-system,Helvetica,sans-serif;
-  --mono:'JetBrains Mono','Consolas',monospace;
+/* Devin Stein — Scholarly Identity tokens */
+[data-mode="foolscap"], :root {
+  --bg:#f7f4ec; --bg-raise:#fcfaf3; --bg-sink:#efebdf; --white:#ffffff;
+  --ink:#0d0c0a; --fg-1:#1a1815; --fg-2:#4a4742; --fg-3:#7a766f; --fg-4:#a8a39a;
+  --rule:#c9c2b3; --rule-faint:#e3dcca;
+  --topo-brown:#b5704f; --topo-brown-2:#8a5438;
+  --sectional-blue:#5a8044; --sectional-blue-2:#3a5a2e;
+  --amber:#9a6b28; --turquoise:#1c8f9c;
+  --accent-terracotta:#c87456;
+  --serif:"EB Garamond", Georgia, "Times New Roman", serif;
+  --sans:"IBM Plex Sans", "Inter", -apple-system, system-ui, sans-serif;
+  --mono:"IBM Plex Mono", "JetBrains Mono", Consolas, monospace;
+  --display-roman:"Cormorant Garamond", "EB Garamond", "Trajan Pro", serif;
+  --ease:cubic-bezier(0.25,0.1,0.25,1);
 }
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;font-size:16px;overflow-x:hidden}
-body{
-  font-family:var(--serif);color:var(--body);
-  background:linear-gradient(180deg,#fafaf7 0%,#f7f7f5 35%,#f5f1ea 100%);
-  line-height:1.7;-webkit-font-smoothing:antialiased;position:relative;min-height:100vh;
+[data-mode="sectional"] {
+  --bg:#16181d; --bg-raise:#1d2027; --bg-sink:#101218; --white:#f7f4ec;
+  --ink:#f4ecd8; --fg-1:#e8e0cc; --fg-2:#b8b0a0; --fg-3:#888278; --fg-4:#5a564f;
+  --rule:#3a3832; --rule-faint:#25241f;
+  --topo-brown:#c98a68; --topo-brown-2:#a06848;
+  --sectional-blue:#8aae6e; --sectional-blue-2:#a8c890;
+  --amber:#c89858; --turquoise:#5fb8c4;
+  --accent-terracotta:#db8e72;
 }
-::selection{background:var(--teal-light);color:var(--teal-hover)}
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; font-size:16px; }
+body { background:#0e1014; color:var(--fg-1); font-family:var(--serif); -webkit-font-smoothing:antialiased; }
+@keyframes prismDrift { 0% { background-position:130% 0; } 50% { background-position:-30% 0; } 100% { background-position:130% 0; } }
+@keyframes glintSweep { 0% { transform:translateX(-120%) skewX(-18deg); opacity:0; } 18% { opacity:.7; } 42% { opacity:0; } 100% { transform:translateX(220%) skewX(-18deg); opacity:0; } }
+@keyframes twinkle { 0%,100% { opacity:.12; transform:scale(.7); } 50% { opacity:.9; transform:scale(1.1); } }
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes auroraShift { 0% { transform:translate3d(0,0,0) scale(1); } 50% { transform:translate3d(0,-2%,0) scale(1.04); } 100% { transform:translate3d(0,0,0) scale(1); } }
+.sched-input::placeholder { color:var(--fg-4); font-style:italic; }
+.sched-input:focus { outline:none; border-color:color-mix(in srgb, var(--turquoise) 70%, transparent); box-shadow:0 0 0 3px color-mix(in srgb, var(--turquoise) 18%, transparent), inset 0 1px 0 rgba(255,255,255,.12); }
+.sched-navlink:hover { border-bottom:1px solid var(--turquoise) !important; }
+.cf-turnstile { min-height:65px; }
+[hidden] { display:none !important; }
 
-/* Grain — over everything */
-body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;opacity:0.022;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-
-.container{max-width:760px;margin:0 auto;padding:0 2.5rem;position:relative;z-index:1}
-
-/* ── NAV (matches main site, simplified) ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;
-  background:linear-gradient(180deg,rgba(255,255,255,.4) 0%,rgba(247,247,245,.45) 40%,rgba(240,240,238,.4) 100%);
-  backdrop-filter:blur(20px) saturate(1.8) brightness(1.08);
-  -webkit-backdrop-filter:blur(20px) saturate(1.8) brightness(1.08);
-  border-bottom:1px solid rgba(255,255,255,.3);
-  box-shadow:inset 0 -1px 0 rgba(255,255,255,.2),0 1px 8px rgba(0,0,0,.02);
-}
-.nav-inner{max-width:940px;margin:0 auto;padding:.85rem 2.5rem;display:flex;justify-content:space-between;align-items:baseline}
-.nav-name{font-family:var(--sans);font-size:.85rem;font-weight:700;color:var(--ink);text-decoration:none;letter-spacing:.06em;text-transform:uppercase}
-.nav-links{display:flex;gap:1.8rem}
-.nav-links a{font-family:var(--sans);font-size:.72rem;font-weight:600;color:var(--dark);text-decoration:none;letter-spacing:.06em;text-transform:uppercase;transition:color .2s;position:relative}
-.nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--teal);transition:width .2s}
-.nav-links a:hover{color:var(--teal)}
-.nav-links a:hover::after{width:100%}
-.nav-links a.active{color:var(--teal)}
-.nav-links a.active::after{width:100%}
-
-/* ── HERO ── */
-.schedule-hero{padding:8.5rem 0 2.5rem}
-.schedule-hero .eyebrow{
-  font-family:var(--mono);font-size:.62rem;font-weight:400;
-  color:var(--sienna);letter-spacing:.08em;text-transform:uppercase;
-  margin-bottom:.6rem;display:flex;align-items:center;gap:.6rem;
-}
-.schedule-hero .eyebrow::before{content:'';display:block;width:24px;height:1px;background:var(--sienna);opacity:.6}
-.schedule-hero h1{font-family:var(--serif);font-size:2.6rem;font-weight:500;line-height:1.1;color:var(--ink);letter-spacing:-.02em;margin-bottom:.4rem}
-.schedule-hero .lede{font-family:var(--serif);font-size:1.15rem;font-weight:300;font-style:italic;color:var(--mid);line-height:1.45;margin-bottom:.8rem;max-width:520px}
-.schedule-hero .meta{font-family:var(--sans);font-size:.78rem;color:var(--mid);line-height:1.6}
-.schedule-hero .meta strong{color:var(--teal);font-weight:500}
-
-/* ── STEPS / SECTIONS ── */
-.step{padding:1.8rem 0;border-top:1px solid var(--faint);position:relative}
-.step[hidden]{display:none}
-.step-head{display:flex;align-items:baseline;gap:1rem;margin-bottom:1.2rem}
-.step-num{font-family:var(--mono);font-size:.65rem;font-weight:400;color:var(--light);letter-spacing:.02em;min-width:20px}
-.step-title{font-family:var(--sans);font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.15em;color:var(--teal)}
-.step-aside{font-family:var(--sans);font-size:.72rem;color:var(--muted);margin-left:auto}
-.step-aside strong{color:var(--teal);font-weight:500}
-
-/* ── DATE STRIP ── */
-.date-strip{
-  display:grid;grid-template-columns:repeat(7,1fr);gap:.5rem;
-  margin-bottom:.5rem;
-}
-.date-strip-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem}
-.date-strip-month{font-family:var(--sans);font-size:.78rem;font-weight:500;color:var(--dark);letter-spacing:.02em}
-.date-strip-arrows{display:flex;gap:.4rem}
-.date-arrow{
-  font-family:var(--mono);font-size:.8rem;color:var(--muted);
-  background:var(--white);border:1px solid var(--rule);
-  width:28px;height:28px;border-radius:3px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .15s;
-}
-.date-arrow:hover{color:var(--teal);border-color:var(--teal);background:var(--teal-faint)}
-.date-arrow:disabled{opacity:.3;cursor:not-allowed}
-.date-arrow:disabled:hover{color:var(--muted);border-color:var(--rule);background:var(--white)}
-
-.date-card{
-  background:var(--white);border:1px solid var(--rule);
-  padding:.7rem .3rem;text-align:center;cursor:pointer;
-  border-radius:3px;transition:all .15s;
-  display:flex;flex-direction:column;gap:.15rem;align-items:center;
-}
-.date-card:hover{border-color:var(--teal);background:var(--teal-faint)}
-.date-card.unavailable{opacity:.35;cursor:not-allowed;background:var(--bg)}
-.date-card.unavailable:hover{border-color:var(--rule);background:var(--bg)}
-.date-card.selected{border-color:var(--teal);background:var(--teal);color:var(--white)}
-.date-card.selected .date-day,.date-card.selected .date-num{color:var(--white)}
-.date-day{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-.date-num{font-family:var(--serif);font-size:1.1rem;font-weight:500;color:var(--ink);line-height:1}
-
-/* ── SLOT GRID ── */
-.slot-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-  gap:.55rem;
-}
-.slot-btn{
-  background:var(--white);border:1px solid var(--rule);
-  padding:.7rem .9rem;cursor:pointer;border-radius:3px;
-  font-family:var(--mono);font-size:.78rem;font-weight:500;
-  color:var(--dark);transition:all .15s;
-  display:flex;flex-direction:column;gap:.15rem;align-items:flex-start;
-}
-.slot-btn:hover{border-color:var(--teal);background:var(--teal-faint);color:var(--teal-hover)}
-.slot-btn.selected{background:var(--teal);border-color:var(--teal);color:var(--white)}
-.slot-btn .slot-mt{
-  font-family:var(--sans);font-size:.6rem;font-weight:400;
-  color:var(--muted);letter-spacing:.02em;
-}
-.slot-btn:hover .slot-mt{color:var(--teal-hover)}
-.slot-btn.selected .slot-mt{color:rgba(255,255,255,.7)}
-.slot-empty{
-  font-family:var(--sans);font-size:.85rem;font-style:italic;color:var(--muted);
-  padding:1rem 0;grid-column:1/-1;text-align:center;
-}
-.slot-loading{
-  font-family:var(--mono);font-size:.7rem;color:var(--muted);
-  padding:1rem 0;grid-column:1/-1;text-align:center;letter-spacing:.05em;
-}
-.slot-loading::after{content:'...';animation:dots 1.4s infinite}
-@keyframes dots{0%,20%{content:'.'}40%{content:'..'}60%,100%{content:'...'}}
-
-/* ── FORM ── */
-.booking-form{display:flex;flex-direction:column;gap:1rem;max-width:480px}
-.form-row{display:flex;flex-direction:column;gap:.35rem}
-.form-row label{
-  font-family:var(--sans);font-size:.66rem;font-weight:600;
-  text-transform:uppercase;letter-spacing:.12em;color:var(--muted);
-}
-.form-row input,.form-row textarea{
-  font-family:var(--serif);font-size:1rem;color:var(--ink);
-  background:var(--white);border:1px solid var(--rule);
-  padding:.7rem .9rem;border-radius:3px;
-  transition:border-color .2s,box-shadow .2s;
-  width:100%;
-}
-.form-row input:focus,.form-row textarea:focus{
-  outline:none;border-color:var(--teal);
-  box-shadow:0 0 0 3px var(--teal-faint);
-}
-.form-row textarea{min-height:90px;resize:vertical;font-family:var(--serif)}
-
-.booking-summary{
-  background:rgba(228,239,236,.4);border-left:2px solid var(--teal);
-  padding:.7rem 1rem;font-family:var(--sans);font-size:.82rem;color:var(--body);
-  margin-bottom:.4rem;
-}
-.booking-summary strong{color:var(--teal-hover);font-weight:500}
-
-.cf-turnstile{margin-top:.4rem}
-
-.submit-btn{
-  font-family:var(--sans);font-size:.78rem;font-weight:600;
-  color:var(--white);background:var(--teal);
-  border:none;padding:.85rem 1.6rem;cursor:pointer;
-  letter-spacing:.06em;text-transform:uppercase;border-radius:3px;
-  transition:background .2s,transform .1s;
-  align-self:flex-start;margin-top:.4rem;
-}
-.submit-btn:hover:not(:disabled){background:var(--teal-hover)}
-.submit-btn:active:not(:disabled){transform:translateY(1px)}
-.submit-btn:disabled{background:var(--muted);cursor:not-allowed;opacity:.6}
-
-.error-msg{
-  font-family:var(--sans);font-size:.82rem;color:var(--red);
-  background:rgba(168,66,58,.06);border-left:2px solid var(--red);
-  padding:.6rem 1rem;margin-top:.4rem;
-}
-.error-msg[hidden]{display:none}
-
-/* ── SUCCESS CARD ── */
-.success-card{
-  background:rgba(255,255,255,.7);
-  backdrop-filter:blur(16px) saturate(1.3);
-  -webkit-backdrop-filter:blur(16px) saturate(1.3);
-  border:1px solid rgba(212,212,212,.4);
-  padding:2rem;position:relative;
-  box-shadow:0 2px 24px rgba(0,0,0,.04);
-  margin:2rem 0;
-}
-.success-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,var(--teal),var(--sienna))}
-.success-card .eyebrow{font-family:var(--mono);font-size:.62rem;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem}
-.success-card h2{font-family:var(--serif);font-size:1.5rem;font-weight:500;color:var(--ink);margin-bottom:.8rem;line-height:1.2}
-.success-card p{font-size:.95rem;color:var(--body);line-height:1.6;margin-bottom:.6rem}
-.success-card a{color:var(--teal);text-decoration:none;border-bottom:1px solid var(--teal-light);transition:border-color .2s}
-.success-card a:hover{border-bottom-color:var(--teal)}
-.success-meta{
-  font-family:var(--mono);font-size:.7rem;color:var(--muted);
-  margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--faint);
-  letter-spacing:.02em;
-}
-
-/* ── BACK LINK ── */
-.back-link{
-  margin:3rem 0 4rem;text-align:center;
-  font-family:var(--mono);font-size:.7rem;letter-spacing:.05em;
-}
-.back-link a{color:var(--muted);text-decoration:none;transition:color .2s}
-.back-link a:hover{color:var(--teal)}
-
-/* ── RESPONSIVE ── */
-@media(max-width:760px){
-  .container{padding:0 1.5rem}
-  .nav-inner{padding:.85rem 1.5rem}
-  .nav-links{gap:1rem}
-  .schedule-hero{padding:7rem 0 2rem}
-  .schedule-hero h1{font-size:2rem}
-  .schedule-hero .lede{font-size:1rem}
-  .date-strip{grid-template-columns:repeat(5,1fr)}
-  .step-aside{display:none}
-}
-@media(max-width:480px){
-  .date-strip{grid-template-columns:repeat(4,1fr)}
-  .schedule-hero h1{font-size:1.7rem}
-  .slot-grid{grid-template-columns:repeat(2,1fr)}
-}
+  .navgroup:hover .menu { display:block !important; }
 </style>
 </head>
 <body>
+<div id="root" data-mode="sectional" style="position:relative; min-height:100vh; background:var(--bg); color:var(--fg-1); font-family:var(--serif); overflow:hidden;">
 
-<nav>
-  <div class="nav-inner">
-    <a href="/" class="nav-name">Devin Stein</a>
-    <div class="nav-links">
-      <a href="/#research">Research</a>
-      <a href="/#teaching">Teaching</a>
-      <a href="schedule.html" class="active">Schedule</a>
-      <a href="/#contact">Contact</a>
+  <!-- Aurora atmosphere -->
+  <div id="aurora" style="position:fixed; inset:-10%; z-index:0; pointer-events:none; opacity:1; animation:auroraShift 22s ease-in-out infinite; background:radial-gradient(900px 620px at 18% 12%, rgba(70,110,185,.20), transparent 60%), radial-gradient(820px 700px at 86% 22%, rgba(95,184,196,.16), transparent 62%), radial-gradient(760px 640px at 72% 92%, rgba(201,138,104,.14), transparent 60%), radial-gradient(680px 560px at 8% 86%, rgba(125,95,160,.18), transparent 60%), radial-gradient(520px 460px at 50% 50%, rgba(255,180,120,.06), transparent 70%);"></div>
+  <!-- star dust -->
+  <div style="position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.5; background-image:radial-gradient(1.2px 1.2px at 12% 22%, rgba(200,212,235,.7), transparent), radial-gradient(1px 1px at 68% 14%, rgba(200,212,235,.6), transparent), radial-gradient(1.4px 1.4px at 83% 62%, rgba(200,212,235,.55), transparent), radial-gradient(1px 1px at 32% 78%, rgba(200,212,235,.5), transparent), radial-gradient(1px 1px at 52% 42%, rgba(200,212,235,.45), transparent), radial-gradient(1.3px 1.3px at 90% 32%, rgba(200,212,235,.5), transparent);"></div>
+  <!-- grain -->
+  <div style="position:fixed; inset:0; pointer-events:none; z-index:998; opacity:.02; background-image:url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;);"></div>
+
+  <!-- Nav -->
+  <nav style="position:sticky; top:0; z-index:100; background:color-mix(in srgb, var(--bg) 42%, transparent); backdrop-filter:blur(26px) saturate(1.6); -webkit-backdrop-filter:blur(26px) saturate(1.6); border-bottom:.5px solid var(--rule-faint);">
+    <!-- Prism / refraction sheen -->
+    <div style="position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:1;">
+      <div style="position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg, transparent 4%, rgba(255,140,190,.55), rgba(190,150,255,.55), rgba(130,200,255,.5), rgba(150,255,215,.45), rgba(255,205,130,.4), transparent 96%);"></div>
+      <div style="position:absolute; inset:-60% 0; background:linear-gradient(105deg, transparent 38%, rgba(255,90,160,.06) 46%, rgba(150,90,255,.07) 50%, rgba(70,160,255,.06) 54%, rgba(60,230,190,.05) 60%, rgba(255,200,120,.04) 64%, transparent 72%); mix-blend-mode:screen; background-size:260% 100%; background-repeat:no-repeat; animation:prismDrift 11s ease-in-out infinite;"></div>
     </div>
+    <div style="max-width:940px; margin:0 auto; padding:14px 2.5rem; display:flex; justify-content:space-between; align-items:baseline; gap:1rem; position:relative; z-index:2;">
+      <a href="index.html" style="font-family:var(--sans); font-size:12px; font-weight:700; color:var(--ink); letter-spacing:.06em; text-transform:uppercase; text-decoration:none;">Devin Stein</a>
+      <div style="display:flex; gap:1.5rem; align-items:baseline;">
+
+        <div class="navgroup" style="position:relative;">
+          <a href="index.html#research" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent; cursor:pointer;" data-hover="border-bottom:1px solid var(--sectional-blue);">Research <span style="opacity:.45; font-size:8px;">&#9662;</span></a>
+          <div class="menu" style="position:absolute; top:100%; left:-12px; padding-top:11px; z-index:140; display:none;">
+            <div style="position:relative; min-width:222px; background:color-mix(in srgb, var(--bg-raise) 90%, transparent); backdrop-filter:blur(32px) saturate(1.9) brightness(1.04); -webkit-backdrop-filter:blur(32px) saturate(1.9) brightness(1.04); border:.5px solid color-mix(in srgb, var(--white) 32%, transparent); box-shadow:0 22px 50px rgba(0,0,0,.32), 0 2px 8px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.35); border-radius:13px; padding:6px; overflow:hidden;"><div style="position:absolute; top:0; left:12%; right:12%; height:1px; background:linear-gradient(90deg, transparent, rgba(255,150,200,.5), rgba(170,160,255,.55), rgba(130,210,255,.5), rgba(160,255,220,.45), transparent);"></div><div style="position:absolute; top:1px; left:0; right:0; height:30%; background:linear-gradient(180deg, rgba(255,255,255,.1), transparent); pointer-events:none;"></div>
+              <a href="index.html#research" style="display:block; padding:9px 12px; text-decoration:none; border-radius:8px; position:relative;" data-hover="background:color-mix(in srgb, var(--white) 12%, transparent);">
+                <div style="font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--fg-1); display:flex; justify-content:space-between; gap:14px;">Papers</div>
+                <div style="font-family:var(--sans); font-size:10px; color:var(--fg-3); letter-spacing:.01em; margin-top:2px;">Published &amp; working papers</div>
+              </a>
+              <a href="research.html" style="display:block; padding:9px 12px; text-decoration:none; border-radius:8px; position:relative;" data-hover="background:color-mix(in srgb, var(--white) 12%, transparent);">
+                <div style="font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--fg-1); display:flex; justify-content:space-between; gap:14px;">Research Map <span style="color:var(--sectional-blue); font-family:var(--mono); font-size:10px;">&nearr;</span></div>
+                <div style="font-family:var(--sans); font-size:10px; color:var(--fg-3); letter-spacing:.01em; margin-top:2px;">Interactive constellation</div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="navgroup" style="position:relative;">
+          <a href="index.html#teaching" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent; cursor:pointer;" data-hover="border-bottom:1px solid var(--sectional-blue);">Teaching <span style="opacity:.45; font-size:8px;">&#9662;</span></a>
+          <div class="menu" style="position:absolute; top:100%; left:-12px; padding-top:11px; z-index:140; display:none;">
+            <div style="position:relative; min-width:222px; background:color-mix(in srgb, var(--bg-raise) 90%, transparent); backdrop-filter:blur(32px) saturate(1.9) brightness(1.04); -webkit-backdrop-filter:blur(32px) saturate(1.9) brightness(1.04); border:.5px solid color-mix(in srgb, var(--white) 32%, transparent); box-shadow:0 22px 50px rgba(0,0,0,.32), 0 2px 8px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.35); border-radius:13px; padding:6px; overflow:hidden;"><div style="position:absolute; top:0; left:12%; right:12%; height:1px; background:linear-gradient(90deg, transparent, rgba(255,150,200,.5), rgba(170,160,255,.55), rgba(130,210,255,.5), rgba(160,255,220,.45), transparent);"></div><div style="position:absolute; top:1px; left:0; right:0; height:30%; background:linear-gradient(180deg, rgba(255,255,255,.1), transparent); pointer-events:none;"></div>
+              <a href="https://devinstein.me/drinkwars/" target="_blank" rel="noopener" style="display:block; padding:9px 12px; text-decoration:none; border-radius:8px; position:relative;" data-hover="background:color-mix(in srgb, var(--white) 12%, transparent);">
+                <div style="font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--fg-1); display:flex; justify-content:space-between; gap:14px;">Drink Wars <span style="color:var(--sectional-blue); font-family:var(--mono); font-size:10px;">&nearr;</span></div>
+                <div style="font-family:var(--sans); font-size:10px; color:var(--fg-3); letter-spacing:.01em; margin-top:2px;">Craft-beverage strategy sim</div>
+              </a>
+              <a href="schedule.html" style="display:block; padding:9px 12px; text-decoration:none; border-radius:8px; position:relative;" data-hover="background:color-mix(in srgb, var(--white) 12%, transparent);">
+                <div style="font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--fg-1); display:flex; justify-content:space-between; gap:14px;">Schedule <span style="color:var(--sectional-blue); font-family:var(--mono); font-size:10px;">&nearr;</span></div>
+                <div style="font-family:var(--sans); font-size:10px; color:var(--fg-3); letter-spacing:.01em; margin-top:2px;">Office hours &amp; meetings</div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <a href="index.html#recognition" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent;" data-hover="border-bottom:1px solid var(--sectional-blue);">Recognition</a>
+        <a href="index.html#talks" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent;" data-hover="border-bottom:1px solid var(--sectional-blue);">Talks</a>
+        <a href="index.html#bio" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent;" data-hover="border-bottom:1px solid var(--sectional-blue);">Bio</a>
+        <a href="https://docs.google.com/document/d/15JjioE7TF23AzHyGsPKE4yBeVMtSmnsa/export?format=pdf" target="_blank" rel="noopener" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent;" data-hover="border-bottom:1px solid var(--sectional-blue);">CV</a>
+      </div>
+    </div>
+  </nav>
+
+  <div id="top" style="max-width:980px; margin:0 auto; padding:0 2rem 5rem; position:relative; z-index:2;">
+
+    <!-- HERO -->
+    <header style="padding:4rem 0 2rem; display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap;">
+      <div>
+        <div style="font-family:var(--mono); font-size:10.5px; font-weight:400; color:var(--topo-brown); letter-spacing:.12em; text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:10px;">
+          <span style="display:block; width:22px; height:1px; background:var(--topo-brown); opacity:.65;"></span>
+          Book a meeting
+        </div>
+        <h1 style="font-family:var(--display-roman); font-weight:400; font-size:3.1rem; line-height:1.02; letter-spacing:.01em; color:var(--ink); margin-bottom:10px;">Schedule <span style="color:var(--turquoise);">office hours</span></h1>
+        <p style="font-family:var(--serif); font-style:italic; font-weight:300; font-size:1.3rem; color:var(--fg-2); line-height:1.4; max-width:30em;">Thirty minutes, on Google Meet &mdash; or in person if you&rsquo;re on campus at Colorado State.</p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+        <div style="display:flex; gap:2px; padding:3px; border-radius:999px; background:color-mix(in srgb, var(--bg-raise) 50%, transparent); border:.5px solid color-mix(in srgb, var(--white) 10%, transparent); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); box-shadow:inset 0 1px 0 rgba(255,255,255,.1);">
+          <button data-mode-btn="auto" style="font-family:var(--sans); font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:5px 12px; border:none; border-radius:999px; cursor:pointer;">Auto</button>
+          <button data-mode-btn="day" style="font-family:var(--sans); font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:5px 12px; border:none; border-radius:999px; cursor:pointer;">Day</button>
+          <button data-mode-btn="night" style="font-family:var(--sans); font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:5px 12px; border:none; border-radius:999px; cursor:pointer;">Night</button>
+        </div>
+        <div id="tzLine" style="font-family:var(--mono); font-size:9.5px; color:var(--fg-3); letter-spacing:.04em; text-align:right;"></div>
+      </div>
+    </header>
+
+    <!-- INSTRUMENT PANEL -->
+    <div style="position:relative; border-radius:18px; padding:1px; background:linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.02) 30%, transparent 55%, rgba(130,200,255,.06) 80%, rgba(255,160,200,.08)); box-shadow:0 24px 70px rgba(0,0,0,.5);">
+      <div style="position:absolute; inset:0; border-radius:18px; pointer-events:none; overflow:hidden;">
+        <div style="position:absolute; top:0; left:8%; right:8%; height:1px; background:linear-gradient(90deg, transparent, rgba(255,150,200,.5), rgba(170,160,255,.55), rgba(130,210,255,.5), rgba(160,255,220,.45), transparent);"></div>
+      </div>
+      <div style="position:relative; border-radius:17px; overflow:hidden; background:color-mix(in srgb, var(--bg-raise) 52%, transparent); backdrop-filter:blur(34px) saturate(1.7) brightness(1.06); -webkit-backdrop-filter:blur(34px) saturate(1.7) brightness(1.06); box-shadow:inset 0 1px 0 rgba(255,255,255,.16), inset 0 0 60px rgba(255,255,255,.02);">
+        <div style="position:absolute; top:0; bottom:0; left:0; width:40%; pointer-events:none; background:linear-gradient(90deg, transparent, rgba(255,255,255,.07), transparent); animation:glintSweep 9s ease-in-out infinite; z-index:5;"></div>
+        <span style="position:absolute; top:14px; right:22px; width:3px; height:3px; border-radius:50%; background:#fff; box-shadow:0 0 6px 1px rgba(255,255,255,.7); animation:twinkle 4s ease-in-out infinite; z-index:6;"></span>
+        <span style="position:absolute; bottom:20px; left:30px; width:2px; height:2px; border-radius:50%; background:#cfe0ff; box-shadow:0 0 5px 1px rgba(180,210,255,.7); animation:twinkle 5.5s ease-in-out .8s infinite; z-index:6;"></span>
+
+        <div style="display:grid; grid-template-columns:1.15fr .85fr; gap:0; position:relative; z-index:2;">
+          <!-- LEFT — CALENDAR -->
+          <div style="padding:1.6rem 1.7rem; border-right:.5px solid color-mix(in srgb, var(--white) 8%, transparent);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem;">
+              <div style="display:flex; align-items:baseline; gap:.7rem;">
+                <span style="font-family:var(--mono); font-size:10px; color:var(--fg-4);">01</span>
+                <span id="monthLabel" style="font-family:var(--display-roman); font-size:1.4rem; color:var(--ink); letter-spacing:.01em;"></span>
+              </div>
+              <div style="display:flex; gap:.4rem;">
+                <button id="prevMonth" style="">&lsaquo;</button>
+                <button id="nextMonth" style="">&rsaquo;</button>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:6px;" id="weekdayHeads"></div>
+            <div style="display:flex; flex-direction:column; gap:4px;" id="calGrid"></div>
+            <div style="display:flex; gap:1.1rem; margin-top:1.1rem; padding-top:.9rem; border-top:.5px solid color-mix(in srgb, var(--white) 7%, transparent);">
+              <div style="display:flex; align-items:center; gap:.4rem;"><span style="width:7px; height:7px; border-radius:50%; background:var(--turquoise); box-shadow:0 0 6px 1px color-mix(in srgb, var(--turquoise) 60%, transparent);"></span><span style="font-family:var(--sans); font-size:9.5px; color:var(--fg-3);">Available</span></div>
+              <div style="display:flex; align-items:center; gap:.4rem;"><span style="width:7px; height:7px; border-radius:50%; border:1px solid var(--fg-4);"></span><span style="font-family:var(--sans); font-size:9.5px; color:var(--fg-3);">Unavailable</span></div>
+            </div>
+          </div>
+          <!-- RIGHT — TIME RAIL -->
+          <div style="padding:1.6rem 1.7rem; display:flex; flex-direction:column; min-height:360px;">
+            <div style="display:flex; align-items:baseline; gap:.7rem; margin-bottom:1.1rem;">
+              <span style="font-family:var(--mono); font-size:10px; color:var(--fg-4);">02</span>
+              <span id="timeHead" style="font-family:var(--sans); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.14em; color:var(--turquoise);">Pick a time</span>
+            </div>
+            <div id="timeRail" style="flex:1; display:flex; flex-direction:column;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAILS (form) -->
+    <div id="step-form" hidden style="position:relative; border-radius:16px; padding:1px; margin-top:1.3rem; background:linear-gradient(135deg, rgba(255,255,255,.14), transparent 50%, rgba(130,200,255,.06)); box-shadow:0 18px 50px rgba(0,0,0,.4); animation:fadeUp .35s var(--ease);">
+      <div style="border-radius:15px; overflow:hidden; background:color-mix(in srgb, var(--bg-raise) 55%, transparent); backdrop-filter:blur(30px) saturate(1.6); -webkit-backdrop-filter:blur(30px) saturate(1.6); box-shadow:inset 0 1px 0 rgba(255,255,255,.14); padding:1.7rem 1.8rem;">
+        <div style="display:flex; align-items:baseline; gap:.7rem; margin-bottom:1.2rem;">
+          <span style="font-family:var(--mono); font-size:10px; color:var(--fg-4);">03</span>
+          <span style="font-family:var(--sans); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.14em; color:var(--turquoise);">Your details</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:.6rem; background:color-mix(in srgb, var(--turquoise) 12%, transparent); border:.5px solid color-mix(in srgb, var(--turquoise) 30%, transparent); border-radius:9px; padding:.7rem 1rem; margin-bottom:1.3rem; box-shadow:inset 0 1px 0 rgba(255,255,255,.1);">
+          <span style="font-family:var(--mono); font-size:14px; color:var(--turquoise);">&#9678;</span>
+          <span id="summaryLine" style="font-family:var(--sans); font-size:13px; color:var(--fg-1);"></span>
+        </div>
+        <form id="bookForm">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+            <div style="display:flex; flex-direction:column; gap:.35rem;">
+              <label style="font-family:var(--sans); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.12em; color:var(--fg-3);">Full name</label>
+              <input class="sched-input" name="name" type="text" autocomplete="name" style="font-family:var(--serif); font-size:1rem; color:var(--ink); background:color-mix(in srgb, var(--white) 6%, transparent); border:.5px solid color-mix(in srgb, var(--white) 14%, transparent); padding:.7rem .9rem; border-radius:9px; box-shadow:inset 0 1px 0 rgba(255,255,255,.08); transition:border-color .2s, box-shadow .2s; width:100%;">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:.35rem;">
+              <label style="font-family:var(--sans); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.12em; color:var(--fg-3);">Email</label>
+              <input class="sched-input" name="email" type="email" autocomplete="email" style="font-family:var(--serif); font-size:1rem; color:var(--ink); background:color-mix(in srgb, var(--white) 6%, transparent); border:.5px solid color-mix(in srgb, var(--white) 14%, transparent); padding:.7rem .9rem; border-radius:9px; box-shadow:inset 0 1px 0 rgba(255,255,255,.08); transition:border-color .2s, box-shadow .2s; width:100%;">
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:.35rem; margin-bottom:1rem;">
+            <label style="font-family:var(--sans); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.12em; color:var(--fg-3);">What would you like to discuss?</label>
+            <textarea class="sched-input" name="purpose" placeholder="A sentence or two &mdash; this helps me confirm the right meeting." style="font-family:var(--serif); font-size:1rem; color:var(--ink); background:color-mix(in srgb, var(--white) 6%, transparent); border:.5px solid color-mix(in srgb, var(--white) 14%, transparent); padding:.7rem .9rem; border-radius:9px; box-shadow:inset 0 1px 0 rgba(255,255,255,.08); min-height:84px; resize:vertical; width:100%;"></textarea>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAADMs_XGt9bSo4hVS" data-theme="auto"></div>
+            <button id="submitBtn" type="submit" style="font-family:var(--sans); font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:#0e1014; background:linear-gradient(135deg, var(--sectional-blue-2), var(--turquoise)); border:none; padding:.8rem 1.6rem; border-radius:9px; cursor:pointer; box-shadow:0 4px 18px color-mix(in srgb, var(--turquoise) 30%, transparent), inset 0 1px 0 rgba(255,255,255,.3);">Request this time</button>
+          </div>
+          <div id="errorMsg" hidden style="font-family:var(--sans); font-size:12.5px; color:var(--accent-terracotta); background:color-mix(in srgb, var(--accent-terracotta) 10%, transparent); border-left:2px solid var(--accent-terracotta); border-radius:0 6px 6px 0; padding:.6rem 1rem; margin-top:1rem;"></div>
+          <p style="font-family:var(--sans); font-size:11.5px; color:var(--fg-3); line-height:1.5; margin-top:1rem;">I review each request and confirm by email, usually within a day.</p>
+        </form>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div id="step-success" hidden style="position:relative; border-radius:16px; padding:1px; margin-top:1.3rem; background:linear-gradient(135deg, rgba(170,255,210,.3), rgba(130,200,255,.12) 45%, rgba(255,170,200,.18)); box-shadow:0 18px 50px rgba(0,0,0,.4); animation:fadeUp .4s var(--ease);">
+      <div style="position:relative; border-radius:15px; overflow:hidden; background:color-mix(in srgb, var(--bg-raise) 58%, transparent); backdrop-filter:blur(30px) saturate(1.6); -webkit-backdrop-filter:blur(30px) saturate(1.6); box-shadow:inset 0 1px 0 rgba(255,255,255,.16); padding:2.2rem 2rem;">
+        <span style="position:absolute; top:18px; right:26px; width:3px; height:3px; border-radius:50%; background:#fff; box-shadow:0 0 7px 2px rgba(255,255,255,.8); animation:twinkle 3.5s ease-in-out infinite;"></span>
+        <div style="font-family:var(--mono); font-size:10px; color:var(--turquoise); letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:8px;"><span style="font-size:13px;">&#10003;</span> Request sent</div>
+        <h2 id="successHeading" style="font-family:var(--display-roman); font-size:1.9rem; font-weight:400; color:var(--ink); margin-bottom:1rem; line-height:1.12;"></h2>
+        <p id="successDetail" style="font-family:var(--serif); font-size:1.05rem; color:var(--fg-1); line-height:1.65; margin-bottom:.7rem; max-width:40em;"></p>
+        <p id="successCancel" style="font-family:var(--serif); font-size:.95rem; color:var(--fg-2); line-height:1.6;"></p>
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; font-family:var(--mono); font-size:10px; color:var(--fg-4); margin-top:1.4rem; padding-top:1rem; border-top:.5px solid color-mix(in srgb, var(--white) 8%, transparent); letter-spacing:.02em;">
+          <span id="successMeta"></span>
+          <button id="resetBtn" style="font-family:var(--mono); font-size:10px; color:var(--fg-3); background:none; border:.5px solid color-mix(in srgb, var(--white) 14%, transparent); border-radius:6px; padding:.35rem .7rem; cursor:pointer; letter-spacing:.04em;">Book another &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-family:var(--mono); font-size:10.5px; letter-spacing:.05em; text-align:center; margin:2.5rem 0 0;"><a href="index.html" class="sched-navlink" style="color:var(--fg-3); text-decoration:none;">&larr; Back to devinstein.me</a></p>
+
   </div>
-</nav>
-
-<div class="container">
-
-  <header class="schedule-hero">
-    <div class="eyebrow">Book a meeting</div>
-    <h1>Schedule office hours</h1>
-    <p class="lede">Thirty minutes, on Google Meet (or in person if you're on campus at CSU).</p>
-    <p class="meta">Mon–Fri, <strong>8am–5pm Mountain Time</strong>. Times below shown in your timezone (<span id="visitor-tz-label">…</span>).</p>
-  </header>
-
-  <!-- 01 — DATE -->
-  <section class="step" id="step-date">
-    <div class="step-head">
-      <span class="step-num">01</span>
-      <span class="step-title">Pick a date</span>
-      <span class="step-aside">Next 4 weeks · weekdays only</span>
-    </div>
-    <div class="date-strip-nav">
-      <span class="date-strip-month" id="dateStripMonth">…</span>
-      <div class="date-strip-arrows">
-        <button class="date-arrow" id="datePrev" aria-label="Previous week">‹</button>
-        <button class="date-arrow" id="dateNext" aria-label="Next week">›</button>
-      </div>
-    </div>
-    <div class="date-strip" id="dateStrip"></div>
-  </section>
-
-  <!-- 02 — TIME -->
-  <section class="step" id="step-time" hidden>
-    <div class="step-head">
-      <span class="step-num">02</span>
-      <span class="step-title">Pick a time</span>
-      <span class="step-aside" id="timeAside"></span>
-    </div>
-    <div class="slot-grid" id="slotGrid">
-      <div class="slot-loading">Loading availability</div>
-    </div>
-  </section>
-
-  <!-- 03 — DETAILS -->
-  <section class="step" id="step-form" hidden>
-    <div class="step-head">
-      <span class="step-num">03</span>
-      <span class="step-title">Your details</span>
-    </div>
-    <div class="booking-summary" id="bookingSummary"></div>
-    <form class="booking-form" id="bookingForm" novalidate>
-      <div class="form-row">
-        <label for="bk-name">Full name</label>
-        <input id="bk-name" name="name" type="text" required autocomplete="name">
-      </div>
-      <div class="form-row">
-        <label for="bk-email">Email</label>
-        <input id="bk-email" name="email" type="email" required autocomplete="email">
-      </div>
-      <div class="form-row">
-        <label for="bk-purpose">What would you like to discuss?</label>
-        <textarea id="bk-purpose" name="purpose" required placeholder="A sentence or two — this helps me confirm the right meetings."></textarea>
-      </div>
-      <!-- Cloudflare Turnstile -->
-      <div class="cf-turnstile" data-sitekey="0x4AAAAAADMs_XGt9bSo4hVS"></div>
-      <p style="font-size:.85rem;color:var(--light);line-height:1.5;margin:.1rem 0 .2rem">I review each request and confirm by email, usually within a day.</p>
-      <button type="submit" class="submit-btn" id="submitBtn">Request this time</button>
-      <div class="error-msg" id="errorMsg" hidden></div>
-    </form>
-  </section>
-
-  <!-- 04 — SUCCESS -->
-  <section class="step" id="step-success" hidden>
-    <div class="success-card">
-      <div class="eyebrow">Request sent</div>
-      <h2 id="successHeading">Request sent.</h2>
-      <p id="successDetail">I'll review your request and email a confirmation with the Google Meet link, usually within a day.</p>
-      <p id="successCancel">Need to change something? Just reply to that email, or <a href="mailto:devin.stein@colostate.edu?subject=Office hours request">email me</a> directly.</p>
-      <div class="success-meta" id="successMeta"></div>
-    </div>
-  </section>
-
-  <p class="back-link"><a href="/">← Back to devinstein.me</a></p>
-
 </div>
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
-// ─────────────────────────────────────────────────────────────
-//  CONFIG — set after Apps Script web-app deployment.
-//  See brain/reference/schedule_spec.md §Architecture for deploy steps.
-// ─────────────────────────────────────────────────────────────
-const SCHEDULER_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwb3Sq3wgiCI_u5Of6lHH_zAtyJszipDh0iA3YU_-Cpi93uQLXEP-ospVvKBoKmzAVxBA/exec';
-const HORIZON_DAYS = 28;
-const WORK_DAYS = [1, 2, 3, 4, 5]; // Mon..Fri (0=Sun)
-const MT_TZ = 'America/Denver';
+// ===== real backend config (preserved from production schedule.html) =====
+var SCHEDULER_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwb3Sq3wgiCI_u5Of6lHH_zAtyJszipDh0iA3YU_-Cpi93uQLXEP-ospVvKBoKmzAVxBA/exec';
+var HORIZON_DAYS = 28;
+var MT_TZ = 'America/Denver';
 
-// ─────────────────────────────────────────────────────────────
-//  STATE
-// ─────────────────────────────────────────────────────────────
-const state = {
-  visitorTz: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  weekOffset: 0,           // weeks from current visible week
-  selectedDate: null,      // YYYY-MM-DD in MT
-  selectedSlot: null,      // {start, end} ISO UTC
-  cachedAvailability: {},  // key: YYYY-MM-DD (MT) → array of slots
+var rootEl = document.getElementById('root');
+var auroraEl = document.getElementById('aurora');
+var state = {
+  modeChoice: 'night', resolvedMode: 'sectional',
+  visitorTz: (Intl.DateTimeFormat().resolvedOptions().timeZone) || 'your timezone',
+  monthCursor: { y: (new Date()).getFullYear(), m: (new Date()).getMonth() },
+  selectedDate: null, selectedSlot: null, slots: [], slotsLoading: false,
+  cachedAvailability: {},
 };
 
-document.getElementById('visitor-tz-label').textContent = state.visitorTz;
-
-// ─────────────────────────────────────────────────────────────
-//  DATE STRIP
-// ─────────────────────────────────────────────────────────────
-function fmtMtDate(d) {
-  // Format a Date as YYYY-MM-DD in MT.
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: MT_TZ, year: 'numeric', month: '2-digit', day: '2-digit'
-  }).formatToParts(d);
-  const get = type => parts.find(p => p.type === type).value;
-  return `${get('year')}-${get('month')}-${get('day')}`;
+// ===== mode toggle =====
+function resolveMode(choice){
+  if (choice === 'day') return 'foolscap';
+  if (choice === 'night') return 'sectional';
+  var dark = false;
+  try { dark = window.matchMedia('(prefers-color-scheme: dark)').matches; } catch(e){}
+  var h = new Date().getHours();
+  if (!dark && (h >= 18 || h < 7)) dark = true;
+  return dark ? 'sectional' : 'foolscap';
 }
-function getMtWeekday(d) {
-  // 0=Sun..6=Sat in MT.
-  const dayName = new Intl.DateTimeFormat('en-US', {timeZone: MT_TZ, weekday: 'short'}).format(d);
-  return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(dayName);
-}
-
-function buildWeekdays(offsetWeeks) {
-  // Return the next 7 weekdays starting from (today + offsetWeeks weeks).
-  const out = [];
-  const start = new Date();
-  start.setDate(start.getDate() + offsetWeeks * 7);
-  let cursor = new Date(start);
-  // Move to next Monday (or stay if today is Mon during offset 0)
-  while (out.length < 7) {
-    const wd = getMtWeekday(cursor);
-    if (WORK_DAYS.includes(wd)) {
-      out.push(new Date(cursor));
-    }
-    cursor.setDate(cursor.getDate() + 1);
-    if (out.length >= 7) break;
-    if ((cursor - start) / (1000 * 60 * 60 * 24) > 14) break; // safety
-  }
-  return out;
-}
-
-function renderDateStrip() {
-  const strip = document.getElementById('dateStrip');
-  const monthLabel = document.getElementById('dateStripMonth');
-  const prev = document.getElementById('datePrev');
-  const next = document.getElementById('dateNext');
-  const days = buildWeekdays(state.weekOffset);
-  if (!days.length) { strip.innerHTML = ''; return; }
-
-  const firstMonth = new Intl.DateTimeFormat('en-US', {timeZone: MT_TZ, month: 'long', year: 'numeric'}).format(days[0]);
-  const lastMonth = new Intl.DateTimeFormat('en-US', {timeZone: MT_TZ, month: 'long', year: 'numeric'}).format(days[days.length-1]);
-  monthLabel.textContent = firstMonth === lastMonth ? firstMonth : `${firstMonth.split(' ')[0]} – ${lastMonth}`;
-
-  const horizonEnd = new Date();
-  horizonEnd.setDate(horizonEnd.getDate() + HORIZON_DAYS);
-  const minLead = new Date();
-  minLead.setHours(minLead.getHours() + 4); // keep in sync with backend MIN_LEAD_HOURS
-
-  prev.disabled = state.weekOffset <= 0;
-  next.disabled = days[0] > horizonEnd;
-
-  strip.innerHTML = days.map(d => {
-    const ymd = fmtMtDate(d);
-    const dayShort = new Intl.DateTimeFormat('en-US', {timeZone: MT_TZ, weekday: 'short'}).format(d);
-    const dayNum = new Intl.DateTimeFormat('en-US', {timeZone: MT_TZ, day: 'numeric'}).format(d);
-    const tooEarly = d < minLead;
-    const tooLate = d > horizonEnd;
-    const unavailable = tooEarly || tooLate;
-    const selected = state.selectedDate === ymd;
-    return `
-      <div class="date-card${unavailable ? ' unavailable' : ''}${selected ? ' selected' : ''}" data-date="${ymd}" ${unavailable ? '' : `tabindex="0" role="button"`}>
-        <span class="date-day">${dayShort}</span>
-        <span class="date-num">${dayNum}</span>
-      </div>
-    `;
-  }).join('');
-
-  strip.querySelectorAll('.date-card:not(.unavailable)').forEach(card => {
-    card.addEventListener('click', () => onDateSelect(card.dataset.date));
-    card.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onDateSelect(card.dataset.date); }
-    });
+function applyMode(choice){
+  var resolved = resolveMode(choice);
+  rootEl.setAttribute('data-mode', resolved);
+  try { document.documentElement.setAttribute('data-mode', resolved); } catch(e){}
+  try { document.body.style.background = resolved === 'sectional' ? '#0e1014' : '#efe9da'; } catch(e){}
+  try { localStorage.setItem('ds_sched_mode', choice); } catch(e){}
+  if (auroraEl) auroraEl.style.opacity = resolved === 'sectional' ? '1' : '.7';
+  state.modeChoice = choice; state.resolvedMode = resolved;
+  document.querySelectorAll('[data-mode-btn]').forEach(function(b){
+    var on = b.getAttribute('data-mode-btn') === choice;
+    b.style.background = on ? 'color-mix(in srgb, var(--turquoise) 88%, transparent)' : 'transparent';
+    b.style.color = on ? '#0e1014' : 'var(--fg-3)';
   });
 }
-
-document.getElementById('datePrev').addEventListener('click', () => { if (state.weekOffset > 0) { state.weekOffset--; renderDateStrip(); } });
-document.getElementById('dateNext').addEventListener('click', () => { state.weekOffset++; renderDateStrip(); });
-
-// ─────────────────────────────────────────────────────────────
-//  AVAILABILITY (calls Apps Script)
-// ─────────────────────────────────────────────────────────────
-async function fetchAvailability(ymd) {
-  if (state.cachedAvailability[ymd]) return state.cachedAvailability[ymd];
-  const url = new URL(SCHEDULER_ENDPOINT);
-  url.searchParams.set('action', 'availability');
-  url.searchParams.set('date', ymd);
-  url.searchParams.set('days', '1');
-  url.searchParams.set('tz', state.visitorTz);
-  const res = await fetch(url.toString(), {method: 'GET'});
-  if (!res.ok) throw new Error('fetch failed');
-  const json = await res.json();
-  if (!json.ok) throw new Error(json.error || 'availability error');
-  state.cachedAvailability[ymd] = json.slots || [];
-  return state.cachedAvailability[ymd];
-}
-
-async function onDateSelect(ymd) {
-  state.selectedDate = ymd;
-  state.selectedSlot = null;
-  document.getElementById('step-form').hidden = true;
-  document.getElementById('step-success').hidden = true;
-  renderDateStrip();
-  const stepTime = document.getElementById('step-time');
-  stepTime.hidden = false;
-  const grid = document.getElementById('slotGrid');
-  grid.innerHTML = '<div class="slot-loading">Loading availability</div>';
-
-  // Update aside label
-  const dateObj = new Date(ymd + 'T12:00:00Z');
-  const dateLabel = new Intl.DateTimeFormat('en-US', {timeZone: MT_TZ, weekday: 'long', month: 'long', day: 'numeric'}).format(dateObj);
-  document.getElementById('timeAside').innerHTML = `<strong>${dateLabel}</strong>`;
-
-  try {
-    const slots = await fetchAvailability(ymd);
-    renderSlots(slots);
-  } catch (err) {
-    grid.innerHTML = `<div class="slot-empty" style="color:var(--red)">Could not load availability. Please try again.</div>`;
-  }
-
-  stepTime.scrollIntoView({behavior: 'smooth', block: 'start'});
-}
-
-function renderSlots(slots) {
-  const grid = document.getElementById('slotGrid');
-  if (!slots.length) {
-    grid.innerHTML = '<div class="slot-empty">No availability on this date — try another.</div>';
-    return;
-  }
-  grid.innerHTML = slots.map(slot => {
-    const start = new Date(slot.start);
-    const visitorTime = new Intl.DateTimeFormat('en-US', {timeZone: state.visitorTz, hour: 'numeric', minute: '2-digit', hour12: true}).format(start);
-    const mtTime = new Intl.DateTimeFormat('en-US', {timeZone: MT_TZ, hour: 'numeric', minute: '2-digit', hour12: true}).format(start);
-    const same = visitorTime === mtTime;
-    return `
-      <button type="button" class="slot-btn" data-start="${slot.start}" data-end="${slot.end}">
-        <span>${visitorTime}</span>
-        ${same ? '' : `<span class="slot-mt">${mtTime} MT</span>`}
-      </button>
-    `;
-  }).join('');
-  grid.querySelectorAll('.slot-btn').forEach(btn => {
-    btn.addEventListener('click', () => onSlotSelect({start: btn.dataset.start, end: btn.dataset.end}, btn));
-  });
-}
-
-function onSlotSelect(slot, btn) {
-  state.selectedSlot = slot;
-  document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
-  if (btn) btn.classList.add('selected');
-  showForm();
-}
-
-// ─────────────────────────────────────────────────────────────
-//  FORM / BOOKING
-// ─────────────────────────────────────────────────────────────
-function showForm() {
-  const stepForm = document.getElementById('step-form');
-  stepForm.hidden = false;
-  const start = new Date(state.selectedSlot.start);
-  const visitorFmt = new Intl.DateTimeFormat('en-US', {
-    timeZone: state.visitorTz, weekday: 'long', month: 'long', day: 'numeric',
-    hour: 'numeric', minute: '2-digit', hour12: true
-  }).format(start);
-  const mtFmt = new Intl.DateTimeFormat('en-US', {
-    timeZone: MT_TZ, hour: 'numeric', minute: '2-digit', hour12: true
-  }).format(start);
-  document.getElementById('bookingSummary').innerHTML = `
-    <strong>${visitorFmt}</strong> (${mtFmt} MT) · 30 minutes
-  `;
-  stepForm.scrollIntoView({behavior: 'smooth', block: 'start'});
-}
-
-document.getElementById('bookingForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const errorMsg = document.getElementById('errorMsg');
-  errorMsg.hidden = true;
-  const submitBtn = document.getElementById('submitBtn');
-  const form = e.target;
-  const name = form.name.value.trim();
-  const email = form.email.value.trim();
-  const purpose = form.purpose.value.trim();
-  const turnstileEl = form.querySelector('[name="cf-turnstile-response"]');
-  const turnstileToken = turnstileEl ? turnstileEl.value : '';
-
-  if (!name || !email) { showError('Please fill in your name and email.'); return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('That email address looks off — please double-check.'); return; }
-  if (!purpose) { showError("Please add a sentence about what you'd like to discuss."); return; }
-  if (!turnstileToken) { showError('Please complete the spam check.'); return; }
-  if (!state.selectedSlot) { showError('Please pick a time slot.'); return; }
-
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Sending…';
-
-  try {
-    const body = new URLSearchParams({
-      action: 'book',
-      name, email, purpose,
-      start: state.selectedSlot.start,
-      end: state.selectedSlot.end,
-      visitor_tz: state.visitorTz,
-      turnstile_token: turnstileToken,
-    });
-    const res = await fetch(SCHEDULER_ENDPOINT, {method: 'POST', body});
-    const json = await res.json();
-    if (!json.ok) {
-      showError(formatError(json.error));
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Request this time';
-      return;
-    }
-    showSuccess(json, {name, email});
-  } catch (err) {
-    showError('Something went wrong on our end. Please try again, or email me directly.');
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Request this time';
-  }
+document.querySelectorAll('[data-mode-btn]').forEach(function(b){
+  b.addEventListener('click', function(){ applyMode(b.getAttribute('data-mode-btn')); });
 });
 
-function showError(msg) {
-  const el = document.getElementById('errorMsg');
-  el.textContent = msg;
-  el.hidden = false;
+function tzLine(){
+  var tz = state.visitorTz, long = '';
+  try { long = (new Intl.DateTimeFormat('en-US', { timeZoneName:'long' }).formatToParts(new Date()).find(function(p){return p.type==='timeZoneName';}) || {}).value || ''; } catch(e){}
+  var city = (tz.split('/').pop() || tz).replace(/_/g,' ');
+  var name = (long && !/^GMT|^UTC/.test(long)) ? long : city;
+  return 'Times in ' + name;
 }
 
-function formatError(code) {
-  switch (code) {
+// ===== helpers =====
+function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function fmt(s, opts){ return new Intl.DateTimeFormat('en-US', opts).format(new Date(s)); }
+
+// ===== calendar =====
+function renderWeekdayHeads(){
+  document.getElementById('weekdayHeads').innerHTML = ['Su','Mo','Tu','We','Th','Fr','Sa'].map(function(wd){
+    return '<div style="font-family:var(--sans); font-size:9.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--fg-4); text-align:center; padding:4px 0;">'+wd+'</div>';
+  }).join('');
+}
+function renderMonth(){
+  var today = new Date(); today.setHours(0,0,0,0);
+  var horizon = new Date(today); horizon.setDate(horizon.getDate()+HORIZON_DAYS);
+  var y = state.monthCursor.y, m = state.monthCursor.m;
+  var first = new Date(y, m, 1);
+  var gridStart = new Date(y, m, 1 - first.getDay());
+  var lastDay = new Date(y, m+1, 0).getDate();
+  var cellBase = 'position:relative; aspect-ratio:1/1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; border-radius:9px; transition:box-shadow .15s var(--ease);';
+  var needWeeks = Math.ceil((first.getDay()+lastDay)/7);
+  var html = '';
+  for (var w=0; w<needWeeks; w++){
+    html += '<div style="display:grid; grid-template-columns:repeat(7,1fr); gap:4px;">';
+    for (var di=0; di<7; di++){
+      var d = new Date(gridStart); d.setDate(gridStart.getDate()+w*7+di);
+      var inMonth = d.getMonth() === m;
+      var dow = d.getDay(); var weekend = dow===0 || dow===6;
+      var past = d < today; var beyond = d > horizon;
+      var key = ymd(d);
+      var available = inMonth && !weekend && !past && !beyond;
+      var sel = state.selectedDate === key;
+      var isToday = d.getTime() === today.getTime();
+      var style = cellBase, numStyle, dotStyle = 'display:none;';
+      if (sel){
+        style += ' background:color-mix(in srgb, var(--turquoise) 88%, transparent); border:1px solid var(--turquoise); cursor:pointer; box-shadow:0 0 18px 1px color-mix(in srgb, var(--turquoise) 45%, transparent), inset 0 1px 0 rgba(255,255,255,.3);';
+        numStyle = 'font-family:var(--serif); font-size:1.05rem; font-weight:600; color:#0e1014; font-feature-settings:\'onum\'; line-height:1;';
+      } else if (available){
+        style += ' background:color-mix(in srgb, var(--white) 6%, transparent); border:.5px solid '+(isToday?'color-mix(in srgb, var(--topo-brown) 65%, transparent)':'color-mix(in srgb, var(--white) 12%, transparent)')+'; cursor:pointer; box-shadow:inset 0 1px 0 rgba(255,255,255,.1);';
+        numStyle = 'font-family:var(--serif); font-size:1.05rem; font-weight:500; color:var(--ink); font-feature-settings:\'onum\'; line-height:1;';
+        dotStyle = 'display:block; width:5px; height:5px; border-radius:50%; background:var(--turquoise); box-shadow:0 0 6px 1px color-mix(in srgb, var(--turquoise) 60%, transparent);';
+      } else {
+        style += ' background:transparent; border:.5px solid transparent; cursor:default;';
+        numStyle = 'font-family:var(--serif); font-size:1.05rem; font-weight:400; color:'+(inMonth?'var(--fg-4)':'color-mix(in srgb, var(--fg-4) 45%, transparent)')+'; font-feature-settings:\'onum\'; line-height:1;';
+      }
+      html += '<button '+(available?('data-day="'+key+'"'):'')+' style="'+style+'"><span style="'+numStyle+'">'+d.getDate()+'</span><span style="'+dotStyle+'"></span></button>';
+    }
+    html += '</div>';
+  }
+  document.getElementById('calGrid').innerHTML = html;
+  document.getElementById('monthLabel').textContent = new Intl.DateTimeFormat('en-US', { month:'long', year:'numeric' }).format(first);
+  // arrows
+  var cur = new Date(); var prevDisabled = (y < cur.getFullYear()) || (y === cur.getFullYear() && m <= cur.getMonth());
+  var nextDisabled = first > horizon;
+  styleArrow(document.getElementById('prevMonth'), prevDisabled);
+  styleArrow(document.getElementById('nextMonth'), nextDisabled);
+  document.getElementById('prevMonth').disabled = prevDisabled;
+  document.getElementById('nextMonth').disabled = nextDisabled;
+  // wire day buttons
+  document.getElementById('calGrid').querySelectorAll('[data-day]').forEach(function(b){
+    b.addEventListener('click', function(){ selectDate(b.getAttribute('data-day')); });
+  });
+}
+function styleArrow(el, dis){
+  el.style.cssText = 'font-family:var(--mono); font-size:15px; width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:color-mix(in srgb, var(--white) 5%, transparent); border:.5px solid color-mix(in srgb, var(--white) 12%, transparent); cursor:'+(dis?'not-allowed':'pointer')+'; color:'+(dis?'var(--fg-4)':'var(--fg-2)')+'; opacity:'+(dis?'.4':'1')+'; box-shadow:inset 0 1px 0 rgba(255,255,255,.08);';
+}
+document.getElementById('prevMonth').addEventListener('click', function(){ if (this.disabled) return; var d=new Date(state.monthCursor.y, state.monthCursor.m-1, 1); state.monthCursor={y:d.getFullYear(), m:d.getMonth()}; renderMonth(); });
+document.getElementById('nextMonth').addEventListener('click', function(){ if (this.disabled) return; var d=new Date(state.monthCursor.y, state.monthCursor.m+1, 1); state.monthCursor={y:d.getFullYear(), m:d.getMonth()}; renderMonth(); });
+
+// ===== availability (real backend; no mock) =====
+async function fetchAvailability(key){
+  if (state.cachedAvailability[key]) return state.cachedAvailability[key];
+  var url = new URL(SCHEDULER_ENDPOINT);
+  url.searchParams.set('action','availability');
+  url.searchParams.set('date', key);
+  url.searchParams.set('days','1');
+  url.searchParams.set('tz', state.visitorTz);
+  var res = await fetch(url.toString(), { method:'GET' });
+  if (!res.ok) throw new Error('fetch failed');
+  var json = await res.json();
+  if (!json.ok) throw new Error(json.error || 'availability error');
+  state.cachedAvailability[key] = json.slots || [];
+  return state.cachedAvailability[key];
+}
+
+async function selectDate(key){
+  state.selectedDate = key; state.selectedSlot = null; state.slots = [];
+  document.getElementById('step-form').hidden = true;
+  document.getElementById('step-success').hidden = true;
+  renderMonth();
+  var dayLabel = new Intl.DateTimeFormat('en-US', { weekday:'long', month:'long', day:'numeric' }).format(new Date(key+'T12:00:00'));
+  document.getElementById('timeHead').textContent = dayLabel;
+  var rail = document.getElementById('timeRail');
+  rail.innerHTML = shimmer();
+  try {
+    var slots = await fetchAvailability(key);
+    if (state.selectedDate !== key) return;
+    state.slots = slots;
+    renderTimeRail();
+  } catch(e){
+    if (state.selectedDate !== key) return;
+    rail.innerHTML = '<div style="flex:1; display:flex; align-items:center; justify-content:center; text-align:center; padding:2rem 1rem;"><p style="font-family:var(--serif); font-style:italic; font-size:1rem; color:var(--accent-terracotta); line-height:1.5;">Could not load availability. Please try again.</p></div>';
+  }
+}
+function shimmer(){
+  var row = '<div style="height:46px; border-radius:9px; background:linear-gradient(90deg, color-mix(in srgb, var(--white) 4%, transparent), color-mix(in srgb, var(--white) 9%, transparent), color-mix(in srgb, var(--white) 4%, transparent)); background-size:240% 100%; animation:prismDrift 1.6s linear infinite; border:.5px solid color-mix(in srgb, var(--white) 7%, transparent);"></div>';
+  return '<div style="display:flex; flex-direction:column; gap:8px;">'+row+row+row+row+row+'</div>';
+}
+function renderTimeRail(){
+  var rail = document.getElementById('timeRail');
+  if (!state.slots || state.slots.length === 0){
+    rail.innerHTML = '<div style="flex:1; display:flex; align-items:center; justify-content:center; text-align:center; padding:2rem 1rem;"><p style="font-family:var(--serif); font-style:italic; font-size:1rem; color:var(--fg-3); line-height:1.5;">No open times on this date.<br>Try another day on the chart.</p></div>';
+    return;
+  }
+  var slotBase = 'position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; min-height:60px; padding:.6rem .5rem; border-radius:9px; transition:box-shadow .15s var(--ease);';
+  var cells = state.slots.map(function(slot, i){
+    var vis = fmt(slot.start, { timeZone:state.visitorTz, hour:'numeric', minute:'2-digit', hour12:true });
+    var mt = fmt(slot.start, { timeZone:MT_TZ, hour:'numeric', minute:'2-digit', hour12:true });
+    var sel = state.selectedSlot && state.selectedSlot.start === slot.start;
+    var timeColor = sel ? '#0e1014' : 'var(--ink)';
+    var mtColor = sel ? 'rgba(14,16,20,.65)' : 'var(--fg-3)';
+    var style = sel
+      ? slotBase + ' background:color-mix(in srgb, var(--turquoise) 90%, transparent); border:1px solid var(--turquoise); cursor:pointer; box-shadow:0 0 18px 1px color-mix(in srgb, var(--turquoise) 45%, transparent), inset 0 1px 0 rgba(255,255,255,.3);'
+      : slotBase + ' background:color-mix(in srgb, var(--white) 5%, transparent); border:.5px solid color-mix(in srgb, var(--white) 12%, transparent); cursor:pointer; box-shadow:inset 0 1px 0 rgba(255,255,255,.1);';
+    var mtHtml = (vis !== mt) ? '<span style="font-family:var(--sans); font-size:9px; color:'+mtColor+'; letter-spacing:.03em; position:relative; z-index:1;">'+mt+' MT</span>' : '';
+    return '<button data-slot="'+i+'" style="'+style+'">'+
+      '<span style="position:absolute; top:0; left:0; right:0; height:50%; border-radius:9px 9px 0 0; background:linear-gradient(180deg, rgba(255,255,255,.1), transparent); pointer-events:none;"></span>'+
+      '<span style="font-family:var(--serif); font-size:1.1rem; font-weight:500; line-height:1; color:'+timeColor+'; font-feature-settings:\'onum\'; position:relative; z-index:1;">'+vis+'</span>'+mtHtml+'</button>';
+  }).join('');
+  rail.innerHTML = '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; overflow-y:auto; max-height:340px; padding-right:2px;">'+cells+'</div>';
+  rail.querySelectorAll('[data-slot]').forEach(function(b){
+    b.addEventListener('click', function(){ selectSlot(state.slots[parseInt(b.getAttribute('data-slot'),10)]); });
+  });
+}
+function selectSlot(slot){
+  state.selectedSlot = slot;
+  document.getElementById('step-success').hidden = true;
+  renderTimeRail();
+  // summary
+  var vf = fmt(slot.start, { timeZone:state.visitorTz, weekday:'long', month:'long', day:'numeric', hour:'numeric', minute:'2-digit', hour12:true });
+  var mf = fmt(slot.start, { timeZone:MT_TZ, hour:'numeric', minute:'2-digit', hour12:true });
+  document.getElementById('summaryLine').textContent = vf + ' (' + mf + ' MT) · 30 minutes';
+  document.getElementById('errorMsg').hidden = true;
+  document.getElementById('step-form').hidden = false;
+}
+
+// ===== submit (real backend contract) =====
+document.getElementById('bookForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  document.getElementById('errorMsg').hidden = true;
+  var submitBtn = document.getElementById('submitBtn');
+  var form = e.target;
+  var name = form.name.value.trim();
+  var email = form.email.value.trim();
+  var purpose = form.purpose.value.trim();
+  var turnstileEl = form.querySelector('[name="cf-turnstile-response"]');
+  var turnstileToken = turnstileEl ? turnstileEl.value : '';
+
+  if (!name || !email) return showError('Please fill in your name and email.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError('That email address looks off — please double-check.');
+  if (!purpose) return showError("Please add a sentence about what you'd like to discuss.");
+  if (!turnstileToken) return showError('Please complete the spam check.');
+  if (!state.selectedSlot) return showError('Please pick a time slot.');
+
+  submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
+  try {
+    var body = new URLSearchParams({ action:'book', name:name, email:email, purpose:purpose,
+      start:state.selectedSlot.start, end:state.selectedSlot.end, visitor_tz:state.visitorTz, turnstile_token:turnstileToken });
+    var res = await fetch(SCHEDULER_ENDPOINT, { method:'POST', body:body });
+    var json = await res.json();
+    if (!json.ok){
+      showError(formatError(json.error));
+      submitBtn.disabled = false; submitBtn.textContent = 'Request this time';
+      try { window.turnstile && window.turnstile.reset(); } catch(e){}
+      return;
+    }
+    showSuccess(json, { name:name, email:email });
+  } catch(err){
+    showError('Something went wrong on our end. Please try again, or email me directly.');
+    submitBtn.disabled = false; submitBtn.textContent = 'Request this time';
+    try { window.turnstile && window.turnstile.reset(); } catch(e){}
+  }
+});
+function showError(msg){ var el = document.getElementById('errorMsg'); el.textContent = msg; el.hidden = false; }
+function formatError(code){
+  switch(code){
     case 'slot_taken': return 'That slot was just requested by someone else. Please pick another.';
     case 'spam_check_failed': return 'The spam check failed. Please try again.';
     case 'busy': return 'The scheduler is briefly busy — please try again in a moment.';
@@ -596,49 +481,73 @@ function formatError(code) {
     default: return 'Something went wrong on our end. Please try again, or email me directly.';
   }
 }
-
-function showSuccess(json, who) {
+function showSuccess(json, who){
   document.getElementById('step-form').hidden = true;
   document.getElementById('step-success').hidden = false;
-  const start = new Date(state.selectedSlot.start);
-  const visitorFmt = new Intl.DateTimeFormat('en-US', {
-    timeZone: state.visitorTz, weekday: 'long', month: 'long', day: 'numeric',
-    hour: 'numeric', minute: '2-digit', hour12: true
-  }).format(start);
-  const firstName = (who.name || '').trim().split(/\s+/)[0];
-  if (json.status === 'pending') {
-    // Approval-gated flow: the booking is a request, not yet a confirmed meeting.
-    document.getElementById('successHeading').textContent = `Request sent for ${visitorFmt}.`;
+  var start = new Date(state.selectedSlot.start);
+  var visitorFmt = new Intl.DateTimeFormat('en-US', { timeZone:state.visitorTz, weekday:'long', month:'long', day:'numeric', hour:'numeric', minute:'2-digit', hour12:true }).format(start);
+  var firstName = (who.name || '').trim().split(/\s+/)[0];
+  if (json.status === 'pending'){
+    document.getElementById('successHeading').textContent = 'Request sent for ' + visitorFmt + '.';
     document.getElementById('successDetail').innerHTML =
-      `Thanks${firstName ? ', ' + firstName : ''} — I'll review your request and email a confirmation with the ` +
-      `Google Meet link to <strong>${who.email}</strong>, usually within a day. That time is held for you in the meantime.`;
+      'Thanks' + (firstName ? ', ' + firstName : '') + " — I'll review your request and email a confirmation with the " +
+      'Google Meet link to <strong>' + who.email + '</strong>, usually within a day. That time is held for you in the meantime.';
     document.getElementById('successCancel').innerHTML =
-      `Need to change something before it's confirmed? Just reply to that email, or ` +
-      `<a href="mailto:devin.stein@colostate.edu?subject=Office hours request">email me</a> directly.`;
+      "Need to change something before it's confirmed? Just reply to that email, or " +
+      '<a href="mailto:devin.stein@colostate.edu?subject=Office hours request" style="color:var(--turquoise); text-decoration:none; border-bottom:1px solid color-mix(in srgb, var(--turquoise) 40%, transparent);">email me</a> directly.';
   } else {
-    // Legacy instant-confirm response (kept for backward compatibility).
-    document.getElementById('successHeading').textContent = `You're booked for ${visitorFmt}.`;
-    let detail = `A confirmation email and calendar invite are on their way to <strong>${who.email}</strong>.`;
-    if (json.meet_url) {
-      detail += ` Your Google Meet link: <a href="${json.meet_url}" target="_blank" rel="noopener">${json.meet_url}</a>.`;
-    }
+    document.getElementById('successHeading').textContent = "You're booked for " + visitorFmt + '.';
+    var detail = 'A confirmation email and calendar invite are on their way to <strong>' + who.email + '</strong>.';
+    if (json.meet_url) detail += ' Your Google Meet link: <a href="' + json.meet_url + '" target="_blank" rel="noopener" style="color:var(--turquoise);">' + json.meet_url + '</a>.';
     document.getElementById('successDetail').innerHTML = detail;
-    if (json.cancel_url) {
+    if (json.cancel_url){
       document.getElementById('successCancel').innerHTML =
-        `Need to cancel? <a href="${json.cancel_url}">Cancel this meeting</a>, or ` +
-        `<a href="mailto:devin.stein@colostate.edu?subject=Reschedule office hours">email me</a> to reschedule.`;
+        'Need to cancel? <a href="' + json.cancel_url + '" style="color:var(--turquoise);">Cancel this meeting</a>, or ' +
+        '<a href="mailto:devin.stein@colostate.edu?subject=Reschedule office hours" style="color:var(--turquoise);">email me</a> to reschedule.';
     }
   }
-  if (json.event_id) {
-    document.getElementById('successMeta').textContent = `Reference: ${json.event_id}`;
-  }
-  document.getElementById('step-success').scrollIntoView({behavior: 'smooth', block: 'start'});
+  document.getElementById('successMeta').textContent = json.event_id ? ('Reference · ' + json.event_id) : '';
+  document.getElementById('step-success').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+document.getElementById('resetBtn').addEventListener('click', function(){
+  state.selectedSlot = null; state.selectedDate = null; state.slots = [];
+  document.getElementById('bookForm').reset();
+  try { window.turnstile && window.turnstile.reset(); } catch(e){}
+  document.getElementById('step-form').hidden = true;
+  document.getElementById('step-success').hidden = true;
+  document.getElementById('timeHead').textContent = 'Pick a time';
+  document.getElementById('timeRail').innerHTML = noDateBlock();
+  renderMonth();
+  document.getElementById('top').scrollIntoView({ behavior:'smooth', block:'start' });
+});
+function noDateBlock(){
+  return '<div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:.8rem; padding:2rem 1rem;">'+
+    '<div style="width:46px; height:46px; border-radius:50%; border:.5px solid color-mix(in srgb, var(--white) 14%, transparent); display:flex; align-items:center; justify-content:center; background:color-mix(in srgb, var(--white) 4%, transparent); box-shadow:inset 0 1px 0 rgba(255,255,255,.14);">'+
+    '<span style="font-family:var(--mono); font-size:18px; color:var(--turquoise);">&#8728;</span></div>'+
+    '<p style="font-family:var(--serif); font-style:italic; font-size:1rem; color:var(--fg-3); line-height:1.5; max-width:18em;">Choose a date on the chart to reveal the open times for that day.</p></div>';
 }
 
-// ─────────────────────────────────────────────────────────────
-//  INIT
-// ─────────────────────────────────────────────────────────────
-renderDateStrip();
+// ===== init =====
+(function init(){
+  var choice = 'night';
+  try { var s = localStorage.getItem('ds_sched_mode'); if (s) choice = s; } catch(e){}
+  applyMode(choice);
+  try {
+    var mql = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mql.addEventListener) mql.addEventListener('change', function(){ if (state.modeChoice === 'auto') applyMode('auto'); });
+  } catch(e){}
+  document.getElementById('tzLine').textContent = tzLine();
+  renderWeekdayHeads();
+  renderMonth();
+  document.getElementById('timeRail').innerHTML = noDateBlock();
+})();
+</script>
+<script>
+document.querySelectorAll('[data-hover]').forEach(function(el){
+  var h = el.getAttribute('data-hover');
+  el.addEventListener('mouseenter', function(){ el.setAttribute('data-base-style', el.getAttribute('style')||''); el.setAttribute('style', (el.getAttribute('style')||'') + ';' + h); });
+  el.addEventListener('mouseleave', function(){ if (el.hasAttribute('data-base-style')) el.setAttribute('style', el.getAttribute('data-base-style')); });
+});
 </script>
 </body>
 </html>

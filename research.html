@@ -1,883 +1,527 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-mode="sectional">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Research Network — Devin Stein</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Constellation — Devin Stein</title>
+<meta name="description" content="An interactive map of Devin Stein's research program — projects joined by shared theory, method, and theme.">
+<link rel="icon" href="/favicon.ico?v=3" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/img/favicon.svg?v=3">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png?v=3">
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png?v=3">
+<link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png?v=3">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+/* Devin Stein — Scholarly Identity tokens (sectional night) */
+[data-mode="foolscap"], :root {
+  --bg:#f7f4ec; --bg-raise:#fcfaf3; --bg-sink:#efebdf; --white:#ffffff;
+  --ink:#0d0c0a; --fg-1:#1a1815; --fg-2:#4a4742; --fg-3:#7a766f; --fg-4:#a8a39a;
+  --rule:#c9c2b3; --rule-faint:#e3dcca;
+  --topo-brown:#b5704f; --topo-brown-2:#8a5438;
+  --sectional-blue:#5a8044; --sectional-blue-2:#3a5a2e;
+  --serif:"EB Garamond", Georgia, "Times New Roman", serif;
+  --sans:"IBM Plex Sans", "Inter", -apple-system, system-ui, sans-serif;
+  --mono:"IBM Plex Mono", "JetBrains Mono", Consolas, monospace;
+  --display-roman:"Cormorant Garamond", "EB Garamond", "Trajan Pro", serif;
+}
+[data-mode="sectional"] {
+  --bg:#16181d; --bg-raise:#1d2027; --bg-sink:#101218; --white:#f7f4ec;
+  --ink:#f4ecd8; --fg-1:#e8e0cc; --fg-2:#b8b0a0; --fg-3:#888278; --fg-4:#5a564f;
+  --rule:#3a3832; --rule-faint:#25241f;
+  --topo-brown:#c98a68; --topo-brown-2:#a06848;
+  --sectional-blue:#8aae6e; --sectional-blue-2:#a8c890;
+}
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { font-size:16px; }
+body { margin:0; background:#1b2027; color:var(--fg-1); font-family:var(--serif); -webkit-font-smoothing:antialiased; }
+a { color:var(--sectional-blue); text-decoration:none; }
+@keyframes rc-fadeup { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.rc-navlink:hover { color:var(--fg-1) !important; border-bottom:1px solid var(--sectional-blue) !important; }
 
-    <link rel="icon" href="/favicon.ico?v=2" sizes="any">
-    <link rel="icon" type="image/svg+xml" href="/img/favicon.svg?v=2">
-    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png?v=2">
-    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png?v=2">
-    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png?v=2">
-    <link rel="manifest" href="/site.webmanifest">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Newsreader:wght@400;500&display=swap" rel="stylesheet">
-
-    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-
-    <style>
-        body { margin: 0; padding: 0; background: #0a0a0a; }
-    </style>
+  .navgroup:hover .menu { display:block !important; }
+@keyframes prismDrift { 0% { background-position:130% 0; } 50% { background-position:-30% 0; } 100% { background-position:130% 0; } }
+</style>
 </head>
 <body>
-    <div id="root"></div>
-
-    <script type="text/babel">
-        const { useState, useEffect, useRef, useCallback, useMemo } = React;
-
-        // ── COLOR PALETTE (dark mode — mirrors index.html twilight section) ──
-        const C = {
-          ink: "#0a0a0a", dark: "#1a1a1a", body: "#2a2a2a", mid: "#555",
-          muted: "#888", light: "#b0b0b0", rule: "#d4d4d4", faint: "#ebebeb",
-          bg: "#0a0a0a", white: "#fff",
-          teal: "#1a6b5a", tealHover: "#0f5445", tealLight: "#e4efec",
-          sienna: "#b5704f",
-          // Dark-mode text
-          textPrimary: "rgba(247,247,245,0.92)",
-          textSecondary: "rgba(247,247,245,0.6)",
-          textMuted: "rgba(247,247,245,0.4)",
-          textFaint: "rgba(247,247,245,0.25)",
-          // Dark-mode borders
-          borderLight: "rgba(255,255,255,0.1)",
-          borderMid: "rgba(255,255,255,0.15)",
-        };
-
-        // ── DATA ── Keep in sync with index.html research section.
-        // Source of truth: brain vault overview files. See integration_roadmap.md §7.
-        const PROJECTS = [
-          // Published
-          {
-            id: "fire1", label: "Distributed Knowledge", status: "published", venue: "AMJ",
-            summary: "Community fire prevention plans activate distributed local knowledge across organizational hierarchies, reducing wildfire property losses. Cross-level collaboration roughly doubles the effect of planning alone.",
-            coauthors: "Stein & Minniti", year: 2025,
-            url: "https://doi.org/10.5465/amj.2023.0425",
-            themes: ["governance", "environment", "community", "knowledge", "entrepreneurship", "strategy"],
-            methods: ["panel", "iv", "gis", "archival", "case_study"],
-            theories: ["Ostrom", "Polycentricity", "Stakeholder", "NIE", "Complexity"],
-          },
-          // R&R
-          {
-            id: "fire2", label: "Organizational Mixes", status: "rr", venue: "SMJ",
-            summary: "[Title Withheld for Blind Review] — Organizational diversity reduces wildfire property damage through task specialization. Instrumented via distance-to-MSA; government funding amplifies the diversity effect.",
-            coauthors: "Koppl, Minniti & Stein",
-            url: null,
-            themes: ["governance", "environment", "community", "strategy"],
-            methods: ["panel", "iv", "gis"],
-            theories: ["Polycentricity", "NIE", "Stakeholder", "Ostrom", "Complexity"],
-          },
-          // Under Review
-          {
-            id: "hiv", label: "HIV / Brazil", status: "wp", venue: null,
-            summary: "Religious stigma suppresses HIV case detection; political alignment improves mandate implementation. Refocusing on detection mechanisms (H1–H2) after AMJ rejection; targeting Management Science.",
-            coauthors: "Minniti, Rodriguez & Stein",
-            url: null,
-            themes: ["health", "governance", "community"],
-            methods: ["panel"],
-            theories: ["NIE", "Stakeholder", "Ostrom", "Polycentricity"],
-          },
-          {
-            id: "jbv_si", label: "Entrepreneurial Ecosystems", status: "review", venue: "JBV SI",
-            summary: "[Title Withheld for Blind Review] — Successful entrepreneurial ecosystems transform distributed knowledge from public good into excludable club good through boundary mechanisms, reciprocity norms, coordination rituals, and failure tolerance.",
-            coauthors: "Stein & Minniti",
-            url: null,
-            themes: ["entrepreneurship", "community", "knowledge", "governance"],
-            methods: ["case_study", "archival"],
-            theories: ["Ostrom", "Property Rights", "NIE", "Stakeholder", "Complexity"],
-          },
-          // Working Papers
-          {
-            id: "hybrid", label: "Hybridity", status: "wp", venue: null,
-            summary: "Conceptual paper theorizing how interorganizational hybridity enables systemic search across heterogeneous knowledge domains, connecting organizational diversity to problem-solving under complexity.",
-            coauthors: "Koppl, Minniti & Stein",
-            url: null,
-            themes: ["governance", "strategy", "knowledge"],
-            methods: [],
-            theories: ["Complexity", "NIE", "Stakeholder"],
-          },
-          {
-            id: "fire3", label: "Know Thy Neighbor", status: "wp", venue: null,
-            summary: "Final dissertation chapter. Extends Fire1 by examining how community organizing generates knowledge spillovers across neighboring communities. Published in BCERC conference proceedings (Top 40 Paper, 2024).",
-            coauthors: "Stein & Minniti",
-            url: null,
-            themes: ["community", "entrepreneurship", "knowledge", "environment"],
-            methods: ["panel", "gis", "survival"],
-            theories: ["Ostrom", "Polycentricity", "Stakeholder"],
-          },
-          {
-            id: "resalloc", label: "Scaling Without Hierarchy", status: "wp", venue: null,
-            summary: "When governance capacity is scarce, allocation follows observable salience (fire size) rather than institutional complexity (jurisdictional fragmentation) — producing systematic misallocation that concentrates performance penalties in the most governance-dependent environments.",
-            coauthors: "Stein",
-            url: null,
-            themes: ["governance", "environment", "strategy"],
-            methods: ["panel", "iv", "survival", "gis"],
-            theories: ["TCE", "Polycentricity", "Ostrom", "NIE", "Stakeholder"],
-          },
-          {
-            id: "water", label: "Water Rights", status: "wp", venue: null,
-            summary: "Novel property rights (environmental water) enter fragmented river basins through strategic positioning that minimizes interference with incumbents. But scaling requires the very concentration that blocks entry — creating a paradox.",
-            coauthors: "Stein, Dean & Minniti",
-            url: null,
-            themes: ["environment", "governance", "entrepreneurship"],
-            methods: ["panel", "gis"],
-            theories: ["Property Rights", "NIE", "Ostrom", "Stakeholder"],
-          },
-          {
-            id: "vc", label: "VC & Disasters", status: "wp", venue: null,
-            summary: "Natural disasters deter new VC investors from entering (composition effect), but total capital is unaffected — disasters reshape who invests, not how much. Shared disaster exposure between investor and firm buffers the deterrence effect.",
-            coauthors: "Han, Lee & Stein",
-            url: null,
-            themes: ["entrepreneurship", "environment", "strategy"],
-            methods: ["panel", "iv", "gis", "survival"],
-            theories: ["NIE", "Stakeholder"],
-          },
-          {
-            id: "ski", label: "Ski Industry", status: "wp", venue: null,
-            summary: "Portfolio consolidation enables geographic hedging — building climate-diverse resort portfolios and spreading investment. Climate-diverse portfolios allocate capital more evenly across resorts, buffering individual exposure to snowfall volatility.",
-            coauthors: "Stein",
-            url: null,
-            themes: ["governance", "environment", "strategy", "entrepreneurship"],
-            methods: ["panel", "gis", "survival"],
-            theories: ["TCE", "Property Rights", "Complexity"],
-          },
-        ];
-
-        // Compute links — require substantive alignment (themes + theories), not just shared methods.
-        // Strength is weighted: themes matter most, then theories, then methods.
-        function computeLinks(projects) {
-          const links = [];
-          for (let i = 0; i < projects.length; i++) {
-            for (let j = i + 1; j < projects.length; j++) {
-              const a = projects[i], b = projects[j];
-              const sharedThemes = a.themes.filter(t => b.themes.includes(t));
-              const sharedMethods = a.methods.filter(m => b.methods.includes(m));
-              const sharedTheories = a.theories.filter(t => b.theories.includes(t));
-              const t = sharedThemes.length, th = sharedTheories.length, m = sharedMethods.length;
-              const qualifies = (t >= 2 && th >= 1) || t >= 3;
-              if (!qualifies) continue;
-              const strength = 2 * t + 1.5 * th + m;
-              links.push({
-                source: a.id, target: b.id,
-                strength,
-                shared: {
-                  themes: sharedThemes,
-                  methods: sharedMethods,
-                  theories: sharedTheories,
-                },
-              });
-            }
-          }
-          return links;
-        }
-
-        const ALL_LINKS = computeLinks(PROJECTS);
-
-        // Status visual config — constellation style
-        const STATUS_META = {
-          published: { label: "Published", color: C.teal, bg: "rgba(26,107,90,0.08)" },
-          rr: { label: "R&R", color: "#4a8870", bg: "rgba(74,136,112,0.08)" },
-          review: { label: "Under Review", color: "#c8893d", bg: "rgba(200,137,61,0.08)" },
-          wp: { label: "Working Paper", color: C.sienna, bg: "rgba(181,112,79,0.06)" },
-          progress: { label: "In Progress", color: "#666", bg: "rgba(150,150,150,0.06)" },
-        };
-
-        // Distinctive node styles
-        const NODE_STYLE = {
-          published: { r: 20, ringWidth: 3,   fillOpacity: 1,    strokeOpacity: 1,   dash: "none", glow: true,  innerDot: false },
-          rr:        { r: 16, ringWidth: 2.5,  fillOpacity: 0,    strokeOpacity: 0.85, dash: "none", glow: true,  innerDot: true },
-          review:    { r: 15, ringWidth: 2,    fillOpacity: 0,    strokeOpacity: 0.75, dash: "none", glow: false, innerDot: true },
-          wp:        { r: 13, ringWidth: 1.8,  fillOpacity: 0,    strokeOpacity: 0.5,  dash: "4,3", glow: false, innerDot: true },
-          progress:  { r: 12, ringWidth: 1.5,  fillOpacity: 0,    strokeOpacity: 0.4,  dash: "2,3", glow: false, innerDot: true },
-        };
-
-        const FILTERS = {
-          themes: {
-            label: "Themes",
-            options: [
-              { id: "governance", label: "Governance" },
-              { id: "environment", label: "Environment" },
-              { id: "community", label: "Community" },
-              { id: "entrepreneurship", label: "Entrepreneurship" },
-              { id: "strategy", label: "Strategy" },
-              { id: "knowledge", label: "Knowledge" },
-              { id: "health", label: "Health" },
-            ],
-          },
-          methods: {
-            label: "Methods",
-            options: [
-              { id: "panel", label: "Panel Data" },
-              { id: "iv", label: "IV / GMM" },
-              { id: "gis", label: "GIS / Spatial" },
-              { id: "archival", label: "Archival" },
-              { id: "survival", label: "Survival Analysis" },
-              { id: "case_study", label: "Case Study" },
-            ],
-          },
-          theories: {
-            label: "Theory",
-            options: [
-              { id: "Ostrom", label: "Ostrom" },
-              { id: "NIE", label: "NIE" },
-              { id: "TCE", label: "TCE" },
-              { id: "Polycentricity", label: "Polycentricity" },
-              { id: "Property Rights", label: "Property Rights" },
-              { id: "Complexity", label: "Complexity" },
-              { id: "Stakeholder", label: "Stakeholder" },
-            ],
-          },
-        };
-
-        const FILTER_COLORS = {
-          themes: C.teal,
-          methods: "#5a7a9a",
-          theories: C.sienna,
-        };
-
-        // ── STAR FIELD COMPONENT ──
-        function StarField() {
-          const canvasRef = useRef(null);
-          const starsRef = useRef([]);
-          const frameRef = useRef(null);
-
-          useEffect(() => {
-            const canvas = canvasRef.current;
-            if (!canvas) return;
-            const ctx = canvas.getContext("2d");
-
-            const resize = () => {
-              canvas.width = canvas.parentElement.clientWidth;
-              canvas.height = canvas.parentElement.clientHeight;
-            };
-            resize();
-            window.addEventListener("resize", resize);
-
-            // Generate stars
-            const stars = [];
-            for (let i = 0; i < 100; i++) {
-              const isLarge = Math.random() < 0.15;
-              stars.push({
-                x: Math.random(),
-                y: Math.random(),
-                size: isLarge ? 1.5 + Math.random() * 2 : 0.5 + Math.random() * 1.2,
-                baseOpacity: 0.2 + Math.random() * 0.6,
-                twinkle: Math.random() > 0.35,
-                phase: Math.random() * Math.PI * 2,
-                speed: 0.3 + Math.random() * 0.8,
-                driftX: (Math.random() - 0.5) * 0.00003,
-                driftY: (Math.random() - 0.5) * 0.00003,
-              });
-            }
-            starsRef.current = stars;
-
-            let t = 0;
-            const draw = () => {
-              t += 0.016;
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-              stars.forEach(s => {
-                s.x += s.driftX;
-                s.y += s.driftY;
-                if (s.x < -0.02) s.x = 1.02;
-                if (s.x > 1.02) s.x = -0.02;
-                if (s.y < -0.02) s.y = 1.02;
-                if (s.y > 1.02) s.y = -0.02;
-
-                const px = s.x * canvas.width;
-                const py = s.y * canvas.height;
-                let opacity = s.baseOpacity;
-
-                if (s.twinkle) {
-                  opacity *= 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
-                }
-
-                ctx.beginPath();
-                ctx.arc(px, py, s.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(180, 195, 220, ${opacity})`;
-                ctx.fill();
-
-                // glow on larger stars
-                if (s.size > 1.5) {
-                  ctx.beginPath();
-                  ctx.arc(px, py, s.size * 3, 0, Math.PI * 2);
-                  ctx.fillStyle = `rgba(180, 195, 220, ${opacity * 0.12})`;
-                  ctx.fill();
-                }
-              });
-
-              frameRef.current = requestAnimationFrame(draw);
-            };
-            draw();
-
-            return () => {
-              window.removeEventListener("resize", resize);
-              cancelAnimationFrame(frameRef.current);
-            };
-          }, []);
-
-          return (
-            <canvas
-              ref={canvasRef}
-              style={{
-                position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
-                pointerEvents: "none",
-              }}
-            />
-          );
-        }
-
-        // ── FILM GRAIN OVERLAY ──
-        function FilmGrain() {
-          return (
-            <svg style={{
-              position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
-              pointerEvents: "none", zIndex: 1000, opacity: 0.02,
-            }}>
-              <filter id="grain">
-                <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-              </filter>
-              <rect width="100%" height="100%" filter="url(#grain)" />
-            </svg>
-          );
-        }
-
-        function ResearchNetwork() {
-          const svgRef = useRef(null);
-          const containerRef = useRef(null);
-          const [selected, setSelected] = useState(null);
-          const [dims, setDims] = useState({ width: 900, height: 620 });
-          const [activeFilter, setActiveFilter] = useState(null);
-          const simRef = useRef(null);
-          const nodesRef = useRef(null);
-          const linksRef = useRef(null);
-          const mouseRef = useRef({ x: 0, y: 0 });
-          const floatPhaseRef = useRef(0);
-
-          // Responsive
-          useEffect(() => {
-            const update = () => {
-              if (containerRef.current) {
-                const w = containerRef.current.clientWidth;
-                const graphW = Math.max(400, w - 120); // 60px padding each side
-                setDims({ width: graphW, height: Math.max(520, Math.min(700, graphW * 0.65)) });
-              }
-            };
-            update();
-            window.addEventListener("resize", update);
-            return () => window.removeEventListener("resize", update);
-          }, []);
-
-          // Compute which nodes match current filter
-          const matchingIds = useMemo(() => {
-            if (!activeFilter) return null;
-            const { type, id } = activeFilter;
-            return new Set(PROJECTS.filter(p => p[type]?.includes(id)).map(p => p.id));
-          }, [activeFilter]);
-
-          // D3
-          useEffect(() => {
-            if (!svgRef.current) return;
-            const { width, height } = dims;
-            const svg = d3.select(svgRef.current);
-            svg.selectAll("*").remove();
-
-            // SVG defs for glows
-            const defs = svg.append("defs");
-
-            // Glow filters for published and R&R nodes
-            ["published", "rr"].forEach(status => {
-              const color = STATUS_META[status].color;
-              const filter = defs.append("filter")
-                .attr("id", `glow-${status}`)
-                .attr("x", "-50%").attr("y", "-50%")
-                .attr("width", "200%").attr("height", "200%");
-              filter.append("feGaussianBlur").attr("in", "SourceGraphic").attr("stdDeviation", status === "published" ? 6 : 4).attr("result", "blur");
-              filter.append("feColorMatrix").attr("in", "blur").attr("type", "matrix")
-                .attr("values", `0 0 0 0 ${parseInt(color.slice(1,3),16)/255} 0 0 0 0 ${parseInt(color.slice(3,5),16)/255} 0 0 0 0 ${parseInt(color.slice(5,7),16)/255} 0 0 0 0.6 0`);
-              const merge = filter.append("feMerge");
-              merge.append("feMergeNode");
-              merge.append("feMergeNode").attr("in", "SourceGraphic");
-            });
-
-            const nodes = PROJECTS.map(d => ({ ...d }));
-            const links = ALL_LINKS.map(d => ({ ...d }));
-            nodesRef.current = nodes;
-            linksRef.current = links;
-
-            // Measure each label's half-width so collision force keeps labels from overlapping
-            const measureCtx = document.createElement("canvas").getContext("2d");
-            measureCtx.font = "500 10px 'DM Sans', -apple-system, sans-serif";
-            nodes.forEach(n => { n.labelHalfWidth = measureCtx.measureText(n.label).width / 2; });
-
-            const sim = d3.forceSimulation(nodes)
-              .force("link", d3.forceLink(links).id(d => d.id).distance(d => 140 - d.strength * 4).strength(d => 0.2 + d.strength * 0.03))
-              .force("charge", d3.forceManyBody().strength(-400))
-              .force("center", d3.forceCenter(width / 2, height / 2))
-              .force("collision", d3.forceCollide().radius(d => {
-                const ns = NODE_STYLE[d.status] || NODE_STYLE.wp;
-                // Use label half-width so horizontally adjacent labels don't overlap
-                return Math.max(ns.r + 22, d.labelHalfWidth + 12);
-              }))
-              .force("x", d3.forceX(width / 2).strength(0.05))
-              .force("y", d3.forceY(height / 2).strength(0.05));
-            simRef.current = sim;
-
-            const g = svg.append("g");
-            const zoom = d3.zoom().scaleExtent([0.4, 3]).on("zoom", e => g.attr("transform", e.transform));
-            svg.call(zoom);
-
-            // Links — weighted visual hierarchy so strong ties stand out and weak ones recede
-            const linkMaxStrength = d3.max(links, d => d.strength) || 1;
-            const linkOpacity = d3.scaleLinear().domain([3, linkMaxStrength]).range([0.15, 0.7]).clamp(true);
-            const linkWidth = d3.scaleLinear().domain([3, linkMaxStrength]).range([0.3, 1.8]).clamp(true);
-            const link = g.append("g").selectAll("line").data(links).join("line")
-              .attr("stroke", "rgba(26,107,90,0.18)")
-              .attr("stroke-width", d => linkWidth(d.strength))
-              .attr("stroke-opacity", d => linkOpacity(d.strength));
-
-            // Track mouse position for hover glow
-            svg.on("mousemove", (e) => {
-              const [mx, my] = d3.pointer(e);
-              mouseRef.current = { x: mx, y: my };
-            });
-
-            // Node groups
-            const node = g.append("g").selectAll("g").data(nodes).join("g")
-              .style("cursor", "pointer")
-              .call(d3.drag()
-                .on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.2).restart(); d.fx = d.x; d.fy = d.y; })
-                .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
-                .on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
-              );
-
-            // Invisible hit area — makes small nodes easier to click/drag
-            node.append("circle")
-              .attr("r", d => Math.max((NODE_STYLE[d.status] || NODE_STYLE.wp).r + 10, 24))
-              .attr("fill", "transparent")
-              .attr("stroke", "none");
-
-            // Glow circle (behind main, for published/rr)
-            node.each(function(d) {
-              const ns = NODE_STYLE[d.status] || NODE_STYLE.wp;
-              if (ns.glow) {
-                d3.select(this).append("circle")
-                  .attr("r", ns.r)
-                  .attr("fill", STATUS_META[d.status]?.color || "#666")
-                  .attr("fill-opacity", d.status === "published" ? 0.2 : 0.15)
-                  .attr("filter", `url(#glow-${d.status})`);
-              }
-            });
-
-            // Main ring/fill circle
-            node.append("circle")
-              .attr("r", d => (NODE_STYLE[d.status] || NODE_STYLE.wp).r)
-              .attr("fill", d => {
-                const ns = NODE_STYLE[d.status] || NODE_STYLE.wp;
-                if (ns.fillOpacity === 1) return STATUS_META[d.status]?.color || "#666";
-                return "none";
-              })
-              .attr("fill-opacity", d => (NODE_STYLE[d.status] || NODE_STYLE.wp).fillOpacity)
-              .attr("stroke", d => STATUS_META[d.status]?.color || "#666")
-              .attr("stroke-width", d => (NODE_STYLE[d.status] || NODE_STYLE.wp).ringWidth)
-              .attr("stroke-opacity", d => (NODE_STYLE[d.status] || NODE_STYLE.wp).strokeOpacity)
-              .attr("stroke-dasharray", d => (NODE_STYLE[d.status] || NODE_STYLE.wp).dash);
-
-            // Inner dot (for non-published)
-            node.each(function(d) {
-              const ns = NODE_STYLE[d.status] || NODE_STYLE.wp;
-              if (ns.innerDot) {
-                d3.select(this).append("circle")
-                  .attr("r", d.status === "rr" ? 6 : d.status === "review" ? 5.5 : d.status === "progress" ? 4 : 5)
-                  .attr("fill", STATUS_META[d.status]?.color || "#666")
-                  .attr("fill-opacity", d.status === "progress" ? 0.5 : 0.75);
-              }
-            });
-
-            // Labels — light text on dark background
-            node.append("text")
-              .text(d => d.label)
-              .attr("y", d => (NODE_STYLE[d.status] || NODE_STYLE.wp).r + 14)
-              .attr("text-anchor", "middle")
-              .attr("font-family", "'DM Sans', -apple-system, sans-serif")
-              .attr("font-size", "10px")
-              .attr("font-weight", 500)
-              .attr("fill", C.textSecondary);
-
-            // Hover — show only the hovered node's top 4 strongest neighbors (fewer if it has fewer edges)
-            const HOVER_TOP_K = 4;
-            node.on("mouseover", function(e, d) {
-              const topEdges = links
-                .filter(l => l.source.id === d.id || l.target.id === d.id)
-                .sort((a, b) => b.strength - a.strength)
-                .slice(0, HOVER_TOP_K);
-              const topEdgeSet = new Set(topEdges);
-              const connected = new Set([d.id]);
-              topEdges.forEach(l => { connected.add(l.source.id); connected.add(l.target.id); });
-              node.transition().duration(150)
-                .attr("opacity", n => connected.has(n.id) ? 1 : 0.12);
-              link.transition().duration(150)
-                .attr("stroke-opacity", l => topEdgeSet.has(l) ? 0.85 : 0.04)
-                .attr("stroke", l => topEdgeSet.has(l) ? STATUS_META[d.status]?.color || C.teal : "rgba(26,107,90,0.18)");
-            })
-            .on("mouseout", () => {
-              node.transition().duration(200).attr("opacity", 1);
-              link.transition().duration(200)
-                .attr("stroke-opacity", l => linkOpacity(l.strength))
-                .attr("stroke", "rgba(26,107,90,0.18)");
-            })
-            .on("click", (e, d) => {
-              e.stopPropagation();
-              setSelected(prev => prev?.id === d.id ? null : d);
-            });
-
-            svg.on("click", () => setSelected(null));
-
-            // Continuous gentle floating animation
-            let floatFrame;
-            const floatTick = () => {
-              floatPhaseRef.current += 0.008;
-              const t = floatPhaseRef.current;
-              const mouse = mouseRef.current;
-
-              node.attr("transform", d => {
-                // Gentle per-node float using unique phase offsets
-                const seed = d.id.length * 7 + d.id.charCodeAt(0);
-                const floatX = Math.sin(t + seed * 0.5) * 2.5 + Math.cos(t * 0.7 + seed) * 1.5;
-                const floatY = Math.cos(t * 0.8 + seed * 0.3) * 2 + Math.sin(t * 0.6 + seed * 0.7) * 1.5;
-
-                return `translate(${d.x + floatX},${d.y + floatY})`;
-              });
-
-              link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
-                .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
-
-              floatFrame = requestAnimationFrame(floatTick);
-            };
-
-            // Auto-fit kicks in while sim is still settling so the orbit accelerates into the zoom
-            let didInitialFit = false;
-            const fitToViewport = () => {
-              const pad = 60; // leaves room for node radius + labels
-              const xs = nodes.map(n => n.x);
-              const ys = nodes.map(n => n.y);
-              const minX = Math.min(...xs), maxX = Math.max(...xs);
-              const minY = Math.min(...ys), maxY = Math.max(...ys);
-              const bboxW = maxX - minX, bboxH = maxY - minY;
-              if (bboxW <= 0 || bboxH <= 0) return;
-              const scale = Math.min(2, (width - pad * 2) / bboxW, (height - pad * 2) / bboxH);
-              const tx = width / 2 - ((minX + maxX) / 2) * scale;
-              const ty = height / 2 - ((minY + maxY) / 2) * scale;
-              svg.transition().duration(1500).ease(d3.easeCubicIn)
-                .call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
-            };
-            const kickoff = () => {
-              if (didInitialFit) return;
-              didInitialFit = true;
-              fitToViewport();
-              floatFrame = requestAnimationFrame(floatTick);
-            };
-
-            sim.on("tick", () => {
-              link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
-                .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
-              node.attr("transform", d => `translate(${d.x},${d.y})`);
-              // Begin the zoom-to-fit before sim fully settles so orbit and zoom blend
-              if (!didInitialFit && sim.alpha() < 0.1) kickoff();
-            });
-
-            sim.on("end", kickoff);
-            // Fallback in case sim doesn't fully end
-            setTimeout(kickoff, 3000);
-
-            return () => { sim.stop(); cancelAnimationFrame(floatFrame); };
-          }, [dims]);
-
-          // Apply filter highlighting via D3 transitions
-          useEffect(() => {
-            if (!svgRef.current || !nodesRef.current) return;
-            const svg = d3.select(svgRef.current);
-
-            if (!matchingIds) {
-              svg.selectAll("g g g").transition().duration(200).attr("opacity", 1);
-              const maxS = d3.max(ALL_LINKS, d => d.strength) || 1;
-              const opa = d3.scaleLinear().domain([3, maxS]).range([0.15, 0.7]).clamp(true);
-              svg.selectAll("g g line").transition().duration(200).attr("stroke-opacity", d => opa(d.strength));
-              return;
-            }
-
-            svg.selectAll("g g g").each(function(d) {
-              d3.select(this).transition().duration(200)
-                .attr("opacity", matchingIds.has(d?.id) ? 1 : 0.1);
-            });
-          }, [matchingIds]);
-
-          const toggleFilter = (type, id) => {
-            setActiveFilter(prev => (prev?.type === type && prev?.id === id) ? null : { type, id });
-          };
-
-          // Legend item renderer — SVG icons matching node rendering
-          const legendIcon = (key, meta) => {
-            const ns = NODE_STYLE[key] || NODE_STYLE.wp;
-            const size = 14;
-            const r = 5;
-            return (
-              <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0, verticalAlign: "middle" }}>
-                <circle
-                  cx={size/2} cy={size/2} r={r}
-                  fill={ns.fillOpacity === 1 ? meta.color : "none"}
-                  fillOpacity={ns.fillOpacity}
-                  stroke={meta.color}
-                  strokeWidth={ns.ringWidth * 0.7}
-                  strokeOpacity={ns.strokeOpacity}
-                  strokeDasharray={ns.dash === "none" ? undefined : ns.dash}
-                />
-                {ns.innerDot && (
-                  <circle
-                    cx={size/2} cy={size/2} r={key === "progress" ? 2 : 2.5}
-                    fill={meta.color}
-                    fillOpacity={key === "progress" ? 0.5 : 0.75}
-                  />
-                )}
-              </svg>
-            );
-          };
-
-          return (
-            <div style={{
-              fontFamily: "'DM Sans', -apple-system, sans-serif",
-              background: C.bg, minHeight: "100vh", position: "relative", overflow: "hidden",
-            }}>
-              {/* Film grain overlay */}
-              <FilmGrain />
-
-              {/* Nav bar — dark frosted glass */}
-              <nav style={{
-                position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-                background: "rgba(10,10,10,0.7)",
-                backdropFilter: "blur(20px) saturate(1.5)",
-                WebkitBackdropFilter: "blur(20px) saturate(1.5)",
-                borderBottom: `1px solid ${C.borderLight}`,
-              }}>
-                <div style={{
-                  maxWidth: 960, margin: "0 auto", padding: "0.85rem 1.5rem",
-                  display: "flex", justifyContent: "space-between", alignItems: "baseline",
-                }}>
-                  <a href="index.html" style={{
-                    fontFamily: "'DM Sans', sans-serif", fontSize: "0.85rem", fontWeight: 700,
-                    color: C.textPrimary, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase",
-                  }}>Devin Stein</a>
-                  <a href="index.html" style={{
-                    fontFamily: "'DM Sans', sans-serif", fontSize: "0.72rem", fontWeight: 600,
-                    color: C.textSecondary, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase",
-                  }}>&larr; Home</a>
-                </div>
-              </nav>
-
-              {/* Header */}
-              <div style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1.5rem 0", paddingTop: "4rem", position: "relative", zIndex: 2 }}>
-                <div style={{
-                  fontFamily: "'JetBrains Mono', monospace", fontSize: "0.62rem",
-                  color: C.sienna, letterSpacing: "0.08em", textTransform: "uppercase",
-                  marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.6rem",
-                }}>
-                  <span style={{ display: "block", width: 24, height: 1, background: C.sienna, opacity: 0.6 }} />
-                  Interactive
-                </div>
-                <h1 style={{
-                  fontFamily: "'Newsreader', Georgia, serif", fontSize: "1.8rem",
-                  fontWeight: 400, color: C.textPrimary, margin: "0 0 0.3rem",
-                }}>Research Network</h1>
-                <p style={{
-                  fontFamily: "'Newsreader', Georgia, serif",
-                  fontSize: "0.85rem", color: C.textMuted, lineHeight: 1.6, maxWidth: 600, margin: "0 0 1.2rem",
-                }}>
-                  An interactive map of my research program. Projects are connected by shared theory, methods, and themes. Use the filters to explore the intellectual architecture, or drag nodes to rearrange.
-                </p>
-
-                {/* Filter bar */}
-                <div style={{ display: "flex", gap: "1.8rem", flexWrap: "wrap", marginBottom: "1rem", alignItems: "flex-start" }}>
-                  {Object.entries(FILTERS).map(([type, { label, options }]) => (
-                    <div key={type}>
-                      <div style={{
-                        fontFamily: "'JetBrains Mono', monospace", fontSize: "0.58rem",
-                        color: FILTER_COLORS[type], letterSpacing: "0.1em", textTransform: "uppercase",
-                        marginBottom: "0.4rem", fontWeight: 500,
-                      }}>{label}</div>
-                      <div style={{ display: "flex", gap: "0.35rem", flexWrap: "wrap" }}>
-                        {options.map(opt => {
-                          const isActive = activeFilter?.type === type && activeFilter?.id === opt.id;
-                          return (
-                            <button
-                              key={opt.id}
-                              onClick={() => toggleFilter(type, opt.id)}
-                              style={{
-                                fontFamily: "'JetBrains Mono', monospace", fontSize: "0.6rem",
-                                letterSpacing: "0.02em",
-                                color: isActive ? C.white : C.textMuted,
-                                background: isActive ? FILTER_COLORS[type] : "transparent",
-                                border: `1px solid ${isActive ? FILTER_COLORS[type] : C.borderMid}`,
-                                padding: "0.2rem 0.55rem", cursor: "pointer",
-                                borderRadius: 1, transition: "all 0.15s",
-                              }}
-                            >{opt.label}</button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Legend */}
-                <div style={{ display: "flex", gap: "1.2rem", marginBottom: "0.8rem", flexWrap: "wrap" }}>
-                  {Object.entries(STATUS_META).map(([key, meta]) => (
-                    <div key={key} style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                      {legendIcon(key, meta)}
-                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.6rem", color: C.textMuted }}>
-                        {meta.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Graph area with star field */}
-              <div ref={containerRef} style={{ maxWidth: 960, margin: "0 auto", padding: "0 1.5rem", position: "relative" }}>
-                <div style={{
-                  background: "transparent",
-                  borderRadius: 2, overflow: "hidden", position: "relative",
-                  display: "flex", justifyContent: "center",
-                }}>
-                  {/* Star field canvas behind the SVG */}
-                  <StarField />
-
-                  <svg ref={svgRef} width={dims.width} height={dims.height} style={{ display: "block", position: "relative", zIndex: 1 }} />
-                </div>
-
-                {/* Selected detail — dark glass panel */}
-                {selected && (
-                  <div style={{
-                    background: "rgba(20,20,20,0.8)",
-                    backdropFilter: "blur(16px) saturate(1.3)",
-                    WebkitBackdropFilter: "blur(16px) saturate(1.3)",
-                    border: `1px solid ${C.borderMid}`,
-                    borderLeft: `3px solid ${STATUS_META[selected.status]?.color || C.teal}`,
-                    boxShadow: "0 2px 24px rgba(0,0,0,0.3)",
-                    padding: "1.4rem 1.6rem", marginTop: "0.6rem",
-                    animation: "fadeUp 0.25s ease",
-                  }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                      <div>
-                        <div style={{
-                          fontFamily: "'JetBrains Mono', monospace", fontSize: "0.6rem",
-                          color: STATUS_META[selected.status]?.color, letterSpacing: "0.04em",
-                          textTransform: "uppercase", fontWeight: 500, marginBottom: "0.25rem",
-                        }}>
-                          {STATUS_META[selected.status]?.label}{selected.venue ? ` · ${selected.venue}` : ""}{selected.year ? ` · ${selected.year}` : ""}
-                        </div>
-                        <div style={{
-                          fontFamily: "'Newsreader', Georgia, serif", fontSize: "1.15rem",
-                          color: C.textPrimary, marginBottom: "0.15rem",
-                        }}>{selected.label}</div>
-                        <div style={{ fontSize: "0.78rem", color: C.textMuted, marginBottom: "0.6rem" }}>
-                          {selected.coauthors}
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setSelected(null)}
-                        style={{
-                          background: "none", border: `1px solid ${C.borderMid}`,
-                          fontFamily: "'JetBrains Mono', monospace", fontSize: "0.58rem",
-                          color: C.textMuted, padding: "0.2rem 0.5rem", cursor: "pointer", flexShrink: 0,
-                        }}>✕</button>
-                    </div>
-                    <p style={{
-                      fontSize: "0.9rem", color: C.textSecondary, lineHeight: 1.75,
-                      fontFamily: "'Newsreader', Georgia, serif", margin: "0 0 0.8rem",
-                    }}>{selected.summary}</p>
-                    {selected.url && (
-                      <a
-                        href={selected.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: "inline-flex", alignItems: "center", gap: "0.4rem",
-                          fontFamily: "'JetBrains Mono', monospace", fontSize: "0.64rem",
-                          color: C.tealLight, textDecoration: "none", fontWeight: 500,
-                          borderBottom: "1px solid transparent", transition: "border-color 0.2s",
-                          marginBottom: "0.8rem",
-                        }}
-                        onMouseOver={e => e.target.style.borderBottomColor = C.tealLight}
-                        onMouseOut={e => e.target.style.borderBottomColor = "transparent"}
-                      >
-                        {selected.status === "published" ? "View paper ↗" : "View abstract ↗"}
-                      </a>
-                    )}
-                    <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: selected.url ? "0" : "0" }}>
-                      {[...selected.themes, ...selected.methods, ...selected.theories].map((tag, i) => (
-                        <span key={i} style={{
-                          fontFamily: "'JetBrains Mono', monospace", fontSize: "0.56rem",
-                          color: C.textMuted, border: `1px solid ${C.borderLight}`, padding: "0.15rem 0.45rem",
-                          letterSpacing: "0.02em",
-                        }}>{tag}</span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Footer */}
-              <div style={{
-                maxWidth: 960, margin: "0 auto", padding: "1.2rem 1.5rem 0",
-                position: "relative", zIndex: 2,
-              }}>
-                <p style={{
-                  fontFamily: "'JetBrains Mono', monospace", fontSize: "0.58rem",
-                  color: C.textFaint, letterSpacing: "0.02em",
-                }}>
-                  Click a node for details · Drag to rearrange · Scroll to zoom
-                </p>
-              </div>
-
-              {/* Dusk/twilight horizon gradient at bottom */}
-              <div style={{
-                position: "relative", zIndex: 0,
-                height: 120, marginTop: "1rem",
-                background: `linear-gradient(180deg,
-                  transparent 0%,
-                  rgba(240,202,138,0.06) 20%,
-                  rgba(217,152,96,0.08) 40%,
-                  rgba(196,128,88,0.1) 55%,
-                  rgba(150,95,105,0.08) 70%,
-                  rgba(120,85,120,0.06) 85%,
-                  rgba(80,65,115,0.04) 100%
-                )`,
-              }}>
-                {/* Subtle sun glow */}
-                <div style={{
-                  position: "absolute", bottom: -40, left: "50%", transform: "translateX(-50%)",
-                  width: 400, height: 80,
-                  background: "radial-gradient(ellipse at center, rgba(240,202,138,0.1) 0%, rgba(217,152,96,0.05) 40%, transparent 70%)",
-                  pointerEvents: "none",
-                }} />
-              </div>
-
-              <style>{`
-                @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-                button:hover { opacity: 0.85; }
-              `}</style>
+<div data-mode="sectional" style="position:relative; min-height:100vh; background:#1b2027; color:var(--fg-1); font-family:var(--serif); overflow:hidden;">
+
+  <!-- grain -->
+  <div style="position:fixed; inset:0; pointer-events:none; z-index:1000; opacity:.022; background-image:url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;);"></div>
+
+  <!-- starfield -->
+  <canvas id="rc-canvas" style="position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:0;"></canvas>
+
+  <!-- nav -->
+  <nav style="position:sticky; top:0; z-index:100; background:color-mix(in srgb, var(--bg) 42%, transparent); backdrop-filter:blur(26px) saturate(1.6); -webkit-backdrop-filter:blur(26px) saturate(1.6); border-bottom:.5px solid var(--rule-faint);">
+    <!-- Prism / refraction sheen -->
+    <div style="position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:1;">
+      <div style="position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg, transparent 4%, rgba(255,140,190,.55), rgba(190,150,255,.55), rgba(130,200,255,.5), rgba(150,255,215,.45), rgba(255,205,130,.4), transparent 96%);"></div>
+      <div style="position:absolute; inset:-60% 0; background:linear-gradient(105deg, transparent 38%, rgba(255,90,160,.06) 46%, rgba(150,90,255,.07) 50%, rgba(70,160,255,.06) 54%, rgba(60,230,190,.05) 60%, rgba(255,200,120,.04) 64%, transparent 72%); mix-blend-mode:screen; background-size:260% 100%; background-repeat:no-repeat; animation:prismDrift 11s ease-in-out infinite;"></div>
+    </div>
+    <div style="max-width:940px; margin:0 auto; padding:14px 2.5rem; display:flex; justify-content:space-between; align-items:baseline; gap:1rem; position:relative; z-index:2;">
+      <a href="index.html" style="font-family:var(--sans); font-size:12px; font-weight:700; color:var(--ink); letter-spacing:.06em; text-transform:uppercase; text-decoration:none;">Devin Stein</a>
+      <div style="display:flex; gap:1.5rem; align-items:baseline;">
+
+        <div class="navgroup" style="position:relative;">
+          <a href="index.html#research" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent; cursor:pointer;" data-hover="border-bottom:1px solid var(--sectional-blue);">Research <span style="opacity:.45; font-size:8px;">&#9662;</span></a>
+          <div class="menu" style="position:absolute; top:100%; left:-12px; padding-top:11px; z-index:140; display:none;">
+            <div style="position:relative; min-width:222px; background:color-mix(in srgb, var(--bg-raise) 90%, transparent); backdrop-filter:blur(32px) saturate(1.9) brightness(1.04); -webkit-backdrop-filter:blur(32px) saturate(1.9) brightness(1.04); border:.5px solid color-mix(in srgb, var(--white) 32%, transparent); box-shadow:0 22px 50px rgba(0,0,0,.32), 0 2px 8px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.35); border-radius:13px; padding:6px; overflow:hidden;"><div style="position:absolute; top:0; left:12%; right:12%; height:1px; background:linear-gradient(90deg, transparent, rgba(255,150,200,.5), rgba(170,160,255,.55), rgba(130,210,255,.5), rgba(160,255,220,.45), transparent);"></div><div style="position:absolute; top:1px; left:0; right:0; height:30%; background:linear-gradient(180deg, rgba(255,255,255,.1), transparent); pointer-events:none;"></div>
+              <a href="index.html#research" style="display:block; padding:9px 12px; text-decoration:none; border-radius:8px; position:relative;" data-hover="background:color-mix(in srgb, var(--white) 12%, transparent);">
+                <div style="font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--fg-1); display:flex; justify-content:space-between; gap:14px;">Papers</div>
+                <div style="font-family:var(--sans); font-size:10px; color:var(--fg-3); letter-spacing:.01em; margin-top:2px;">Published &amp; working papers</div>
+              </a>
+              <a href="research.html" style="display:block; padding:9px 12px; text-decoration:none; border-radius:8px; position:relative;" data-hover="background:color-mix(in srgb, var(--white) 12%, transparent);">
+                <div style="font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--fg-1); display:flex; justify-content:space-between; gap:14px;">Research Map <span style="color:var(--sectional-blue); font-family:var(--mono); font-size:10px;">&nearr;</span></div>
+                <div style="font-family:var(--sans); font-size:10px; color:var(--fg-3); letter-spacing:.01em; margin-top:2px;">Interactive constellation</div>
+              </a>
             </div>
-          );
-        }
+          </div>
+        </div>
 
-        // Render the React app
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<ResearchNetwork />);
-    </script>
+        <div class="navgroup" style="position:relative;">
+          <a href="index.html#teaching" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent; cursor:pointer;" data-hover="border-bottom:1px solid var(--sectional-blue);">Teaching <span style="opacity:.45; font-size:8px;">&#9662;</span></a>
+          <div class="menu" style="position:absolute; top:100%; left:-12px; padding-top:11px; z-index:140; display:none;">
+            <div style="position:relative; min-width:222px; background:color-mix(in srgb, var(--bg-raise) 90%, transparent); backdrop-filter:blur(32px) saturate(1.9) brightness(1.04); -webkit-backdrop-filter:blur(32px) saturate(1.9) brightness(1.04); border:.5px solid color-mix(in srgb, var(--white) 32%, transparent); box-shadow:0 22px 50px rgba(0,0,0,.32), 0 2px 8px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.35); border-radius:13px; padding:6px; overflow:hidden;"><div style="position:absolute; top:0; left:12%; right:12%; height:1px; background:linear-gradient(90deg, transparent, rgba(255,150,200,.5), rgba(170,160,255,.55), rgba(130,210,255,.5), rgba(160,255,220,.45), transparent);"></div><div style="position:absolute; top:1px; left:0; right:0; height:30%; background:linear-gradient(180deg, rgba(255,255,255,.1), transparent); pointer-events:none;"></div>
+              <a href="https://devinstein.me/drinkwars/" target="_blank" rel="noopener" style="display:block; padding:9px 12px; text-decoration:none; border-radius:8px; position:relative;" data-hover="background:color-mix(in srgb, var(--white) 12%, transparent);">
+                <div style="font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--fg-1); display:flex; justify-content:space-between; gap:14px;">Drink Wars <span style="color:var(--sectional-blue); font-family:var(--mono); font-size:10px;">&nearr;</span></div>
+                <div style="font-family:var(--sans); font-size:10px; color:var(--fg-3); letter-spacing:.01em; margin-top:2px;">Craft-beverage strategy sim</div>
+              </a>
+              <a href="schedule.html" style="display:block; padding:9px 12px; text-decoration:none; border-radius:8px; position:relative;" data-hover="background:color-mix(in srgb, var(--white) 12%, transparent);">
+                <div style="font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--fg-1); display:flex; justify-content:space-between; gap:14px;">Schedule <span style="color:var(--sectional-blue); font-family:var(--mono); font-size:10px;">&nearr;</span></div>
+                <div style="font-family:var(--sans); font-size:10px; color:var(--fg-3); letter-spacing:.01em; margin-top:2px;">Office hours &amp; meetings</div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <a href="index.html#recognition" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent;" data-hover="border-bottom:1px solid var(--sectional-blue);">Recognition</a>
+        <a href="index.html#talks" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent;" data-hover="border-bottom:1px solid var(--sectional-blue);">Talks</a>
+        <a href="index.html#bio" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent;" data-hover="border-bottom:1px solid var(--sectional-blue);">Bio</a>
+        <a href="https://docs.google.com/document/d/15JjioE7TF23AzHyGsPKE4yBeVMtSmnsa/export?format=pdf" target="_blank" rel="noopener" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent;" data-hover="border-bottom:1px solid var(--sectional-blue);">CV</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- header -->
+  <div style="max-width:1000px; margin:0 auto; padding:4.2rem 1.6rem 0; position:relative; z-index:3;">
+    <div style="font-family:var(--mono); font-size:10px; color:var(--topo-brown); letter-spacing:.14em; text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:10px;">
+      <span style="display:block; width:24px; height:1px; background:var(--topo-brown); opacity:.6;"></span>
+      Interactive &middot; Plate IV &middot; Research Map
+    </div>
+    <h1 style="font-family:var(--display-roman); font-weight:400; font-size:2.9rem; line-height:1.02; letter-spacing:.01em; color:var(--ink); margin-bottom:10px;">The Research <span style="color:var(--sectional-blue-2); font-style:normal;">Constellation</span></h1>
+    <p style="font-family:var(--serif); font-style:italic; font-weight:300; font-size:1.18rem; color:var(--fg-2); line-height:1.4; max-width:38em; margin-bottom:4px;">A chart of one research program &mdash; projects fixed by status, joined by the theory, method, and theme they hold in common.</p>
+    <p style="font-family:var(--sans); font-size:12.5px; color:var(--fg-3); line-height:1.6; max-width:40em; margin-bottom:1.6rem;">Filter by an idea to light the papers that carry it. Hover a node for its strongest ties; click for the abstract. Drag to rearrange, scroll to zoom.</p>
+
+    <!-- filters -->
+    <div id="rc-filters" style="display:flex; gap:2rem; flex-wrap:wrap; margin-bottom:1.2rem; align-items:flex-start;"></div>
+
+    <!-- legend -->
+    <div id="rc-legend" style="display:flex; gap:1.3rem; flex-wrap:wrap; margin-bottom:.4rem; padding-top:.9rem; border-top:.5px solid var(--rule-faint);"></div>
+  </div>
+
+  <!-- graph -->
+  <div id="rc-container" style="max-width:1000px; margin:0 auto; padding:0 1.6rem; position:relative; z-index:2;">
+    <!-- cartographic corner coordinates -->
+    <div style="position:absolute; inset:0 1.6rem; pointer-events:none; z-index:2;">
+      <span style="position:absolute; top:6px; left:6px; font-family:var(--mono); font-size:9px; color:var(--fg-4); letter-spacing:.04em;">33&deg;12&prime;N</span>
+      <span style="position:absolute; top:6px; right:6px; font-family:var(--mono); font-size:9px; color:var(--fg-4); letter-spacing:.04em;">87&deg;33&prime;W</span>
+      <span style="position:absolute; bottom:6px; left:6px; font-family:var(--mono); font-size:9px; color:var(--fg-4); letter-spacing:.04em;">SEC&middot;IV</span>
+      <span style="position:absolute; bottom:6px; right:6px; font-family:var(--mono); font-size:9px; color:var(--fg-4); letter-spacing:.04em;">N&uarr;</span>
+    </div>
+
+    <div style="display:flex; justify-content:center; position:relative;">
+      <svg id="rc-svg" style="display:block; position:relative; z-index:1; overflow:visible;"></svg>
+    </div>
+
+    <!-- detail panel -->
+    <div id="rc-panel" style="display:none;"></div>
+
+    <p id="rc-count" style="font-family:var(--mono); font-size:10px; color:var(--fg-4); letter-spacing:.02em; margin-top:1rem;"></p>
+  </div>
+
+  <!-- horizon -->
+  <div style="position:relative; z-index:0; height:130px; margin-top:1rem; background:linear-gradient(180deg, transparent 0%, rgba(240,202,138,.05) 22%, rgba(217,152,96,.07) 42%, rgba(196,128,88,.08) 56%, rgba(150,95,105,.06) 72%, rgba(120,85,120,.05) 86%, rgba(80,65,115,.035) 100%);"></div>
+
+</div>
+
+<script>
+// ===== Palette (sectional night, concrete hex for D3) =====
+var P = { bg:'#16181d', raise:'#1d2027', ink:'#f4ecd8', fg1:'#e8e0cc', fg2:'#b8b0a0', fg3:'#888278', fg4:'#5a564f',
+  green:'#8aae6e', green2:'#a8c890', clay:'#c98a68', amber:'#c89858', aero:'#5fb8c4' };
+
+var STATUS_META = {
+  published: { label:'Published', color:'#8aae6e' },
+  rr:        { label:'R&R', color:'#c89858' },
+  review:    { label:'Under Review', color:'#5fb8c4' },
+  wp:        { label:'Working Paper', color:'#c98a68' },
+  progress:  { label:'In Progress', color:'#888278' },
+};
+var NODE_STYLE = {
+  published: { r:21, ringWidth:3,   fillOpacity:1, strokeOpacity:1,    dash:'none', glow:true,  innerDot:false },
+  rr:        { r:16, ringWidth:2.5, fillOpacity:0, strokeOpacity:0.9,  dash:'none', glow:true,  innerDot:true },
+  review:    { r:15, ringWidth:2,   fillOpacity:0, strokeOpacity:0.8,  dash:'none', glow:false, innerDot:true },
+  wp:        { r:13, ringWidth:1.6, fillOpacity:0, strokeOpacity:0.55, dash:'4,3',  glow:false, innerDot:true },
+  progress:  { r:12, ringWidth:1.4, fillOpacity:0, strokeOpacity:0.4,  dash:'2,3',  glow:false, innerDot:true },
+};
+var FILTERS = {
+  themes: { label:'Themes', color:'#8aae6e', options:[
+    {id:'governance',label:'Governance'},{id:'environment',label:'Environment'},{id:'community',label:'Community'},
+    {id:'entrepreneurship',label:'Entrepreneurship'},{id:'strategy',label:'Strategy'},{id:'knowledge',label:'Knowledge'},{id:'health',label:'Health'} ]},
+  methods: { label:'Methods', color:'#5fb8c4', options:[
+    {id:'panel',label:'Panel Data'},{id:'iv',label:'IV / GMM'},{id:'gis',label:'GIS / Spatial'},
+    {id:'archival',label:'Archival'},{id:'survival',label:'Survival'},{id:'case_study',label:'Case Study'} ]},
+  theories: { label:'Theory', color:'#c98a68', options:[
+    {id:'Ostrom',label:'Ostrom'},{id:'NIE',label:'NIE'},{id:'TCE',label:'TCE'},{id:'Polycentricity',label:'Polycentricity'},
+    {id:'Property Rights',label:'Property Rights'},{id:'Complexity',label:'Complexity'},{id:'Stakeholder',label:'Stakeholder'} ]},
+};
+
+// ===== Projects (real data; jbv_si flipped review -> rr) =====
+var PROJECTS = [
+  { id:'fire1', label:'Distributed Knowledge', status:'published', venue:'AMJ', year:2025,
+    summary:'Community fire-prevention plans activate distributed local knowledge across organizational hierarchies, reducing wildfire property losses. Cross-level collaboration roughly doubles the effect of planning alone.',
+    coauthors:'Stein & Minniti', url:'https://doi.org/10.5465/amj.2023.0425',
+    themes:['governance','environment','community','knowledge','entrepreneurship','strategy'], methods:['panel','iv','gis','archival','case_study'], theories:['Ostrom','Polycentricity','Stakeholder','NIE','Complexity'] },
+  { id:'fire2', label:'Organizational Mixes', status:'rr', venue:'SMJ', year:null,
+    summary:'[Title withheld for blind review] — Organizational diversity reduces wildfire property damage through task specialization. Instrumented via distance-to-MSA; government funding amplifies the diversity effect.',
+    coauthors:'Koppl, Minniti & Stein', url:null,
+    themes:['governance','environment','community','strategy'], methods:['panel','iv','gis'], theories:['Polycentricity','NIE','Stakeholder','Ostrom','Complexity'] },
+  { id:'hiv', label:'HIV / Brazil', status:'wp', venue:null, year:null,
+    summary:'Religious stigma suppresses HIV case detection; political alignment improves mandate implementation. Refocusing on detection mechanisms after AMJ rejection; targeting Management Science.',
+    coauthors:'Minniti, Rodriguez & Stein', url:null,
+    themes:['health','governance','community'], methods:['panel'], theories:['NIE','Stakeholder','Ostrom','Polycentricity'] },
+  { id:'jbv_si', label:'Entrepreneurial Ecosystems', status:'rr', venue:'JBV SI', year:null,
+    summary:'[Title withheld for blind review] — Successful entrepreneurial ecosystems transform distributed knowledge from public good into excludable club good through boundary mechanisms, reciprocity norms, coordination rituals, and failure tolerance.',
+    coauthors:'Stein & Minniti', url:null,
+    themes:['entrepreneurship','community','knowledge','governance'], methods:['case_study','archival'], theories:['Ostrom','Property Rights','NIE','Stakeholder','Complexity'] },
+  { id:'hybrid', label:'Hybridity', status:'wp', venue:null, year:null,
+    summary:'Conceptual paper theorizing how interorganizational hybridity enables systemic search across heterogeneous knowledge domains, connecting organizational diversity to problem-solving under complexity.',
+    coauthors:'Koppl, Minniti & Stein', url:null,
+    themes:['governance','strategy','knowledge'], methods:[], theories:['Complexity','NIE','Stakeholder'] },
+  { id:'fire3', label:'Know Thy Neighbor', status:'wp', venue:null, year:null,
+    summary:'Final dissertation chapter. Extends Distributed Knowledge by examining how community organizing generates knowledge spillovers across neighboring communities. BCERC proceedings (Top 40 Paper, 2024).',
+    coauthors:'Stein & Minniti', url:null,
+    themes:['community','entrepreneurship','knowledge','environment'], methods:['panel','gis','survival'], theories:['Ostrom','Polycentricity','Stakeholder'] },
+  { id:'resalloc', label:'Scaling Without Hierarchy', status:'wp', venue:null, year:null,
+    summary:'When governance capacity is scarce, allocation follows observable salience (fire size) rather than institutional complexity (jurisdictional fragmentation) — producing systematic misallocation that concentrates penalties in the most governance-dependent environments.',
+    coauthors:'Stein', url:null,
+    themes:['governance','environment','strategy'], methods:['panel','iv','survival','gis'], theories:['TCE','Polycentricity','Ostrom','NIE','Stakeholder'] },
+  { id:'water', label:'Water Rights', status:'wp', venue:null, year:null,
+    summary:'Novel property rights (environmental water) enter fragmented river basins through strategic positioning that minimizes interference with incumbents. But scaling requires the very concentration that blocks entry — a paradox.',
+    coauthors:'Stein, Dean & Minniti', url:null,
+    themes:['environment','governance','entrepreneurship'], methods:['panel','gis'], theories:['Property Rights','NIE','Ostrom','Stakeholder'] },
+  { id:'vc', label:'VC & Disasters', status:'wp', venue:null, year:null,
+    summary:'Natural disasters deter new VC investors from entering (composition effect), but total capital is unaffected — disasters reshape who invests, not how much. Shared disaster exposure buffers the deterrence effect.',
+    coauthors:'Han, Lee & Stein', url:null,
+    themes:['entrepreneurship','environment','strategy'], methods:['panel','iv','gis','survival'], theories:['NIE','Stakeholder'] },
+  { id:'ski', label:'Ski Industry', status:'wp', venue:null, year:null,
+    summary:'Portfolio consolidation enables geographic hedging — building climate-diverse resort portfolios and spreading investment. Climate-diverse portfolios allocate capital more evenly, buffering exposure to snowfall volatility.',
+    coauthors:'Stein', url:null,
+    themes:['governance','environment','strategy','entrepreneurship'], methods:['panel','gis','survival'], theories:['TCE','Property Rights','Complexity'] },
+];
+
+function computeLinks(projects){
+  var links = [];
+  for (var i=0;i<projects.length;i++){ for (var j=i+1;j<projects.length;j++){
+    var a=projects[i], b=projects[j];
+    var st=a.themes.filter(function(t){return b.themes.includes(t);});
+    var sm=a.methods.filter(function(m){return b.methods.includes(m);});
+    var sth=a.theories.filter(function(t){return b.theories.includes(t);});
+    var t=st.length, th=sth.length, m=sm.length;
+    if (!((t>=2 && th>=1) || t>=3)) continue;
+    links.push({ source:a.id, target:b.id, strength:2*t+1.5*th+m, shared:{themes:st,methods:sm,theories:sth} });
+  }}
+  return links;
+}
+var ALL_LINKS = computeLinks(PROJECTS);
+
+// ===== state + refs =====
+var svgEl = document.getElementById('rc-svg');
+var canvasEl = document.getElementById('rc-canvas');
+var containerEl = document.getElementById('rc-container');
+var panelEl = document.getElementById('rc-panel');
+var activeFilter = null, selected = null, dims = null, built = false, d3ready = false;
+var sim = null, _node = null, _link = null, _linkOpacity = null, _floatFrame = null, _starFrame = null;
+
+// ===== filters + legend rendering =====
+function renderFilters(){
+  var html = '';
+  Object.keys(FILTERS).forEach(function(type){
+    var grp = FILTERS[type];
+    html += '<div><div style="font-family:var(--mono); font-size:9px; color:'+grp.color+'; letter-spacing:.12em; text-transform:uppercase; margin-bottom:.45rem; font-weight:500;">'+grp.label+'</div>';
+    html += '<div style="display:flex; gap:.35rem; flex-wrap:wrap; max-width:230px;">';
+    grp.options.forEach(function(opt){
+      var active = activeFilter && activeFilter.type===type && activeFilter.id===opt.id;
+      var style = active
+        ? 'font-family:var(--sans); font-size:11px; letter-spacing:.01em; color:#16181d; background:'+grp.color+'; border:1px solid '+grp.color+'; padding:.22rem .6rem; cursor:pointer; border-radius:1px; font-weight:600; white-space:nowrap;'
+        : 'font-family:var(--sans); font-size:11px; letter-spacing:.01em; color:var(--fg-2); background:transparent; padding:.22rem .6rem; cursor:pointer; border-radius:1px; white-space:nowrap; border:1px solid var(--rule);';
+      html += '<button data-type="'+type+'" data-id="'+opt.id+'" style="'+style+'">'+opt.label+'</button>';
+    });
+    html += '</div></div>';
+  });
+  var box = document.getElementById('rc-filters');
+  box.innerHTML = html;
+  box.querySelectorAll('button').forEach(function(b){
+    b.addEventListener('click', function(){ toggleFilter(b.getAttribute('data-type'), b.getAttribute('data-id')); });
+  });
+}
+function renderLegend(){
+  var html = '';
+  Object.keys(STATUS_META).forEach(function(key){
+    var meta = STATUS_META[key], ns = NODE_STYLE[key], filled = ns.fillOpacity===1;
+    var icon = 'display:inline-block; width:11px; height:11px; border-radius:50%; flex-shrink:0; border:'+Math.max(1,ns.ringWidth-0.8)+'px '+(ns.dash!=='none'?'dashed':'solid')+' '+meta.color+'; background:'+(filled?meta.color:'transparent')+'; opacity:'+ns.strokeOpacity+';';
+    html += '<div style="display:flex; align-items:center; gap:.45rem;"><span style="'+icon+'"></span><span style="font-family:var(--mono); font-size:10px; color:var(--fg-3); letter-spacing:.02em;">'+meta.label+'</span></div>';
+  });
+  document.getElementById('rc-legend').innerHTML = html;
+}
+function renderCount(){
+  document.getElementById('rc-count').innerHTML = 'Click a node for details &middot; Drag to rearrange &middot; Scroll to zoom &middot; ' + PROJECTS.length + ' projects &middot; ' + ALL_LINKS.length + ' ties';
+}
+
+// ===== detail panel =====
+function renderPanel(){
+  if (!selected){ panelEl.style.display='none'; panelEl.innerHTML=''; return; }
+  var sel = selected, meta = STATUS_META[sel.status];
+  var statusLine = meta.label + (sel.venue ? ' · '+sel.venue : '') + (sel.year ? ' · '+sel.year : '');
+  var urlText = sel.status==='published' ? 'View paper ↗' : 'View abstract ↗';
+  var tags = sel.themes.concat(sel.methods).concat(sel.theories);
+  var tagHtml = tags.map(function(t){ return '<span style="font-family:var(--mono); font-size:9.5px; color:var(--fg-3); border:.5px solid var(--rule-faint); padding:.18rem .45rem; letter-spacing:.02em;">'+t+'</span>'; }).join('');
+  var urlHtml = sel.url ? '<a href="'+sel.url+'" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:.4rem; font-family:var(--mono); font-size:11px; color:var(--sectional-blue-2); text-decoration:none; font-weight:500; border-bottom:1px solid transparent; margin-bottom:.9rem;">'+urlText+'</a>' : '';
+  panelEl.style.cssText = 'position:relative; background:rgba(20,22,27,.82); backdrop-filter:blur(16px) saturate(1.3); -webkit-backdrop-filter:blur(16px) saturate(1.3); border:.5px solid var(--rule); box-shadow:0 2px 28px rgba(0,0,0,.35); padding:1.5rem 1.7rem; margin-top:.7rem; overflow:hidden; animation:rc-fadeup .25s ease;';
+  panelEl.innerHTML =
+    '<div style="position:absolute; left:0; top:0; bottom:0; width:3px; background:'+meta.color+';"></div>'+
+    '<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;">'+
+      '<div><div style="font-family:var(--mono); font-size:10px; color:'+meta.color+'; letter-spacing:.04em; text-transform:uppercase; font-weight:500; margin-bottom:5px;">'+statusLine+'</div>'+
+      '<div style="font-family:var(--display-roman); font-size:1.45rem; color:var(--ink); margin-bottom:3px; letter-spacing:.005em;">'+sel.label+'</div>'+
+      '<div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-bottom:.7rem;">'+sel.coauthors+'</div></div>'+
+      '<button id="rc-close" style="background:none; border:.5px solid var(--rule); font-family:var(--mono); font-size:11px; color:var(--fg-3); padding:.25rem .55rem; cursor:pointer; flex-shrink:0;">&times;</button>'+
+    '</div>'+
+    '<p style="font-family:var(--serif); font-size:1rem; color:var(--fg-1); line-height:1.7; max-width:42em; margin-bottom:.9rem; text-wrap:pretty;">'+sel.summary+'</p>'+
+    urlHtml+
+    '<div style="display:flex; gap:.4rem; flex-wrap:wrap;">'+tagHtml+'</div>';
+  panelEl.querySelector('#rc-close').addEventListener('click', function(){ selected=null; renderPanel(); });
+}
+
+function toggleFilter(type, id){
+  activeFilter = (activeFilter && activeFilter.type===type && activeFilter.id===id) ? null : { type:type, id:id };
+  renderFilters(); applyFilter();
+}
+function matchingIds(){
+  if (!activeFilter) return null;
+  var af = activeFilter;
+  return new Set(PROJECTS.filter(function(p){ return (p[af.type]||[]).includes(af.id); }).map(function(p){ return p.id; }));
+}
+function applyFilter(){
+  if (!_node) return;
+  var ids = matchingIds();
+  if (!ids){ _node.transition().duration(200).attr('opacity',1); return; }
+  _node.transition().duration(200).attr('opacity', function(d){ return ids.has(d.id)?1:0.1; });
+}
+
+// ===== starfield (lifted) =====
+function startStarfield(){
+  var cv = canvasEl; if (!cv) return;
+  var ctx = cv.getContext('2d');
+  var resize = function(){ cv.width = window.innerWidth; cv.height = window.innerHeight; };
+  resize(); window.addEventListener('resize', resize);
+  var stars = [];
+  for (var i=0;i<110;i++){
+    var big = Math.random()<0.14;
+    stars.push({ x:Math.random(), y:Math.random(), size:big?1.4+Math.random()*1.8:0.4+Math.random()*1.1,
+      base:0.18+Math.random()*0.55, tw:Math.random()>0.35, phase:Math.random()*6.28, speed:0.3+Math.random()*0.7,
+      dx:(Math.random()-0.5)*0.00003, dy:(Math.random()-0.5)*0.00003 });
+  }
+  var t = 0;
+  function draw(){
+    t += 0.016; ctx.clearRect(0,0,cv.width,cv.height);
+    stars.forEach(function(s){
+      s.x+=s.dx; s.y+=s.dy;
+      if (s.x<-0.02) s.x=1.02; if (s.x>1.02) s.x=-0.02;
+      if (s.y<-0.02) s.y=1.02; if (s.y>1.02) s.y=-0.02;
+      var px=s.x*cv.width, py=s.y*cv.height;
+      var o=s.base; if (s.tw) o*=0.3+0.7*(0.5+0.5*Math.sin(t*s.speed+s.phase));
+      ctx.beginPath(); ctx.arc(px,py,s.size,0,6.2832); ctx.fillStyle='rgba(196,206,224,'+o+')'; ctx.fill();
+      if (s.size>1.4){ ctx.beginPath(); ctx.arc(px,py,s.size*3,0,6.2832); ctx.fillStyle='rgba(196,206,224,'+(o*0.1)+')'; ctx.fill(); }
+    });
+    _starFrame = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ===== graph (lifted from dc-runtime, this-> module) =====
+function measureContainer(){
+  var c = containerEl; if (!c) return;
+  var w = c.clientWidth; if (w<1) return;
+  var graphW = Math.max(380, w-48);
+  var h = Math.max(500, Math.min(680, graphW*0.62));
+  var changed = !dims || Math.abs(dims.width-graphW) > 12;
+  dims = { width:graphW, height:h };
+  if (changed && built) built = false;
+  maybeBuild();
+}
+function maybeBuild(){
+  if (built || !d3ready || !window.d3 || !svgEl || !dims) return;
+  built = true; buildGraph();
+}
+function waitForD3(){ if (window.d3){ d3ready=true; maybeBuild(); return; } setTimeout(waitForD3, 60); }
+
+function buildGraph(){ try { _buildGraph(); } catch(e){ console.log('BUILDGRAPH ERROR:', e && e.message, e && e.stack); } }
+function _buildGraph(){
+  var d3 = window.d3; if (!d3 || !svgEl) return;
+  if (sim) sim.stop();
+  cancelAnimationFrame(_floatFrame); _floatFrame = null;
+  var width = dims.width, height = dims.height;
+  var SM = STATUS_META, NS = NODE_STYLE;
+  var svg = d3.select(svgEl);
+  svg.selectAll('*').remove();
+  svg.attr('width', width).attr('height', height);
+
+  var defs = svg.append('defs');
+  ['published','rr'].forEach(function(status){
+    var color = SM[status].color;
+    var f = defs.append('filter').attr('id','glow-'+status).attr('x','-60%').attr('y','-60%').attr('width','220%').attr('height','220%');
+    f.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation', status==='published'?6:4).attr('result','b');
+    f.append('feColorMatrix').attr('in','b').attr('type','matrix')
+      .attr('values','0 0 0 0 '+(parseInt(color.slice(1,3),16)/255)+' 0 0 0 0 '+(parseInt(color.slice(3,5),16)/255)+' 0 0 0 0 '+(parseInt(color.slice(5,7),16)/255)+' 0 0 0 0.6 0');
+    var m = f.append('feMerge'); m.append('feMergeNode'); m.append('feMergeNode').attr('in','SourceGraphic');
+  });
+
+  var g = svg.append('g');
+
+  // graticule (VOR rose + crosshair)
+  var cx = width/2, cy = height/2, R = Math.min(width,height)*0.42;
+  var grat = g.append('g').attr('opacity',0.5).style('pointer-events','none');
+  [R, R*0.66, R*0.33].forEach(function(rr,i){ grat.append('circle').attr('cx',cx).attr('cy',cy).attr('r',rr)
+    .attr('fill','none').attr('stroke',P.aero).attr('stroke-width',0.5).attr('stroke-opacity', i===0?0.22:0.12); });
+  grat.append('line').attr('x1',cx-R).attr('y1',cy).attr('x2',cx+R).attr('y2',cy).attr('stroke',P.aero).attr('stroke-width',0.5).attr('stroke-opacity',0.1);
+  grat.append('line').attr('x1',cx).attr('y1',cy-R).attr('x2',cx).attr('y2',cy+R).attr('stroke',P.aero).attr('stroke-width',0.5).attr('stroke-opacity',0.1);
+  for (var a=0;a<360;a+=30){
+    var rad=(a-90)*Math.PI/180;
+    grat.append('line').attr('x1',cx+Math.cos(rad)*R).attr('y1',cy+Math.sin(rad)*R)
+      .attr('x2',cx+Math.cos(rad)*(R-8)).attr('y2',cy+Math.sin(rad)*(R-8))
+      .attr('stroke',P.aero).attr('stroke-width',0.6).attr('stroke-opacity',0.25);
+  }
+
+  var nodes = PROJECTS.map(function(d){ return Object.assign({}, d); });
+  var links = ALL_LINKS.map(function(d){ return Object.assign({}, d); });
+  nodes.forEach(function(n,i){
+    var a2 = (i/nodes.length)*Math.PI*2;
+    n.x = width/2 + Math.cos(a2)*(Math.min(width,height)*0.26) + (Math.random()-0.5)*30;
+    n.y = height/2 + Math.sin(a2)*(Math.min(width,height)*0.26) + (Math.random()-0.5)*30;
+  });
+
+  var mc = document.createElement('canvas').getContext('2d');
+  mc.font = "italic 500 14px 'EB Garamond', Georgia, serif";
+  nodes.forEach(function(n){ n.lw = mc.measureText(n.label).width/2; });
+
+  sim = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(function(d){return d.id;}).distance(function(d){return 180-d.strength*5;}).strength(function(d){return 0.18+d.strength*0.03;}))
+    .force('charge', d3.forceManyBody().strength(-560))
+    .force('center', d3.forceCenter(width/2, height/2))
+    .force('collision', d3.forceCollide().radius(function(d){return Math.max((NS[d.status]||NS.wp).r+24, d.lw+14);}))
+    .force('x', d3.forceX(width/2).strength(0.045))
+    .force('y', d3.forceY(height/2).strength(0.06));
+  sim.stop();
+  for (var k=0;k<320;k++) sim.tick();
+
+  var zoom = d3.zoom().scaleExtent([0.4,3]).on('zoom', function(e){ g.attr('transform', e.transform); });
+  svg.call(zoom);
+
+  var maxS = d3.max(links, function(d){return d.strength;}) || 1;
+  var linkOpacity = d3.scaleLinear().domain([3,maxS]).range([0.14,0.6]).clamp(true);
+  var linkWidth = d3.scaleLinear().domain([3,maxS]).range([0.3,1.7]).clamp(true);
+  var baseLinkColor = 'rgba(138,174,110,0.5)';
+  _linkOpacity = linkOpacity;
+
+  var link = g.append('g').selectAll('line').data(links).join('line')
+    .attr('stroke', baseLinkColor).attr('stroke-width', function(d){return linkWidth(d.strength);}).attr('stroke-opacity', function(d){return linkOpacity(d.strength);});
+  _link = link;
+
+  var node = g.append('g').selectAll('g').data(nodes).join('g').style('cursor','pointer')
+    .call(d3.drag()
+      .on('start', function(e,d){ if(!e.active) sim.alphaTarget(0.2).restart(); d.fx=d.x; d.fy=d.y; })
+      .on('drag', function(e,d){ d.fx=e.x; d.fy=e.y; })
+      .on('end', function(e,d){ if(!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; }));
+  _node = node;
+
+  node.append('circle').attr('r', function(d){ return Math.max((NS[d.status]||NS.wp).r+10, 24); }).attr('fill','transparent');
+  node.each(function(d){ var ns=NS[d.status]||NS.wp; if (ns.glow) d3.select(this).append('circle').attr('r',ns.r).attr('fill',SM[d.status].color).attr('fill-opacity', d.status==='published'?0.2:0.15).attr('filter','url(#glow-'+d.status+')'); });
+  node.append('circle')
+    .attr('r', function(d){ return (NS[d.status]||NS.wp).r; })
+    .attr('fill', function(d){ var ns=NS[d.status]||NS.wp; return ns.fillOpacity===1?SM[d.status].color:'none'; })
+    .attr('fill-opacity', function(d){ return (NS[d.status]||NS.wp).fillOpacity; })
+    .attr('stroke', function(d){ return SM[d.status].color; })
+    .attr('stroke-width', function(d){ return (NS[d.status]||NS.wp).ringWidth; })
+    .attr('stroke-opacity', function(d){ return (NS[d.status]||NS.wp).strokeOpacity; })
+    .attr('stroke-dasharray', function(d){ return (NS[d.status]||NS.wp).dash; });
+  node.each(function(d){ var ns=NS[d.status]||NS.wp; if (ns.innerDot) d3.select(this).append('circle')
+    .attr('r', d.status==='rr'?6:d.status==='review'?5.5:d.status==='progress'?4:5)
+    .attr('fill', SM[d.status].color).attr('fill-opacity', d.status==='progress'?0.5:0.75); });
+  node.append('text').text(function(d){return d.label;})
+    .attr('y', function(d){ return (NS[d.status]||NS.wp).r+17; }).attr('text-anchor','middle')
+    .attr('font-family',"'EB Garamond', Georgia, serif").attr('font-size','14px').attr('font-style','italic').attr('font-weight',500)
+    .attr('fill', P.fg1).attr('letter-spacing','0.005em');
+
+  node.attr('transform', function(d){ return 'translate('+d.x+','+d.y+')'; });
+  link.attr('x1', function(d){return d.source.x;}).attr('y1', function(d){return d.source.y;}).attr('x2', function(d){return d.target.x;}).attr('y2', function(d){return d.target.y;});
+
+  var HK = 4;
+  node.on('mouseover', function(e,d){
+    var top = links.filter(function(l){return l.source.id===d.id || l.target.id===d.id;}).sort(function(a,b){return b.strength-a.strength;}).slice(0,HK);
+    var tset = new Set(top); var conn = new Set([d.id]);
+    top.forEach(function(l){ conn.add(l.source.id); conn.add(l.target.id); });
+    node.transition().duration(150).attr('opacity', function(n){ return conn.has(n.id)?1:0.1; });
+    link.transition().duration(150)
+      .attr('stroke-opacity', function(l){ return tset.has(l)?0.85:0.03; })
+      .attr('stroke', function(l){ return tset.has(l)?P.aero:baseLinkColor; })
+      .attr('stroke-dasharray', function(l){ return tset.has(l)?'5,4':'none'; });
+  }).on('mouseout', function(){
+    if (activeFilter){ applyFilter(); } else node.transition().duration(200).attr('opacity',1);
+    link.transition().duration(200).attr('stroke-opacity', function(l){return linkOpacity(l.strength);}).attr('stroke', baseLinkColor).attr('stroke-dasharray','none');
+  }).on('click', function(e,d){ e.stopPropagation(); selected = (selected && selected.id===d.id) ? null : d; renderPanel(); });
+
+  svg.on('click', function(){ selected=null; renderPanel(); });
+
+  function floatTick(){
+    _floatPhase = (typeof _floatPhase==='number'?_floatPhase:0) + 0.008;
+    var t = _floatPhase;
+    node.attr('transform', function(d){
+      var seed = d.id.length*7 + d.id.charCodeAt(0);
+      var fx = Math.sin(t+seed*0.5)*2.4 + Math.cos(t*0.7+seed)*1.4;
+      var fy = Math.cos(t*0.8+seed*0.3)*1.9 + Math.sin(t*0.6+seed*0.7)*1.4;
+      return 'translate('+(d.x+fx)+','+(d.y+fy)+')';
+    });
+    link.attr('x1', function(d){return d.source.x;}).attr('y1', function(d){return d.source.y;}).attr('x2', function(d){return d.target.x;}).attr('y2', function(d){return d.target.y;});
+    _floatFrame = requestAnimationFrame(floatTick);
+  }
+  sim.on('tick', function(){
+    link.attr('x1', function(d){return d.source.x;}).attr('y1', function(d){return d.source.y;}).attr('x2', function(d){return d.target.x;}).attr('y2', function(d){return d.target.y;});
+    node.attr('transform', function(d){ return 'translate('+d.x+','+d.y+')'; });
+  });
+  _floatFrame = requestAnimationFrame(floatTick);
+
+  if (activeFilter) applyFilter();
+}
+var _floatPhase = 0;
+
+// ===== init =====
+renderFilters(); renderLegend(); renderCount();
+startStarfield();
+measureContainer();
+window.addEventListener('resize', measureContainer);
+if (typeof ResizeObserver !== 'undefined' && containerEl){ new ResizeObserver(measureContainer).observe(containerEl); }
+[80,300,800].forEach(function(ms){ setTimeout(measureContainer, ms); });
+waitForD3();
+</script>
+<script>
+document.querySelectorAll('[data-hover]').forEach(function(el){
+  var h = el.getAttribute('data-hover');
+  el.addEventListener('mouseenter', function(){ el.setAttribute('data-base-style', el.getAttribute('style')||''); el.setAttribute('style', (el.getAttribute('style')||'') + ';' + h); });
+  el.addEventListener('mouseleave', function(){ if (el.hasAttribute('data-base-style')) el.setAttribute('style', el.getAttribute('data-base-style')); });
+});
+</script>
 </body>
 </html>

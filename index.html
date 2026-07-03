@@ -60,8 +60,54 @@ body {
   @keyframes prismDrift { 0% { background-position:130% 0; } 50% { background-position:-30% 0; } 100% { background-position:130% 0; } }
   /* nav dropdowns via hover */
   .navgroup:hover .menu { display:block !important; }
-  .topo-divider polyline { transition:transform .2s cubic-bezier(.25,.1,.25,1); will-change:transform; }
+  .topo-divider polyline { transition:none; will-change:transform; }
   a { -webkit-tap-highlight-color:transparent; }
+</style>
+<style id="mobile-fixes">
+/* ===== Responsive / mobile layer ===== */
+.nav-toggle{ display:none; }
+@media (max-width:760px){
+  .wrap{ padding-left:1.15rem !important; padding-right:1.15rem !important; }
+
+  /* --- NAV -> hamburger --- */
+  .nav-inner{ flex-wrap:wrap; align-items:center !important; padding-left:1.15rem !important; padding-right:1.15rem !important; }
+  .nav-toggle{ display:inline-flex; align-items:center; justify-content:center; }
+  .nav-links{ display:none !important; flex-direction:column; align-items:stretch !important;
+    width:100%; gap:.05rem !important; margin-top:12px; padding-top:10px; border-top:.5px solid var(--rule-faint); }
+  nav.nav-open .nav-links{ display:flex !important; }
+  .nav-links > a, .navgroup > a{ display:block; padding:11px 4px !important; font-size:13px !important;
+    letter-spacing:.08em !important; border-bottom:none !important; width:100%; }
+  .navgroup{ position:static !important; width:100%; }
+  .navgroup .menu{ position:static !important; display:block !important; padding-top:0 !important; left:auto !important; top:auto !important; }
+  .navgroup .menu > div{ min-width:0 !important; background:transparent !important; backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important; border:none !important; box-shadow:none !important; border-radius:0 !important;
+    padding:0 0 8px 14px !important; }
+  .navgroup .menu > div > div[style*="height:1px"], .navgroup .menu > div > div[style*="height:30%"]{ display:none !important; }
+  .navgroup .menu a{ padding:8px !important; }
+  .nav-caret{ display:none !important; }
+
+  /* --- home hero --- */
+  .hero{ padding-top:2.2rem !important; }
+  .hero-head{ flex-direction:column !important; gap:1rem !important; align-items:flex-start !important; }
+  .hero-photo{ width:92px !important; height:92px !important; }
+  .big-title{ font-size:2.4rem !important; }
+
+  /* --- 2-col grids stack --- */
+  .pub-row{ grid-template-columns:1fr !important; gap:5px !important; }
+  .pub-row > div:first-child{ white-space:normal !important; }
+  /* teaching (courses|badges) & bio (headshot|text) -> stack, nothing squeezed */
+  .stack-grid{ grid-template-columns:1fr !important; gap:1.5rem !important; }
+
+  /* --- scheduler instrument panel --- */
+  .sched-grid{ grid-template-columns:1fr !important; }
+  .sched-grid > div:first-child{ border-right:none !important;
+    border-bottom:.5px solid color-mix(in srgb, var(--white) 8%, transparent) !important; }
+  .sched-grid > div{ min-height:0 !important; }
+
+  /* --- research constellation --- */
+  #rc-container{ padding-left:.5rem !important; padding-right:.5rem !important; }
+}
+@media (max-width:420px){ .big-title{ font-size:2rem !important; } }
 </style>
 </head>
 <body>
@@ -281,12 +327,12 @@ body {
       <div style="position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg, transparent 4%, rgba(255,140,190,.55), rgba(190,150,255,.55), rgba(130,200,255,.5), rgba(150,255,215,.45), rgba(255,205,130,.4), transparent 96%);"></div>
       <div style="position:absolute; inset:-60% 0; background:linear-gradient(105deg, transparent 38%, rgba(255,90,160,.06) 46%, rgba(150,90,255,.07) 50%, rgba(70,160,255,.06) 54%, rgba(60,230,190,.05) 60%, rgba(255,200,120,.04) 64%, transparent 72%); mix-blend-mode:screen; background-size:260% 100%; background-repeat:no-repeat; animation:prismDrift 11s ease-in-out infinite;"></div>
     </div>
-    <div style="max-width:940px; margin:0 auto; padding:14px 2.5rem; display:flex; justify-content:space-between; align-items:baseline; gap:1rem; position:relative; z-index:2;">
+    <div class="nav-inner" style="max-width:940px; margin:0 auto; padding:14px 2.5rem; display:flex; justify-content:space-between; align-items:baseline; gap:1rem; position:relative; z-index:2;">
       <a href="#top" style="font-family:var(--sans); font-size:12px; font-weight:700; color:var(--ink); letter-spacing:.06em; text-transform:uppercase; text-decoration:none;">Devin Stein</a>
-      <div style="display:flex; gap:1.5rem; align-items:baseline;">
+      <button class="nav-toggle" aria-label="Menu" aria-expanded="false" style="background:none; border:none; cursor:pointer; padding:6px; margin:-2px -4px -2px 0; color:var(--fg-1); line-height:0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg></button><div class="nav-links" style="display:flex; gap:1.5rem; align-items:baseline;">
 
         <div class="navgroup" style="position:relative;">
-          <a href="#research" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent; cursor:pointer;" data-hover="border-bottom:1px solid var(--sectional-blue);">Research <span style="opacity:.45; font-size:8px;">&#9662;</span></a>
+          <a href="#research" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent; cursor:pointer;" data-hover="border-bottom:1px solid var(--sectional-blue);">Research <span class="nav-caret" style="opacity:.45; font-size:8px;">&#9662;</span></a>
           <div class="menu" style="position:absolute; top:100%; left:-12px; padding-top:11px; z-index:140; display:none;">
             <div style="position:relative; min-width:222px; background:color-mix(in srgb, var(--bg-raise) 90%, transparent); backdrop-filter:blur(32px) saturate(1.9) brightness(1.04); -webkit-backdrop-filter:blur(32px) saturate(1.9) brightness(1.04); border:.5px solid color-mix(in srgb, var(--white) 32%, transparent); box-shadow:0 22px 50px rgba(0,0,0,.32), 0 2px 8px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.35); border-radius:13px; padding:6px; overflow:hidden;"><div style="position:absolute; top:0; left:12%; right:12%; height:1px; background:linear-gradient(90deg, transparent, rgba(255,150,200,.5), rgba(170,160,255,.55), rgba(130,210,255,.5), rgba(160,255,220,.45), transparent);"></div><div style="position:absolute; top:1px; left:0; right:0; height:30%; background:linear-gradient(180deg, rgba(255,255,255,.1), transparent); pointer-events:none;"></div>
               <a href="#research" style="display:block; padding:9px 12px; text-decoration:none; border-radius:8px; position:relative;" data-hover="background:color-mix(in srgb, var(--white) 12%, transparent);">
@@ -302,16 +348,16 @@ body {
         </div>
 
         <div class="navgroup" style="position:relative;">
-          <a href="#teaching" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent; cursor:pointer;" data-hover="border-bottom:1px solid var(--sectional-blue);">Teaching <span style="opacity:.45; font-size:8px;">&#9662;</span></a>
+          <a href="#teaching" style="font-family:var(--sans); font-size:10.5px; font-weight:600; color:var(--fg-1); letter-spacing:.06em; text-transform:uppercase; text-decoration:none; border-bottom:1px solid transparent; cursor:pointer;" data-hover="border-bottom:1px solid var(--sectional-blue);">Teaching <span class="nav-caret" style="opacity:.45; font-size:8px;">&#9662;</span></a>
           <div class="menu" style="position:absolute; top:100%; left:-12px; padding-top:11px; z-index:140; display:none;">
             <div style="position:relative; min-width:222px; background:color-mix(in srgb, var(--bg-raise) 90%, transparent); backdrop-filter:blur(32px) saturate(1.9) brightness(1.04); -webkit-backdrop-filter:blur(32px) saturate(1.9) brightness(1.04); border:.5px solid color-mix(in srgb, var(--white) 32%, transparent); box-shadow:0 22px 50px rgba(0,0,0,.32), 0 2px 8px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.35); border-radius:13px; padding:6px; overflow:hidden;"><div style="position:absolute; top:0; left:12%; right:12%; height:1px; background:linear-gradient(90deg, transparent, rgba(255,150,200,.5), rgba(170,160,255,.55), rgba(130,210,255,.5), rgba(160,255,220,.45), transparent);"></div><div style="position:absolute; top:1px; left:0; right:0; height:30%; background:linear-gradient(180deg, rgba(255,255,255,.1), transparent); pointer-events:none;"></div>
-              <a href="https://devinstein.me/drinkwars/" target="_blank" rel="noopener" style="display:block; padding:9px 12px; text-decoration:none; border-radius:8px; position:relative;" data-hover="background:color-mix(in srgb, var(--white) 12%, transparent);">
-                <div style="font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--fg-1); display:flex; justify-content:space-between; gap:14px;">Drink Wars <span style="color:var(--sectional-blue); font-family:var(--mono); font-size:10px;">&nearr;</span></div>
-                <div style="font-family:var(--sans); font-size:10px; color:var(--fg-3); letter-spacing:.01em; margin-top:2px;">Craft-beverage strategy sim</div>
-              </a>
               <a href="schedule.html" style="display:block; padding:9px 12px; text-decoration:none; border-radius:8px; position:relative;" data-hover="background:color-mix(in srgb, var(--white) 12%, transparent);">
                 <div style="font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--fg-1); display:flex; justify-content:space-between; gap:14px;">Schedule <span style="color:var(--sectional-blue); font-family:var(--mono); font-size:10px;">&nearr;</span></div>
                 <div style="font-family:var(--sans); font-size:10px; color:var(--fg-3); letter-spacing:.01em; margin-top:2px;">Office hours &amp; meetings</div>
+              </a>
+              <a href="https://devinstein.me/drinkwars/" target="_blank" rel="noopener" style="display:block; padding:9px 12px; text-decoration:none; border-radius:8px; position:relative;" data-hover="background:color-mix(in srgb, var(--white) 12%, transparent);">
+                <div style="font-family:var(--sans); font-size:11.5px; font-weight:600; color:var(--fg-1); display:flex; justify-content:space-between; gap:14px;">Drink Wars <span style="color:var(--sectional-blue); font-family:var(--mono); font-size:10px;">&nearr;</span></div>
+                <div style="font-family:var(--sans); font-size:10px; color:var(--fg-3); letter-spacing:.01em; margin-top:2px;">Craft-beverage strategy sim</div>
               </a>
             </div>
           </div>
@@ -325,20 +371,20 @@ body {
     </div>
   </nav>
 
-  <div id="top" style="max-width:940px; margin:0 auto; padding:0 2.5rem; position:relative; z-index:1;">
+  <div id="top" class="wrap" style="max-width:940px; margin:0 auto; padding:0 2.5rem; position:relative; z-index:1;">
 
     <!-- HERO -->
-    <header style="padding:5rem 0 2.5rem;">
-      <div style="display:flex; gap:2rem; align-items:center; margin-bottom:1.4rem;">
-        <div style="width:130px; height:130px; flex-shrink:0; border-radius:50%; overflow:hidden; border:2px solid var(--rule-faint);">
-          <img src="img/headshot.jpg" alt="Devin Stein" style="width:100%; height:100%; object-fit:cover; object-position:center 20%; filter:var(--img-filter); transform:scale(1.15);">
+    <header class="hero" style="padding:5rem 0 2.5rem;">
+      <div class="hero-head" style="display:flex; gap:2rem; align-items:center; margin-bottom:1.4rem;">
+        <div class="hero-photo" style="width:130px; height:130px; flex-shrink:0; border-radius:50%; overflow:hidden; border:2px solid var(--rule-faint);">
+          <img src="img/headshot.jpg" alt="Devin Stein" style="width:100%; height:100%; object-fit:cover; object-position:center 38%; filter:var(--img-filter); transform:scale(1.55);">
         </div>
         <div>
           <div style="font-family:var(--mono); font-size:10.5px; font-weight:400; color:var(--topo-brown); letter-spacing:.12em; text-transform:uppercase; margin-bottom:6px; display:flex; align-items:center; gap:10px;">
             <span style="display:block; width:22px; height:1px; background:var(--topo-brown); opacity:.65;"></span>
             Strategy &middot; Governance &middot; Environment
           </div>
-          <h1 style="font-size:3.4rem; font-weight:500; line-height:1.04; letter-spacing:-.022em; color:var(--ink); margin-bottom:4px; font-family:var(--serif);">Devin Stein</h1>
+          <h1 class="big-title" style="font-size:3.4rem; font-weight:500; line-height:1.04; letter-spacing:-.022em; color:var(--ink); margin-bottom:4px; font-family:var(--serif);">Devin Stein</h1>
           <div style="font-family:var(--serif); font-style:italic; font-weight:300; font-size:1.4rem; color:var(--fg-2); line-height:1.3; margin-bottom:8px;">How order emerges without hierarchy</div>
           <div style="font-family:var(--sans); font-size:13px; color:var(--fg-2); line-height:1.55;">
             Assistant Professor of Strategy &amp; Entrepreneurship, <a href="https://biz.colostate.edu/" target="_blank" rel="noopener" style="color:var(--sectional-blue); border-bottom:1px solid transparent;" data-hover="border-bottom:1px solid var(--sectional-blue);">College of Business, Colorado State University</a><br>
@@ -401,16 +447,16 @@ body {
       </div>
       <div style="font-family:var(--sans); font-size:13px; color:var(--fg-2); border-left:2px solid var(--topo-brown); padding:6px 0 6px 16px; margin-bottom:1.5rem; max-width:600px; line-height:1.6;">My work contributes to strategy and management theory by studying <em style="color:var(--sectional-blue); font-style:normal; font-weight:500;">polycentric governance</em>&thinsp;&mdash;&thinsp;how decentralized, overlapping organizational structures create public value in contexts where centralized authority breaks down.</div>
 
-      <div style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--sectional-blue-2); font-weight:600;">Published · AMJ</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);"><a href="https://doi.org/10.5465/amj.2023.0425" target="_blank" rel="noopener" style="color:inherit; text-decoration:none; border-bottom:1px solid var(--rule-faint);" data-hover="border-bottom:1px solid var(--sectional-blue);">Distributed Knowledge and the Creation of Public Value</a></div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Stein, D. &amp; Minniti, M. (2025)</div></div></div>
-        <div style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--amber);">R&amp;R · SMJ</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">[Title withheld for blind review] &mdash; Organizational diversity and wildfire management</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Koppl, R., Minniti, M., &amp; Stein, D.</div></div></div>
-        <div style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--amber);">R&amp;R · JBV</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">[Title withheld for blind review] &mdash; Entrepreneurial ecosystems as knowledge commons</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Stein, D. &amp; Minniti, M.</div></div></div>
-        <div style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--fg-3);">Working Paper</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">Whisky is for Drinking, Water is for Fighting Over: Stakeholder Dynamics and Property Rights Innovations</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Stein, D., Dean, T., &amp; Minniti, M.</div></div></div>
-        <div style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--fg-3);">Working Paper</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">Scaling Without Hierarchy: Governing Collective Action Across Organizational Boundaries</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Stein, D.</div></div></div>
-        <div style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--fg-3);">Working Paper</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">Venture Capital Composition Under Natural Disaster Exposure</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Han, S., Lee, S. Y., &amp; Stein, D.</div></div></div>
-        <div style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--fg-3);">Working Paper</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">Adapting Together: Portfolio Consolidation and Climate Adaptation in the Ski Industry</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Stein, D.</div></div></div>
-        <div style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--fg-3);">Working Paper</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">Enabling Systemic Search Through Interorganizational Hybridity</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Koppl, R., Minniti, M., &amp; Stein, D.</div></div></div>
-        <div style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--fg-3);">Working Paper</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">Stigma, Alignment, and Public Health Policy in Brazil</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Minniti, M., Rodriguez, Z., &amp; Stein, D.</div></div></div>
-        <div style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--fg-3);">Working Paper</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">Know Thy Neighbor: Community Organizing and Knowledge Spillovers</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Stein, D. &amp; Minniti, M.</div></div></div>
+      <div class="pub-row" style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--sectional-blue-2); font-weight:600;">Published · AMJ</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);"><a href="https://doi.org/10.5465/amj.2023.0425" target="_blank" rel="noopener" style="color:inherit; text-decoration:none; border-bottom:1px solid var(--rule-faint);" data-hover="border-bottom:1px solid var(--sectional-blue);">Distributed Knowledge and the Creation of Public Value</a></div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Stein, D. &amp; Minniti, M. (2025)</div></div></div>
+        <div class="pub-row" style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--amber);">R&amp;R · SMJ</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">[Title withheld for blind review] &mdash; Organizational diversity and wildfire management</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Koppl, R., Minniti, M., &amp; Stein, D.</div></div></div>
+        <div class="pub-row" style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--amber);">R&amp;R · JBV</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">[Title withheld for blind review] &mdash; Entrepreneurial ecosystems as knowledge commons</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Stein, D. &amp; Minniti, M.</div></div></div>
+        <div class="pub-row" style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--fg-3);">Working Paper</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">Whisky is for Drinking, Water is for Fighting Over: Stakeholder Dynamics and Property Rights Innovations</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Stein, D., Dean, T., &amp; Minniti, M.</div></div></div>
+        <div class="pub-row" style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--fg-3);">Working Paper</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">Scaling Without Hierarchy: Governing Collective Action Across Organizational Boundaries</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Stein, D.</div></div></div>
+        <div class="pub-row" style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--fg-3);">Working Paper</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">Venture Capital Composition Under Natural Disaster Exposure</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Han, S., Lee, S. Y., &amp; Stein, D.</div></div></div>
+        <div class="pub-row" style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--fg-3);">Working Paper</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">Adapting Together: Portfolio Consolidation and Climate Adaptation in the Ski Industry</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Stein, D.</div></div></div>
+        <div class="pub-row" style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--fg-3);">Working Paper</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">Enabling Systemic Search Through Interorganizational Hybridity</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Koppl, R., Minniti, M., &amp; Stein, D.</div></div></div>
+        <div class="pub-row" style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--fg-3);">Working Paper</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">Stigma, Alignment, and Public Health Policy in Brazil</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Minniti, M., Rodriguez, Z., &amp; Stein, D.</div></div></div>
+        <div class="pub-row" style="padding:1.1rem 0; border-bottom:.5px solid var(--rule-faint); border-top:.5px solid var(--rule-faint); display:grid; grid-template-columns:145px 1fr; gap:24px; align-items:baseline; margin-top:-.5px;" data-hover="background:color-mix(in srgb, var(--sectional-tint) 35%, transparent);"><div style="font-family:var(--mono); font-size:10.5px; line-height:1.65; padding-top:2px; white-space:nowrap; color:var(--fg-3);">Working Paper</div><div><div style="font-size:1.05rem; font-weight:400; color:var(--ink); line-height:1.45; font-family:var(--serif);">Know Thy Neighbor: Community Organizing and Knowledge Spillovers</div><div style="font-family:var(--sans); font-size:12px; color:var(--fg-3); margin-top:2px;">Stein, D. &amp; Minniti, M.</div></div></div>
     </section>
 
     <!-- Topo divider -->
@@ -513,7 +559,7 @@ body {
         <span style="font-family:var(--mono); font-size:10.5px; color:var(--fg-4);">03</span>
         <span style="font-family:var(--sans); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.15em; color:var(--sectional-blue);">Teaching</span>
       </div>
-      <div style="display:grid; grid-template-columns:1.55fr .85fr; gap:2.6rem; align-items:start;">
+      <div class="stack-grid" style="display:grid; grid-template-columns:1.55fr .85fr; gap:2.6rem; align-items:start;">
 
         <!-- LEFT — courses & evaluations (the primary content) -->
         <!-- CLAUDE CODE: replace placeholder courses + the 4.8 evaluation figure with real data from the repo. -->
@@ -622,7 +668,7 @@ body {
       </div>
       <div style="background:rgba(22,24,29,.55); backdrop-filter:blur(16px) saturate(1.3); -webkit-backdrop-filter:blur(16px) saturate(1.3); border:.5px solid rgba(247,236,216,.14); padding:2rem; margin-top:.3rem; position:relative; box-shadow:0 2px 28px rgba(0,0,0,.35); border-radius:4px; overflow:hidden;">
         <div style="position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg, var(--sectional-blue), var(--topo-brown));"></div>
-        <div style="display:grid; grid-template-columns:180px 1fr; gap:32px;">
+        <div class="stack-grid" style="display:grid; grid-template-columns:180px 1fr; gap:32px;">
           <div>
             <img src="img/headshot.jpg" alt="Devin Stein" style="width:180px; height:224px; object-fit:cover; object-position:center 15%; filter:var(--img-filter); border:.5px solid var(--rule-faint);"><div style="display:flex; flex-direction:column; gap:.3rem; margin-top:.7rem;"><a href="img/headshot-hires.jpg" download style="font-family:var(--mono); font-size:10.5px; color:rgba(247,244,236,.6); text-decoration:none;" data-hover="color:rgba(247,244,236,.95);">&darr; Hi-res headshot</a><a href="https://docs.google.com/document/d/15JjioE7TF23AzHyGsPKE4yBeVMtSmnsa/export?format=pdf" download style="font-family:var(--mono); font-size:10.5px; color:rgba(247,244,236,.6); text-decoration:none;" data-hover="color:rgba(247,244,236,.95);">&darr; CV (PDF)</a></div>
           </div>
@@ -641,7 +687,7 @@ body {
 
   <!-- CONTACT -->
   <footer id="contact" style="background:#0d0c0a; color:#f7f4ec; padding:2.5rem 0 1.6rem; margin-top:2rem; position:relative; z-index:1;">
-    <div style="max-width:940px; margin:0 auto; padding:0 2.5rem; display:flex; flex-direction:column; gap:1.4rem;">
+    <div class="wrap" style="max-width:940px; margin:0 auto; padding:0 2.5rem; display:flex; flex-direction:column; gap:1.4rem;">
       <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:16px;">
         <div style="font-family:var(--serif); font-size:17px; color:rgba(247,244,236,.92);">Reach out &mdash; <a href="mailto:Devin.Stein@colostate.edu" style="color:rgba(228,239,236,.88); text-decoration:none; border-bottom:1px solid rgba(228,239,236,.3);" data-hover="border-bottom:1px solid rgba(228,239,236,.7);">Devin.Stein@colostate.edu</a></div>
         <div style="display:flex; gap:1.6rem;">
@@ -673,42 +719,44 @@ body {
       if (el.hasAttribute('data-base-style')) el.setAttribute('style', el.getAttribute('data-base-style'));
     });
   });
-  // parallax terrain
-  var layers = Array.prototype.slice.call(document.querySelectorAll('[data-parallax]'));
-  function onScroll(){
-    var y = window.scrollY || window.pageYOffset || 0;
-    layers.forEach(function(el){
-      var s = parseFloat(el.getAttribute('data-parallax')) || 0.15;
-      el.style.transform = 'translate3d(0,' + (y*s).toFixed(1) + 'px,0)';
-    });
-  }
-  window.addEventListener('scroll', onScroll, {passive:true});
-  onScroll();
 })();
 (function(){
-  var dividers = document.querySelectorAll('.topo-divider');
-  if(!dividers.length) return;
+  // Subtle vertical parallax — terrain drifts gently UPWARD as you scroll down
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var layers = Array.prototype.slice.call(document.querySelectorAll('[data-parallax]'));
+  var dividers = Array.prototype.slice.call(document.querySelectorAll('.topo-divider'));
   var visible = new Set();
-  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting) visible.add(e.target); else visible.delete(e.target); }); }, {rootMargin:'250px'});
-  dividers.forEach(function(d){ io.observe(d); });
-  var ticking=false;
-  function drift(){
-    if(ticking) return; ticking=true;
-    requestAnimationFrame(function(){
-      visible.forEach(function(div){
-        var rect=div.getBoundingClientRect();
-        var progress=(rect.top+rect.height/2)/window.innerHeight;
-        var offset=(progress-0.5)*2;
-        div.querySelectorAll('polyline').forEach(function(line,i){
-          var depth=0.3+(i%7)*0.35;
-          line.style.transform='translate('+(offset*22*depth).toFixed(1)+'px,'+(offset*5*depth).toFixed(1)+'px)';
-        });
-      });
-      ticking=false;
+  if (dividers.length){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting) visible.add(e.target); else visible.delete(e.target); });
+    }, {rootMargin:'240px'});
+    dividers.forEach(function(d){ io.observe(d); });
+  }
+  var ticking = false;
+  function update(){
+    ticking = false;
+    var y = window.scrollY || window.pageYOffset || 0;
+    // background contour layers: gentle upward drift (deeper layers move a little more)
+    for (var l=0; l<layers.length; l++){
+      var el = layers[l];
+      var s = parseFloat(el.getAttribute('data-parallax')) || 0.1;
+      el.style.transform = 'translate3d(0,' + (-y * s * 0.22).toFixed(1) + 'px,0)';
+    }
+    // topo dividers: soft vertical strata parallax as the band crosses the viewport
+    visible.forEach(function(div){
+      var rect = div.getBoundingClientRect();
+      var progress = (rect.top + rect.height/2) / window.innerHeight;
+      var offset = (progress - 0.5) * 2;                 // +1 low in view .. -1 high
+      var lines = div.getElementsByTagName('polyline');
+      for (var i=0; i<lines.length; i++){
+        var depth = 0.4 + (i % 5) * 0.3;                 // nearer strata drift a touch more
+        lines[i].style.transform = 'translateY(' + (offset * 12 * depth).toFixed(1) + 'px)';
+      }
     });
   }
-  window.addEventListener('scroll', drift, {passive:true});
-  drift();
+  function onScroll(){ if(!ticking){ ticking = true; requestAnimationFrame(update); } }
+  if(!reduce) window.addEventListener('scroll', onScroll, {passive:true});
+  update();
 })();
 function toggleBio(){
   var ext = document.getElementById('bio-extended');
@@ -725,6 +773,19 @@ function copyBio(btn){
   btn.style.color = '#16181d'; btn.style.background = '#8aae6e'; btn.style.borderColor = '#8aae6e';
   setTimeout(function(){ btn.textContent='copy'; btn.style.color='rgba(247,244,236,.55)'; btn.style.background='rgba(255,255,255,.05)'; btn.style.borderColor='rgba(247,236,216,.2)'; }, 1400);
 }
+</script>
+<script>
+(function(){
+  var t=document.querySelector('.nav-toggle'); if(!t) return;
+  var nav=t.closest('nav'); if(!nav) return;
+  t.addEventListener('click',function(){
+    var open=nav.classList.toggle('nav-open');
+    t.setAttribute('aria-expanded', open?'true':'false');
+  });
+  nav.querySelectorAll('.nav-links a').forEach(function(a){
+    a.addEventListener('click',function(){ nav.classList.remove('nav-open'); t.setAttribute('aria-expanded','false'); });
+  });
+})();
 </script>
 </body>
 </html>

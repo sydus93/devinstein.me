@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Schedule a meeting — Devin Stein</title>
-<meta name="description" content="Book office hours with Devin Stein. 30-minute slots on Google Meet, Mon–Fri, Mountain Time.">
+<meta name="description" content="Schedule a meeting with Devin Stein. 30-minute slots on Google Meet, Mon–Fri, Mountain Time.">
 <link rel="icon" href="/favicon.ico?v=3" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/img/favicon.svg?v=3">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png?v=3">
@@ -62,6 +62,10 @@ body { background:#1b2027; color:var(--fg-1); font-family:var(--serif); -webkit-
   .wrap{ padding-left:1.15rem !important; padding-right:1.15rem !important; }
 
   /* --- NAV -> hamburger --- */
+  /* near-opaque bar + light blur: any residual iOS backdrop re-raster is invisible */
+  .nav-bg{ background:color-mix(in srgb, var(--bg) 92%, transparent) !important;
+    backdrop-filter:blur(10px) !important; -webkit-backdrop-filter:blur(10px) !important; }
+  .nav-sheen{ animation:none !important; }
   .nav-inner{ flex-wrap:wrap; align-items:center !important; padding-left:1.15rem !important; padding-right:1.15rem !important; }
   .nav-toggle{ display:inline-flex; align-items:center; justify-content:center; }
   .nav-links{ display:none !important; flex-direction:column; align-items:stretch !important;
@@ -111,11 +115,13 @@ body { background:#1b2027; color:var(--fg-1); font-family:var(--serif); -webkit-
   <div style="position:fixed; inset:0; pointer-events:none; z-index:998; opacity:.02; background-image:url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;);"></div>
 
   <!-- Nav -->
-  <nav style="position:sticky; top:0; z-index:100; background:color-mix(in srgb, var(--bg) 42%, transparent); backdrop-filter:blur(26px) saturate(1.6); -webkit-backdrop-filter:blur(26px) saturate(1.6); border-bottom:.5px solid var(--rule-faint);">
+  <nav style="position:sticky; top:0; z-index:100; transform:translateZ(0); -webkit-transform:translateZ(0);">
+    <!-- frosted bar on its own layer: backdrop-filter directly on a sticky element flickers on iOS Safari -->
+    <div class="nav-bg" style="position:absolute; inset:0; z-index:0; pointer-events:none; background:color-mix(in srgb, var(--bg) 42%, transparent); backdrop-filter:blur(26px) saturate(1.6); -webkit-backdrop-filter:blur(26px) saturate(1.6); border-bottom:.5px solid var(--rule-faint);"></div>
     <!-- Prism / refraction sheen -->
     <div style="position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:1;">
       <div style="position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg, transparent 4%, rgba(255,140,190,.55), rgba(190,150,255,.55), rgba(130,200,255,.5), rgba(150,255,215,.45), rgba(255,205,130,.4), transparent 96%);"></div>
-      <div style="position:absolute; inset:-60% 0; background:linear-gradient(105deg, transparent 38%, rgba(255,90,160,.06) 46%, rgba(150,90,255,.07) 50%, rgba(70,160,255,.06) 54%, rgba(60,230,190,.05) 60%, rgba(255,200,120,.04) 64%, transparent 72%); mix-blend-mode:screen; background-size:260% 100%; background-repeat:no-repeat; animation:prismDrift 11s ease-in-out infinite;"></div>
+      <div class="nav-sheen" style="position:absolute; inset:-60% 0; background:linear-gradient(105deg, transparent 38%, rgba(255,90,160,.06) 46%, rgba(150,90,255,.07) 50%, rgba(70,160,255,.06) 54%, rgba(60,230,190,.05) 60%, rgba(255,200,120,.04) 64%, transparent 72%); mix-blend-mode:screen; background-size:260% 100%; background-repeat:no-repeat; animation:prismDrift 11s ease-in-out infinite;"></div>
     </div>
     <div class="nav-inner" style="max-width:940px; margin:0 auto; padding:14px 2.5rem; display:flex; justify-content:space-between; align-items:baseline; gap:1rem; position:relative; z-index:2;">
       <a href="index.html" style="font-family:var(--sans); font-size:12px; font-weight:700; color:var(--ink); letter-spacing:.06em; text-transform:uppercase; text-decoration:none;">Devin Stein</a>
@@ -170,8 +176,8 @@ body { background:#1b2027; color:var(--fg-1); font-family:var(--serif); -webkit-
           <span style="display:block; width:22px; height:1px; background:var(--topo-brown); opacity:.65;"></span>
           Book a meeting
         </div>
-        <h1 class="big-title" style="font-family:var(--display-roman); font-weight:400; font-size:3.1rem; line-height:1.02; letter-spacing:.01em; color:var(--ink); margin-bottom:10px;">Schedule <span style="color:var(--turquoise);">office hours</span></h1>
-        <p style="font-family:var(--serif); font-style:italic; font-weight:300; font-size:1.3rem; color:var(--fg-2); line-height:1.4; max-width:30em;">Thirty minutes, on Google Meet &mdash; or in person if you&rsquo;re on campus at Colorado State.</p>
+        <h1 class="big-title" style="font-family:var(--display-roman); font-weight:400; font-size:3.1rem; line-height:1.02; letter-spacing:.01em; color:var(--ink); margin-bottom:10px;">Schedule <span style="color:var(--turquoise);">a meeting</span></h1>
+        <p style="font-family:var(--serif); font-style:italic; font-weight:300; font-size:1.3rem; color:var(--fg-2); line-height:1.4; max-width:30em;">Thirty minutes, on Google Meet.</p>
       </div>
       <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
         <div style="display:flex; gap:2px; padding:3px; border-radius:999px; background:color-mix(in srgb, var(--bg-raise) 50%, transparent); border:.5px solid color-mix(in srgb, var(--white) 10%, transparent); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); box-shadow:inset 0 1px 0 rgba(255,255,255,.1);">
@@ -536,7 +542,7 @@ function showSuccess(json, who){
       'Google Meet link to <strong>' + who.email + '</strong>, usually within a day. That time is held for you in the meantime.';
     document.getElementById('successCancel').innerHTML =
       "Need to change something before it's confirmed? Just reply to that email, or " +
-      '<a href="mailto:devin.stein@colostate.edu?subject=Office hours request" style="color:var(--turquoise); text-decoration:none; border-bottom:1px solid color-mix(in srgb, var(--turquoise) 40%, transparent);">email me</a> directly.';
+      '<a href="mailto:devin.stein@colostate.edu?subject=Meeting request" style="color:var(--turquoise); text-decoration:none; border-bottom:1px solid color-mix(in srgb, var(--turquoise) 40%, transparent);">email me</a> directly.';
   } else {
     document.getElementById('successHeading').textContent = "You're booked for " + visitorFmt + '.';
     var detail = 'A confirmation email and calendar invite are on their way to <strong>' + who.email + '</strong>.';
@@ -545,7 +551,7 @@ function showSuccess(json, who){
     if (json.cancel_url){
       document.getElementById('successCancel').innerHTML =
         'Need to cancel? <a href="' + json.cancel_url + '" style="color:var(--turquoise);">Cancel this meeting</a>, or ' +
-        '<a href="mailto:devin.stein@colostate.edu?subject=Reschedule office hours" style="color:var(--turquoise);">email me</a> to reschedule.';
+        '<a href="mailto:devin.stein@colostate.edu?subject=Reschedule meeting" style="color:var(--turquoise);">email me</a> to reschedule.';
     }
   }
   document.getElementById('successMeta').textContent = json.event_id ? ('Reference · ' + json.event_id) : '';

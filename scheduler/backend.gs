@@ -31,14 +31,31 @@
 
 // ─── CONFIG ─────────────────────────────────────────────────────────
 const CONFIG = {
-  CALENDAR_ID: 'primary',
+  CALENDAR_ID: 'primary',                 // WRITE target: pending holds + confirmed events land here.
+  // READ set for conflict checks. A busy block on ANY of these makes a slot
+  // unbookable. FreeBusy is per-calendar-ID and never folds subscribed/secondary
+  // calendars into 'primary', so every calendar that should block must be listed
+  // explicitly — including the write target itself. Find each ID in Google Calendar
+  // → (hover calendar) Settings → Integrate calendar → Calendar ID.
+  // A bad/inaccessible ID fails OPEN (slot stays bookable); run smokeTest() after
+  // editing — it flags any calendar it can't reach.
+  BUSY_CALENDAR_IDS: [
+    'primary',                                                     // Personal (== devintstein@gmail.com; the write target)
+    'lfeoe65m554jdghvmoic7uc5bl62dgev@import.calendar.google.com', // CSU Work (subscribed Exchange ICS)
+    'n1331p93dnr5vopbei99gdub54@group.calendar.google.com',        // School (work / teaching)
+    'family03095491314846671795@group.calendar.google.com',        // Family
+  ],
   NOTIFICATION_EMAIL: 'devin.stein@colostate.edu',  // CSU
   WORK_DAYS: [1, 2, 3, 4, 5],            // Mon..Fri (0=Sun, 6=Sat)
-  WORK_HOURS_MT: [8, 17],                // [start, end_exclusive] in MT
   WORK_TZ: 'America/Denver',
-  SLOT_MIN: 30,
-  BUFFER_MIN: 15,
-  HORIZON_DAYS: 28,
+  SLOT_MIN: 30,                          // meeting length (minutes)
+  SLOT_STEP_MIN: 30,                     // grid cadence — slots land on the :00 / :30
+  BUFFER_MIN: 15,                        // cushion AFTER each booking (NOT part of the grid).
+                                         //   A booked 10:00 slot reserves through 10:45 → pushes next-bookable to 11:00,
+                                         //   but the 9:30 slot before it stays open (back-to-back allowed). See slotFreeAgainst.
+  FIRST_SLOT_MIN: 9 * 60,                // first slot STARTS 9:00 AM MT
+  LAST_START_MIN: 16 * 60,               // last slot STARTS 4:00 PM MT (meeting ends 4:30)
+  HORIZON_DAYS: 56,                      // ~2 months of bookable window
   MIN_LEAD_HOURS: 4,
   PENDING_TTL_HOURS: 48,                 // unanswered requests auto-expire after this
   // Active Web App /exec URL — used to build cancel/approve/decline links in emails.
@@ -53,6 +70,7 @@ function doGet(e) {
   try {
     const action = (e && e.parameter && e.parameter.action) || '';
     if (action === 'availability') return jsonResponse(handleAvailability(e.parameter));
+    if (action === 'month') return jsonResponse(handleMonthAvailability(e.parameter));
     if (action === 'cancel') return handleCancel(e.parameter);    // returns an HTML page, not JSON
     if (action === 'approve') return confirmActionPage('approve', e.parameter);  // read-only confirm screen
     if (action === 'decline') return confirmActionPage('decline', e.parameter);  // read-only confirm screen
@@ -85,20 +103,95 @@ function jsonResponse(obj) {
 }
 
 // ─── AVAILABILITY ───────────────────────────────────────────────────
+// Per-day slot list for the booking rail. One FreeBusy call covers the whole
+// range (all BUSY_CALENDAR_IDS at once); slots are then checked locally.
 function handleAvailability(params) {
   const date = params.date;
   const days = Math.max(1, Math.min(7, parseInt(params.days || '1', 10)));
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return {ok: false, error: 'validation_error'};
 
+  const now = new Date();
+  const intervals = fetchBusyIntervals(rangeStartIso(date), rangeEndIso(addDaysMt(date, days - 1)));
   const allSlots = [];
   for (let i = 0; i < days; i++) {
     const d = addDaysMt(date, i);
     if (!isWorkday(d)) continue;
-    const canonical = generateCanonicalSlots(d);
-    const free = canonical.filter(s => isSlotBookable(s));
-    free.forEach(s => allSlots.push({start: s.start.toISOString(), end: s.end.toISOString()}));
+    generateCanonicalSlots(d).forEach(s => {
+      if (slotWithinBookingWindow(s, now) && slotFreeAgainst(s, intervals)) {
+        allSlots.push({start: s.start.toISOString(), end: s.end.toISOString()});
+      }
+    });
   }
-  return {ok: true, slots: allSlots, generated_at: new Date().toISOString()};
+  return {ok: true, slots: allSlots, generated_at: now.toISOString()};
+}
+
+// Per-day availability COUNTS across a wide range (the month map). One FreeBusy
+// call for the whole range; days with ≥1 bookable slot are returned as {ymd: count}.
+// Days that are weekends or fully unavailable are simply omitted.
+function handleMonthAvailability(params) {
+  const date = params.date;
+  const days = Math.max(1, Math.min(70, parseInt(params.days || '31', 10)));
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return {ok: false, error: 'validation_error'};
+
+  const now = new Date();
+  const intervals = fetchBusyIntervals(rangeStartIso(date), rangeEndIso(addDaysMt(date, days - 1)));
+  const out = {};
+  for (let i = 0; i < days; i++) {
+    const d = addDaysMt(date, i);
+    if (!isWorkday(d)) continue;
+    let count = 0;
+    generateCanonicalSlots(d).forEach(s => {
+      if (slotWithinBookingWindow(s, now) && slotFreeAgainst(s, intervals)) count++;
+    });
+    if (count > 0) out[d] = count;
+  }
+  return {ok: true, days: out, generated_at: now.toISOString()};
+}
+
+// ─── BUSY-INTERVAL HELPERS ──────────────────────────────────────────
+// Start/end of an MT calendar day as ISO, used to bound FreeBusy range queries.
+function rangeStartIso(ymdMt) { const [Y,M,D] = ymdMt.split('-').map(Number); return dateInMt(Y,M,D,0,0).toISOString(); }
+function rangeEndIso(ymdMt)   { const [Y,M,D] = ymdMt.split('-').map(Number); return dateInMt(Y,M,D,23,59).toISOString(); }
+
+// One FreeBusy call over [startIso, endIso] across ALL BUSY_CALENDAR_IDS,
+// returning a flat list of {start:Date, end:Date} busy intervals (transparency
+// respected — "Free"/all-day events don't appear; only "Busy" ones do).
+function fetchBusyIntervals(startIso, endIso) {
+  const calIds = CONFIG.BUSY_CALENDAR_IDS;
+  const result = Calendar.Freebusy.query({
+    timeMin: startIso,
+    timeMax: endIso,
+    items: calIds.map(id => ({id: id})),
+  });
+  const cals = result.calendars || {};
+  const intervals = [];
+  calIds.forEach(id => {
+    (((cals[id] || {}).busy) || []).forEach(b => {
+      intervals.push({start: new Date(b.start), end: new Date(b.end)});
+    });
+  });
+  return intervals;
+}
+
+// A slot is free iff it overlaps no busy interval, where each busy interval is
+// extended by BUFFER_MIN at its END only (buffer AFTER a meeting, not before).
+// So a booked 10:00–10:30 reserves through 10:45 → blocks the 10:30 slot and pushes
+// the next opening to 11:00, but the 9:30 slot stays open (back-to-back before a
+// booking is allowed by design — Devin will absorb those manually).
+function slotFreeAgainst(slot, intervals) {
+  const bufMs = CONFIG.BUFFER_MIN * 60 * 1000;
+  const cs = slot.start.getTime();
+  const ce = slot.end.getTime();
+  return !intervals.some(iv => iv.start.getTime() < ce && (iv.end.getTime() + bufMs) > cs);
+}
+
+// Time gates independent of calendar conflicts: far enough out (lead time),
+// not past the booking horizon.
+function slotWithinBookingWindow(slot, now) {
+  const t = slot.start.getTime();
+  if (t < now.getTime() + CONFIG.MIN_LEAD_HOURS * 3600 * 1000) return false;
+  if (t > now.getTime() + CONFIG.HORIZON_DAYS * 86400 * 1000) return false;
+  return true;
 }
 
 // ─── BOOKING (creates a PENDING hold, not a confirmed event) ────────
@@ -152,14 +245,14 @@ function handleBook(params) {
 
 // ─── SLOT LOGIC ─────────────────────────────────────────────────────
 function generateCanonicalSlots(ymdMt) {
-  // Returns 12 canonical slot {start, end} pairs in UTC for the MT-local date ymdMt.
-  // Slot N starts at 08:00 + (N-1) × 45min in WORK_TZ; ends 30min later.
+  // 30-minute meeting slots on a :00/:30 grid in WORK_TZ, for the MT-local date ymdMt.
+  // First slot starts FIRST_SLOT_MIN (9:00 MT); last slot STARTS LAST_START_MIN
+  // (4:00 MT, ending 4:30). BUFFER_MIN is NOT baked into the grid — slots read every
+  // :30, but the bookability check reserves the buffer so a booked 10:00 blocks 10:30.
   const [Y, M, D] = ymdMt.split('-').map(Number);
   const slots = [];
-  for (let i = 0; i < 12; i++) {
-    const startMin = (CONFIG.WORK_HOURS_MT[0] * 60) + i * (CONFIG.SLOT_MIN + CONFIG.BUFFER_MIN);
+  for (let startMin = CONFIG.FIRST_SLOT_MIN; startMin <= CONFIG.LAST_START_MIN; startMin += CONFIG.SLOT_STEP_MIN) {
     const endMin = startMin + CONFIG.SLOT_MIN;
-    if (endMin > CONFIG.WORK_HOURS_MT[1] * 60) break;
     const startH = Math.floor(startMin / 60), startM = startMin % 60;
     const endH = Math.floor(endMin / 60), endM = endMin % 60;
     slots.push({
@@ -194,28 +287,24 @@ function addDaysMt(ymdMt, n) {
 }
 
 function isSlotBookable(slot) {
-  // Filter: future enough (lead time), within horizon, no busy-marked conflicts.
+  // Authoritative single-slot check (used for the booking-time race re-check).
+  // Gates: far enough out, within horizon, and no Busy conflict in the buffered
+  // window across ALL BUSY_CALENDAR_IDS. FreeBusy respects each event's Busy/Free
+  // transparency (all-day "Free" events don't block); pending holds are opaque so
+  // they reserve the slot. A calendar we can't read returns no busy → fails open
+  // (see smokeTest() for a reachability probe).
   const now = new Date();
-  const leadCutoff = new Date(now.getTime() + CONFIG.MIN_LEAD_HOURS * 3600 * 1000);
-  if (slot.start < leadCutoff) return false;
-  const horizonEnd = new Date(now.getTime() + CONFIG.HORIZON_DAYS * 86400 * 1000);
-  if (slot.start > horizonEnd) return false;
-  // Freebusy API respects each event's "Show me as" setting:
-  // events marked Free (default for all-day events, holidays) do NOT block;
-  // only events marked Busy (default for timed meetings) block.
-  // Pending holds are created opaque, so they count as busy and reserve the slot.
-  const calId = CONFIG.CALENDAR_ID;
-  const result = Calendar.Freebusy.query({
-    timeMin: slot.start.toISOString(),
-    timeMax: slot.end.toISOString(),
-    items: [{id: calId}],
-  });
-  const busy = ((result.calendars || {})[calId] || {}).busy || [];
-  return busy.length === 0;
+  if (!slotWithinBookingWindow(slot, now)) return false;
+  const bufMs = CONFIG.BUFFER_MIN * 60 * 1000;
+  const intervals = fetchBusyIntervals(
+    new Date(slot.start.getTime() - bufMs).toISOString(),
+    new Date(slot.end.getTime() + bufMs).toISOString()
+  );
+  return slotFreeAgainst(slot, intervals);
 }
 
 function isCanonicalSlot(startDate, endDate) {
-  // Verify start matches one of the 12 canonical slots for that day's MT date.
+  // Verify start matches one of the canonical grid slots for that day's MT date.
   const ymd = Utilities.formatDate(startDate, CONFIG.WORK_TZ, 'yyyy-MM-dd');
   if (!isWorkday(ymd)) return false;
   const canonical = generateCanonicalSlots(ymd);
@@ -863,6 +952,24 @@ function smokeTest() {
   }
   console.log('Test date (MT):', ymd);
   console.log('Is workday:', isWorkday(ymd));
+
+  // Reachability probe: confirm every BUSY_CALENDAR_IDS entry actually resolves.
+  // A calendar that returns an error here is silently NOT blocking availability —
+  // usually a mistyped ID or one this account can't read.
+  console.log('=== BUSY CALENDARS ===');
+  const probe = Calendar.Freebusy.query({
+    timeMin: new Date().toISOString(),
+    timeMax: new Date(Date.now() + 86400 * 1000).toISOString(),
+    items: CONFIG.BUSY_CALENDAR_IDS.map(id => ({id: id})),
+  });
+  CONFIG.BUSY_CALENDAR_IDS.forEach(id => {
+    const entry = (probe.calendars || {})[id] || {};
+    if (entry.errors && entry.errors.length) {
+      console.log('  ✗ UNREACHABLE:', id, '→', JSON.stringify(entry.errors));
+    } else {
+      console.log('  ✓ ok:', id, '(' + ((entry.busy || []).length) + ' busy block(s) next 24h)');
+    }
+  });
   const slots = generateCanonicalSlots(ymd);
   console.log('Generated', slots.length, 'canonical slots:');
   slots.forEach(s => console.log('  ',

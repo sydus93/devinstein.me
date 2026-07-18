@@ -185,11 +185,6 @@ body { background:#1b2027; color:var(--fg-1); font-family:var(--serif); -webkit-
         <p style="font-family:var(--serif); font-style:italic; font-weight:300; font-size:1.3rem; color:var(--fg-2); line-height:1.4; max-width:30em;">Thirty minutes, on Google Meet.</p>
       </div>
       <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
-        <div style="display:flex; gap:2px; padding:3px; border-radius:999px; background:color-mix(in srgb, var(--bg-raise) 50%, transparent); border:.5px solid color-mix(in srgb, var(--white) 10%, transparent); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); box-shadow:inset 0 1px 0 rgba(255,255,255,.1);">
-          <button data-mode-btn="auto" style="font-family:var(--sans); font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:5px 12px; border:none; border-radius:999px; cursor:pointer;">Auto</button>
-          <button data-mode-btn="day" style="font-family:var(--sans); font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:5px 12px; border:none; border-radius:999px; cursor:pointer;">Day</button>
-          <button data-mode-btn="night" style="font-family:var(--sans); font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:5px 12px; border:none; border-radius:999px; cursor:pointer;">Night</button>
-        </div>
         <div id="tzLine" style="font-family:var(--mono); font-size:9.5px; color:var(--fg-3); letter-spacing:.04em; text-align:right;"></div>
       </div>
     </header>
@@ -287,6 +282,16 @@ body { background:#1b2027; color:var(--fg-1); font-family:var(--serif); -webkit-
       </div>
     </div>
 
+    <!-- APPEARANCE — moved below the scheduler and de-emphasized (was top-right of hero) -->
+    <div style="margin-top:1.8rem; display:flex; justify-content:center; align-items:center; gap:10px; opacity:.7;">
+      <span style="font-family:var(--mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-4);">Appearance</span>
+      <div style="display:flex; gap:2px; padding:3px; border-radius:999px; background:color-mix(in srgb, var(--bg-raise) 40%, transparent); border:.5px solid color-mix(in srgb, var(--white) 8%, transparent);">
+        <button data-mode-btn="auto" style="font-family:var(--sans); font-size:9.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:4px 11px; border:none; border-radius:999px; cursor:pointer;">Auto</button>
+        <button data-mode-btn="day" style="font-family:var(--sans); font-size:9.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:4px 11px; border:none; border-radius:999px; cursor:pointer;">Day</button>
+        <button data-mode-btn="night" style="font-family:var(--sans); font-size:9.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; padding:4px 11px; border:none; border-radius:999px; cursor:pointer;">Night</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -294,7 +299,7 @@ body { background:#1b2027; color:var(--fg-1); font-family:var(--serif); -webkit-
 <script>
 // ===== real backend config (preserved from production schedule.html) =====
 var SCHEDULER_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwb3Sq3wgiCI_u5Of6lHH_zAtyJszipDh0iA3YU_-Cpi93uQLXEP-ospVvKBoKmzAVxBA/exec';
-var HORIZON_DAYS = 28;
+var HORIZON_DAYS = 56;  // ~2 months — must match backend CONFIG.HORIZON_DAYS
 var MT_TZ = 'America/Denver';
 
 var rootEl = document.getElementById('root');
@@ -305,6 +310,8 @@ var state = {
   monthCursor: { y: (new Date()).getFullYear(), m: (new Date()).getMonth() },
   selectedDate: null, selectedSlot: null, slots: [], slotsLoading: false,
   cachedAvailability: {},
+  monthAvail: {},          // ymd -> count of bookable slots (from action=month)
+  monthAvailLoaded: false, // false until the first month fetch resolves
 };
 
 // ===== mode toggle =====
@@ -371,7 +378,11 @@ function renderMonth(){
       var dow = d.getDay(); var weekend = dow===0 || dow===6;
       var past = d < today; var beyond = d > horizon;
       var key = ymd(d);
-      var available = inMonth && !weekend && !past && !beyond;
+      var eligible = inMonth && !weekend && !past && !beyond;
+      // Provisional (weekday-based) until the month fetch resolves; then a day is
+      // "available" only if it actually has ≥1 bookable slot (respects busy events,
+      // full days, buffers). Fixes days that looked open but had no times.
+      var available = eligible && (!state.monthAvailLoaded || state.monthAvail[key] > 0);
       var sel = state.selectedDate === key;
       var isToday = d.getTime() === today.getTime();
       var style = cellBase, numStyle, dotStyle = 'display:none;';
@@ -424,6 +435,26 @@ async function fetchAvailability(key){
   if (!json.ok) throw new Error(json.error || 'availability error');
   state.cachedAvailability[key] = json.slots || [];
   return state.cachedAvailability[key];
+}
+
+async function fetchMonthAvailability(){
+  // One backend call covers the whole horizon; the month map reads slot counts
+  // from it to decide which days show the "Available" dot. On failure we keep the
+  // provisional weekday view (monthAvailLoaded stays false).
+  try {
+    var url = new URL(SCHEDULER_ENDPOINT);
+    url.searchParams.set('action','month');
+    url.searchParams.set('date', ymd(new Date()));
+    url.searchParams.set('days', String(HORIZON_DAYS + 1));
+    url.searchParams.set('tz', state.visitorTz);
+    var res = await fetch(url.toString(), { method:'GET' });
+    if (!res.ok) throw new Error('fetch failed');
+    var json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'month error');
+    state.monthAvail = json.days || {};
+    state.monthAvailLoaded = true;
+    renderMonth();
+  } catch(e){ /* keep provisional view */ }
 }
 
 async function selectDate(key){
@@ -537,6 +568,10 @@ function formatError(code){
 function showSuccess(json, who){
   document.getElementById('step-form').hidden = true;
   document.getElementById('step-success').hidden = false;
+  // The requested slot is now held — drop cached availability and refresh the
+  // month map so the taken time (and its buffer) disappears.
+  state.cachedAvailability = {};
+  fetchMonthAvailability();
   var start = new Date(state.selectedSlot.start);
   var visitorFmt = new Intl.DateTimeFormat('en-US', { timeZone:state.visitorTz, weekday:'long', month:'long', day:'numeric', hour:'numeric', minute:'2-digit', hour12:true }).format(start);
   var firstName = (who.name || '').trim().split(/\s+/)[0];
@@ -592,6 +627,7 @@ function noDateBlock(){
   document.getElementById('tzLine').textContent = tzLine();
   renderWeekdayHeads();
   renderMonth();
+  fetchMonthAvailability();  // refine the "Available" dots with real slot counts
   document.getElementById('timeRail').innerHTML = noDateBlock();
 })();
 </script>

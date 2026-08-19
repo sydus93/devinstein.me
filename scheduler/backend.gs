@@ -63,6 +63,12 @@ const CONFIG = {
   WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbwb3Sq3wgiCI_u5Of6lHH_zAtyJszipDh0iA3YU_-Cpi93uQLXEP-ospVvKBoKmzAVxBA/exec',
   MEETING_TITLE: name => `Office Hours: ${name} ↔ Devin Stein`,
   PENDING_TITLE: name => `⏳ PENDING — Office Hours: ${name}`,
+  // V3 — meeting location. The visitor picks one on the booking form. 'virtual'
+  // gets an auto-created Google Meet link on approval; 'campus' gets the office
+  // address instead and NO conference link. Anything unrecognized → 'virtual',
+  // which is exactly what every booking did before V3.
+  OFFICE_LOCATION: 'Rockwell Hall 237, Colorado State University, Fort Collins, CO',
+  VIRTUAL_LOCATION: 'Google Meet (link in the calendar invite)',
 };
 
 // ─── ENTRY POINTS ───────────────────────────────────────────────────
@@ -203,6 +209,7 @@ function handleBook(params) {
   // 2. Validate inputs. Purpose is required — it's the context Devin uses to approve/decline.
   const {name, email, purpose, start, end, visitor_tz} = params;
   if (!name || !email || !purpose || !start || !end) return {ok: false, error: 'validation_error'};
+  const locChoice = normalizeLocationChoice(params.location);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return {ok: false, error: 'validation_error'};
 
   const startDate = new Date(start);
@@ -223,7 +230,7 @@ function handleBook(params) {
   let event;
   try {
     if (!isSlotBookable({start: startDate, end: endDate})) return {ok: false, error: 'slot_taken'};
-    event = createPendingHold({name, email, purpose, startDate, endDate, visitor_tz});
+    event = createPendingHold({name, email, purpose, startDate, endDate, visitor_tz, locChoice});
   } catch (err) {
     console.error('createPendingHold failed:', err);
     return {ok: false, error: 'internal'};
@@ -233,14 +240,14 @@ function handleBook(params) {
 
   // 5. Notify the visitor (request received) and Devin (approve/decline).
   try {
-    sendVisitorPending({name, email, startDate, endDate, visitor_tz});
-    sendDevinApprovalRequest({name, email, purpose, startDate, endDate, visitor_tz, eventId: event.id});
+    sendVisitorPending({name, email, startDate, endDate, visitor_tz, locChoice});
+    sendDevinApprovalRequest({name, email, purpose, startDate, endDate, visitor_tz, locChoice, eventId: event.id});
   } catch (err) {
     console.error('email send failed (hold still created):', err);
     // Don't fail the request — the hold exists and shows on Devin's calendar.
   }
 
-  return {ok: true, status: 'pending', event_id: event.id};
+  return {ok: true, status: 'pending', event_id: event.id, location: locChoice};
 }
 
 // ─── SLOT LOGIC ─────────────────────────────────────────────────────
@@ -316,7 +323,7 @@ function isCanonicalSlot(startDate, endDate) {
 }
 
 // ─── CALENDAR EVENT (Advanced Calendar Service) ────────────────────
-function createPendingHold({name, email, purpose, startDate, endDate, visitor_tz}) {
+function createPendingHold({name, email, purpose, startDate, endDate, visitor_tz, locChoice}) {
   // A pending hold: blocks the slot (opaque → counts as busy) but has NO attendee
   // and NO Meet link yet. Those are added on approval, so the visitor is never
   // invited to a meeting Devin hasn't confirmed. Visitor details live in
@@ -328,6 +335,7 @@ function createPendingHold({name, email, purpose, startDate, endDate, visitor_tz
       '',
       `Visitor: ${name} <${email}>`,
       `Visitor TZ: ${visitor_tz || 'unknown'}`,
+      `Wants: ${locationLabel(locChoice)}`,
       '',
       'Purpose:',
       purpose ? purpose : '(none provided)',
@@ -336,6 +344,7 @@ function createPendingHold({name, email, purpose, startDate, endDate, visitor_tz
     ].join('\n'),
     start: {dateTime: startDate.toISOString(), timeZone: 'UTC'},
     end: {dateTime: endDate.toISOString(), timeZone: 'UTC'},
+    location: locationLabel(locChoice),  // visible on the calendar entry while pending
     transparency: 'opaque',  // reserve the slot while pending
     colorId: '5',            // Banana — visually flags pending holds on the calendar
     extendedProperties: {
@@ -344,6 +353,7 @@ function createPendingHold({name, email, purpose, startDate, endDate, visitor_tz
         vName: name,
         vEmail: email,
         vTz: visitor_tz || '',
+        vLocation: normalizeLocationChoice(locChoice),
         vPurpose: (purpose || '').substring(0, 900),
       },
     },
@@ -357,8 +367,23 @@ function extractMeetUrl(event) {
   return video ? video.uri : '';
 }
 
+// ─── MEETING LOCATION (V3) ─────────────────────────────────────
+// Whitelist, not a passthrough: a stale cached form (or a hand-rolled POST)
+// that omits the field books a virtual meeting rather than failing validation.
+function normalizeLocationChoice(v) {
+  return String(v || '').toLowerCase() === 'campus' ? 'campus' : 'virtual';
+}
+
+function isCampus(v) {
+  return normalizeLocationChoice(v) === 'campus';
+}
+
+function locationLabel(v) {
+  return isCampus(v) ? 'In person — ' + CONFIG.OFFICE_LOCATION : 'Virtual — Google Meet';
+}
+
 // ─── EMAIL ──────────────────────────────────────────────────────────
-function sendVisitorPending({name, email, startDate, endDate, visitor_tz}) {
+function sendVisitorPending({name, email, startDate, endDate, visitor_tz, locChoice}) {
   const visitorTime = Utilities.formatDate(startDate, visitor_tz || 'UTC', "EEEE, MMMM d 'at' h:mm a z");
   const mtTime = Utilities.formatDate(startDate, CONFIG.WORK_TZ, "h:mm a z");
   const subject = `Office-hours request received — ${Utilities.formatDate(startDate, visitor_tz || 'UTC', "MMM d, h:mm a")}`;
@@ -367,7 +392,11 @@ function sendVisitorPending({name, email, startDate, endDate, visitor_tz}) {
     '',
     `Thanks for the request. I've held ${visitorTime} (${mtTime}, Mountain Time) for office hours.`,
     '',
-    "I review each request personally — you'll get a confirmation with the Google Meet link once I approve it, usually within a day. If that time stops working, just reply to this email.",
+    isCampus(locChoice)
+      ? `You asked to meet in person, so we'll be in my office — ${CONFIG.OFFICE_LOCATION}.`
+      : "You asked to meet virtually, so I'll send a Google Meet link.",
+    '',
+    "I review each request personally — you'll get a confirmation once I approve it, usually within a day. If that time stops working, just reply to this email.",
     '',
     '— Devin',
     'devinstein.me/schedule',
@@ -378,14 +407,17 @@ function sendVisitorPending({name, email, startDate, endDate, visitor_tz}) {
   });
 }
 
-function sendDevinApprovalRequest({name, email, purpose, startDate, endDate, visitor_tz, eventId}) {
+function sendDevinApprovalRequest({name, email, purpose, startDate, endDate, visitor_tz, locChoice, eventId}) {
   const mtTime = Utilities.formatDate(startDate, CONFIG.WORK_TZ, "EEE MMM d 'at' h:mm a z");
   const aUrl = approveUrl(eventId);
   const dUrl = declineUrl(eventId);
-  const subject = `Approve? ${name} — ${Utilities.formatDate(startDate, CONFIG.WORK_TZ, "MMM d, h:mm a")}`;
+  const campus = isCampus(locChoice);
+  const subject = `Approve? ${name} — ${Utilities.formatDate(startDate, CONFIG.WORK_TZ, "MMM d, h:mm a")}` +
+    (campus ? ' (in person)' : '');
   const text = [
     `${name} <${email}> requested office hours.`,
     `${mtTime}  (30 min)`,
+    `Where: ${locationLabel(locChoice)}`,
     `Visitor TZ: ${visitor_tz || 'unknown'}`,
     '',
     'Purpose:',
@@ -403,6 +435,7 @@ function sendDevinApprovalRequest({name, email, purpose, startDate, endDate, vis
     '<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;max-width:520px;color:#2c2a26">',
     `<p style="margin:0 0 .3rem"><strong>${esc(name)}</strong> &lt;${esc(email)}&gt; requested office hours.</p>`,
     `<p style="margin:0 0 .2rem;font-size:1.05rem"><strong>${esc(mtTime)}</strong> &nbsp;(30 min)</p>`,
+    `<p style="margin:0 0 .5rem"><span style="display:inline-block;background:${campus ? '#f0e6d8' : '#dff0eb'};color:${campus ? '#8a5a2b' : '#1a6b5a'};border-radius:999px;padding:.16rem .7rem;font-size:.82rem;font-weight:600">${campus ? '&#127970; ' : '&#128249; '}${esc(locationLabel(locChoice))}</span></p>`,
     `<p style="margin:0 0 1rem;color:#8a857c;font-size:.9rem">Visitor TZ: ${esc(visitor_tz || 'unknown')}</p>`,
     '<p style="margin:0 0 .2rem;color:#8a857c;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em">Purpose</p>',
     `<p style="margin:0 0 1.4rem;line-height:1.55;white-space:pre-wrap">${esc(purpose || '(none provided)')}</p>`,
@@ -414,7 +447,7 @@ function sendDevinApprovalRequest({name, email, purpose, startDate, endDate, vis
   GmailApp.sendEmail(CONFIG.NOTIFICATION_EMAIL, subject, text, {htmlBody: html});
 }
 
-function sendVisitorConfirmation({name, email, startDate, endDate, visitor_tz, meetUrl, eventId}) {
+function sendVisitorConfirmation({name, email, startDate, endDate, visitor_tz, meetUrl, locChoice, eventId}) {
   const visitorTime = Utilities.formatDate(startDate, visitor_tz || 'UTC', "EEEE, MMMM d 'at' h:mm a z");
   const mtTime = Utilities.formatDate(startDate, CONFIG.WORK_TZ, "h:mm a z");
   const subject = `Office hours confirmed — ${Utilities.formatDate(startDate, visitor_tz || 'UTC', "MMM d, h:mm a")}`;
@@ -423,7 +456,9 @@ function sendVisitorConfirmation({name, email, startDate, endDate, visitor_tz, m
     '',
     `You're confirmed for office hours with Devin Stein on ${visitorTime} (${mtTime}, Mountain Time).`,
     '',
-    meetUrl ? `Google Meet: ${meetUrl}` : 'Meeting details are in the calendar invite.',
+    isCampus(locChoice)
+      ? `Where: my office — ${CONFIG.OFFICE_LOCATION}.`
+      : (meetUrl ? `Google Meet: ${meetUrl}` : 'Meeting details are in the calendar invite.'),
     '',
     'A calendar invite is in your inbox.',
     '',
@@ -658,15 +693,22 @@ function confirmActionPage(action, params) {
   const name = priv.vName || 'the visitor';
   const first = String(name).split(/\s+/)[0];
   const purpose = priv.vPurpose || '';
+  const campus = isCampus(priv.vLocation);
   const accent = isApprove ? '#1a6b5a' : '#b5704f';
   const verb = isApprove ? 'Approve & send invite' : 'Decline request';
   const heading = isApprove ? 'Approve this request?' : 'Decline this request?';
   const lead = isApprove
-    ? 'Confirm office hours with <strong>' + escapeHtml(name) + '</strong> and send ' + escapeHtml(first) + ' the calendar invite and Google Meet link.'
+    ? 'Confirm office hours with <strong>' + escapeHtml(name) + '</strong> and send ' + escapeHtml(first) +
+      (campus
+        ? ' the calendar invite, with your office address as the location. No Meet link is created.'
+        : ' the calendar invite and a Google Meet link.')
     : 'Turn down this request from <strong>' + escapeHtml(name) + '</strong>. ' + escapeHtml(first) + ' will get a brief note that you could not fit it in, and the slot reopens.';
   const postAction = isApprove ? 'approve_confirm' : 'decline_confirm';
   const detail =
     '<p style="margin:.2rem 0 .2rem;font-size:1.05rem;color:#1f1d1a"><strong>' + escapeHtml(whenMt) + '</strong></p>' +
+    '<p style="margin:.2rem 0 .6rem"><span style="display:inline-block;background:' + (campus ? '#f0e6d8' : '#dff0eb') +
+      ';color:' + (campus ? '#8a5a2b' : '#1a6b5a') + ';border-radius:999px;padding:.16rem .7rem;font-size:.82rem;font-weight:600">' +
+      escapeHtml(locationLabel(priv.vLocation)) + '</span></p>' +
     (purpose
       ? '<p style="margin:.2rem 0 1.2rem;color:#6a665e;line-height:1.5;white-space:pre-wrap">&ldquo;' + escapeHtml(purpose) + '&rdquo;</p>'
       : '<div style="height:.6rem"></div>');
@@ -747,38 +789,48 @@ function handleApprove(params) {
     }
     const startDate = new Date(event.start.dateTime);
     const endDate = new Date(event.end.dateTime);
-    // Promote the hold: add the attendee + a Meet link, flip state, retitle, and
-    // notify the attendee (sendUpdates:'all' → calendar invite goes out now).
+    const locChoice = normalizeLocationChoice(priv.vLocation);
+    const campus = isCampus(locChoice);
+    // Promote the hold: add the attendee, set the real location, flip state,
+    // retitle, and notify the attendee (sendUpdates:'all' → invite goes out now).
     let updated;
     try {
-      updated = Calendar.Events.patch({
+      const patch = {
         summary: CONFIG.MEETING_TITLE(name),
         attendees: [{email: email}],
         colorId: '10',  // Basil (green) — confirmed
+        location: campus ? CONFIG.OFFICE_LOCATION : CONFIG.VIRTUAL_LOCATION,
         extendedProperties: {private: {bookingState: 'confirmed'}},
-        conferenceData: {
+      };
+      // Only a virtual booking gets a Meet link — an in-person visitor shouldn't
+      // be handed a video link they aren't meant to use.
+      if (!campus) {
+        patch.conferenceData = {
           createRequest: {
             requestId: Utilities.getUuid(),
             conferenceSolutionKey: {type: 'hangoutsMeet'},
           },
-        },
-      }, CONFIG.CALENDAR_ID, eventId, {conferenceDataVersion: 1, sendUpdates: 'all'});
+        };
+      }
+      updated = Calendar.Events.patch(patch, CONFIG.CALENDAR_ID, eventId,
+        {conferenceDataVersion: 1, sendUpdates: 'all'});
     } catch (err) {
       console.error('approve patch failed:', err);
       return resultPage('Something went wrong',
         'Could not confirm automatically. Open the event on your calendar to approve it manually.', false);
     }
-    let meetUrl = extractMeetUrl(updated);
-    if (!meetUrl) {
+    let meetUrl = campus ? '' : extractMeetUrl(updated);
+    if (!campus && !meetUrl) {
       try { meetUrl = extractMeetUrl(Calendar.Events.get(CONFIG.CALENDAR_ID, eventId)); } catch (e) {}
     }
     try {
-      sendVisitorConfirmation({name, email, startDate, endDate, visitor_tz, meetUrl, eventId});
+      sendVisitorConfirmation({name, email, startDate, endDate, visitor_tz, meetUrl, locChoice, eventId});
     } catch (err) {
       console.error('approve confirmation email failed:', err);
     }
     return resultPage('Meeting confirmed',
-      name + ' is booked for ' + whenMt + ', and a confirmation with the Google Meet link is on its way to them.', true);
+      name + ' is booked for ' + whenMt + ', and a confirmation is on its way to them — ' +
+      (campus ? 'with your office address (' + CONFIG.OFFICE_LOCATION + ').' : 'with the Google Meet link.'), true);
   } finally {
     lock.releaseLock();
   }

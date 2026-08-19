@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Schedule a meeting — Devin Stein</title>
-<meta name="description" content="Schedule a meeting with Devin Stein. 30-minute slots on Google Meet, Mon–Fri, Mountain Time.">
+<meta name="description" content="Schedule a meeting with Devin Stein. 30-minute slots on Google Meet or in my office at Rockwell Hall 237, Mon–Fri, Mountain Time.">
 <link rel="icon" href="/favicon.ico?v=3" sizes="any">
 <link rel="icon" type="image/svg+xml" href="/img/favicon.svg?v=3">
 <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png?v=3">
@@ -49,6 +49,17 @@ body { background:#1b2027; color:var(--fg-1); font-family:var(--serif); -webkit-
 @keyframes auroraShift { 0% { transform:translate3d(0,0,0) scale(1); } 50% { transform:translate3d(0,-2%,0) scale(1.04); } 100% { transform:translate3d(0,0,0) scale(1); } }
 .sched-input::placeholder { color:var(--fg-4); font-style:italic; }
 .sched-input:focus { outline:none; border-color:color-mix(in srgb, var(--turquoise) 70%, transparent); box-shadow:0 0 0 3px color-mix(in srgb, var(--turquoise) 18%, transparent), inset 0 1px 0 rgba(255,255,255,.12); }
+/* Mode-safe: --white is #ffffff in day mode, so white-alpha tints (as the text
+   inputs use) vanish on the cream background. Keyed to --rule/--fg-4 instead so
+   the unselected option stays visible in both Foolscap and Sectional. */
+.loc-opt { display:flex; align-items:flex-start; gap:.6rem; cursor:pointer; padding:.7rem .85rem; border-radius:9px; background:color-mix(in srgb, var(--bg-sink) 42%, transparent); border:.5px solid var(--rule); transition:border-color .2s, background .2s, box-shadow .2s; }
+.loc-opt:hover { border-color:color-mix(in srgb, var(--turquoise) 55%, transparent); }
+.loc-opt input { appearance:none; -webkit-appearance:none; margin:.18rem 0 0; flex:none; width:14px; height:14px; border-radius:50%; background:transparent; border:1.5px solid var(--fg-4); transition:border-color .2s, box-shadow .2s; }
+.loc-opt input:checked { border-color:var(--turquoise); box-shadow:inset 0 0 0 3px var(--turquoise); }
+.loc-opt input:focus-visible { outline:2px solid color-mix(in srgb, var(--turquoise) 60%, transparent); outline-offset:2px; }
+.loc-opt:has(input:checked) { background:color-mix(in srgb, var(--turquoise) 12%, transparent); border-color:color-mix(in srgb, var(--turquoise) 48%, transparent); }
+.loc-title { font-family:var(--sans); font-size:12.5px; font-weight:600; color:var(--fg-1); }
+.loc-sub { font-family:var(--sans); font-size:11px; color:var(--fg-3); line-height:1.45; margin-top:2px; }
 .sched-navlink:hover { border-bottom:1px solid var(--turquoise) !important; }
 .cf-turnstile { min-height:65px; }
 [hidden] { display:none !important; }
@@ -102,6 +113,7 @@ body { background:#1b2027; color:var(--fg-1); font-family:var(--serif); -webkit-
   .sched-grid > div:first-child{ border-right:none !important;
     border-bottom:.5px solid color-mix(in srgb, var(--white) 8%, transparent) !important; }
   .sched-grid > div{ min-height:0 !important; }
+  .sched-loc{ grid-template-columns:1fr !important; }
 
   /* --- research constellation --- */
   #rc-container{ padding-left:.5rem !important; padding-right:.5rem !important; }
@@ -182,7 +194,7 @@ body { background:#1b2027; color:var(--fg-1); font-family:var(--serif); -webkit-
           Book a meeting
         </div>
         <h1 class="big-title" style="font-family:var(--display-roman); font-weight:400; font-size:3.1rem; line-height:1.02; letter-spacing:.01em; color:var(--ink); margin-bottom:10px;">Schedule <span style="color:var(--turquoise);">a meeting</span></h1>
-        <p style="font-family:var(--serif); font-style:italic; font-weight:300; font-size:1.3rem; color:var(--fg-2); line-height:1.4; max-width:30em;">Thirty minutes, on Google Meet.</p>
+        <p style="font-family:var(--serif); font-style:italic; font-weight:300; font-size:1.3rem; color:var(--fg-2); line-height:1.4; max-width:30em;">Thirty minutes &mdash; on Google Meet, or in my office at Rockwell Hall 237.</p>
       </div>
       <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
         <div id="tzLine" style="font-family:var(--mono); font-size:9.5px; color:var(--fg-3); letter-spacing:.04em; text-align:right;"></div>
@@ -253,6 +265,25 @@ body { background:#1b2027; color:var(--fg-1); font-family:var(--serif); -webkit-
               <input class="sched-input" name="email" type="email" autocomplete="email" style="font-family:var(--serif); font-size:1rem; color:var(--ink); background:color-mix(in srgb, var(--white) 6%, transparent); border:.5px solid color-mix(in srgb, var(--white) 14%, transparent); padding:.7rem .9rem; border-radius:9px; box-shadow:inset 0 1px 0 rgba(255,255,255,.08); transition:border-color .2s, box-shadow .2s; width:100%;">
             </div>
           </div>
+          <fieldset style="border:0; margin:0 0 1rem; padding:0; display:flex; flex-direction:column; gap:.5rem;">
+            <legend style="font-family:var(--sans); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.12em; color:var(--fg-3); padding:0; margin-bottom:.15rem;">Where should we meet?</legend>
+            <div class="sched-loc" style="display:grid; grid-template-columns:1fr 1fr; gap:.6rem;">
+              <label class="loc-opt">
+                <input type="radio" name="location" value="virtual" checked>
+                <span>
+                  <span class="loc-title">Virtually</span>
+                  <span class="loc-sub" style="display:block;">I&rsquo;ll send a Google Meet link with the confirmation.</span>
+                </span>
+              </label>
+              <label class="loc-opt">
+                <input type="radio" name="location" value="campus">
+                <span>
+                  <span class="loc-title">On campus</span>
+                  <span class="loc-sub" style="display:block;">My office &mdash; Rockwell Hall 237, CSU.</span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
           <div style="display:flex; flex-direction:column; gap:.35rem; margin-bottom:1rem;">
             <label style="font-family:var(--sans); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.12em; color:var(--fg-3);">What would you like to discuss?</label>
             <textarea class="sched-input" name="purpose" placeholder="A sentence or two &mdash; this helps me confirm the right meeting." style="font-family:var(--serif); font-size:1rem; color:var(--ink); background:color-mix(in srgb, var(--white) 6%, transparent); border:.5px solid color-mix(in srgb, var(--white) 14%, transparent); padding:.7rem .9rem; border-radius:9px; box-shadow:inset 0 1px 0 rgba(255,255,255,.08); min-height:84px; resize:vertical; width:100%;"></textarea>
@@ -527,6 +558,8 @@ document.getElementById('bookForm').addEventListener('submit', async function(e)
   var name = form.name.value.trim();
   var email = form.email.value.trim();
   var purpose = form.purpose.value.trim();
+  var locEl = form.querySelector('input[name="location"]:checked');
+  var locChoice = locEl ? locEl.value : 'virtual';
   var turnstileEl = form.querySelector('[name="cf-turnstile-response"]');
   var turnstileToken = turnstileEl ? turnstileEl.value : '';
 
@@ -538,7 +571,7 @@ document.getElementById('bookForm').addEventListener('submit', async function(e)
 
   submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
   try {
-    var body = new URLSearchParams({ action:'book', name:name, email:email, purpose:purpose,
+    var body = new URLSearchParams({ action:'book', name:name, email:email, purpose:purpose, location:locChoice,
       start:state.selectedSlot.start, end:state.selectedSlot.end, visitor_tz:state.visitorTz, turnstile_token:turnstileToken });
     var res = await fetch(SCHEDULER_ENDPOINT, { method:'POST', body:body });
     var json = await res.json();
@@ -548,7 +581,7 @@ document.getElementById('bookForm').addEventListener('submit', async function(e)
       try { window.turnstile && window.turnstile.reset(); } catch(e){}
       return;
     }
-    showSuccess(json, { name:name, email:email });
+    showSuccess(json, { name:name, email:email, location:locChoice });
   } catch(err){
     showError('Something went wrong on our end. Please try again, or email me directly.');
     submitBtn.disabled = false; submitBtn.textContent = 'Request this time';
@@ -577,9 +610,14 @@ function showSuccess(json, who){
   var firstName = (who.name || '').trim().split(/\s+/)[0];
   if (json.status === 'pending'){
     document.getElementById('successHeading').textContent = 'Request sent for ' + visitorFmt + '.';
+    var campus = who.location === 'campus';
     document.getElementById('successDetail').innerHTML =
-      'Thanks' + (firstName ? ', ' + firstName : '') + " — I'll review your request and email a confirmation with the " +
-      'Google Meet link to <strong>' + who.email + '</strong>, usually within a day. That time is held for you in the meantime.';
+      'Thanks' + (firstName ? ', ' + firstName : '') + " — I'll review your request and email a confirmation to " +
+      '<strong>' + who.email + '</strong>, usually within a day' +
+      (campus
+        ? ", with directions to my office (Rockwell Hall 237)."
+        : ', with the Google Meet link.') +
+      ' That time is held for you in the meantime.';
     document.getElementById('successCancel').innerHTML =
       "Need to change something before it's confirmed? Just reply to that email, or " +
       '<a href="mailto:devin.stein@colostate.edu?subject=Meeting request" style="color:var(--turquoise); text-decoration:none; border-bottom:1px solid color-mix(in srgb, var(--turquoise) 40%, transparent);">email me</a> directly.';
